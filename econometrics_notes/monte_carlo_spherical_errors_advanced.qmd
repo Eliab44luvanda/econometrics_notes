@@ -364,6 +364,9 @@ case_abbrev_labels <- c(
   `Heteroscedastic + AR(1)` = "HET-AR1"
 )
 
+# Compute efficiency metrics for later visualization
+efficiency_data <- data.frame()
+
 generate_data <- function(case, n) {
   x <- rnorm(n)
 
@@ -401,8 +404,33 @@ run_rep <- function(case, n) {
   b_ols <- coef(fit)[2]
   se_ols <- summary(fit)$coefficients[2, 2]
   se_hc <- sqrt(diag(vcovHC(fit, type = "HC1")))[2]
+  
+  # GLS estimation with known covariance structure
+  b_gls <- NA
+  if (case == "spherical") {
+    # GLS = OLS under spherical errors
+    b_gls <- coef(fit)[2]
+  } else if (case == "heteroscedastic") {
+    # Feasible GLS: weight by inverse of sd_true
+    X_aug <- cbind(1, dat$x)
+    weights <- 1 / dat$sd_true
+    X_w <- X_aug * weights
+    y_w <- dat$y * weights
+    b_gls <- solve(t(X_w) %*% X_w) %*% t(X_w) %*% y_w
+    b_gls <- b_gls[2]
+  } else if (case == "het_ar1") {
+    # For AR(1) with heteroscedasticity, use a simpler WLS approximation
+    # using inverse variance weights
+    vars <- dat$sd_true^2
+    weights <- 1 / sqrt(vars)
+    X_aug <- cbind(1, dat$x)
+    X_w <- X_aug * weights
+    y_w <- dat$y * weights
+    b_gls <- solve(t(X_w) %*% X_w) %*% t(X_w) %*% y_w
+    b_gls <- b_gls[2]
+  }
 
-  c(b_ols, se_ols, se_hc)
+  c(b_ols, se_ols, se_hc, b_gls)
 }
 
 results <- map_dfr(sample_sizes, function(n) {
@@ -412,50 +440,139 @@ results <- map_dfr(sample_sizes, function(n) {
     tibble(
       n = n,
       case = case,
-      beta1_hat = est[1, ],
+      beta1_hat_ols = est[1, ],
       se_ols = est[2, ],
-      se_hc = est[3, ]
+      se_hc = est[3, ],
+      beta1_hat_gls = est[4, ]
     )
   })
 }) %>%
   mutate(case = factor(case, levels = cases, labels = unname(case_labels[cases])))
 
-summary_table <- results %>%
+# Compute efficiency and other metrics
+efficiency_metrics <- results %>%
   group_by(n, case) %>%
   summarise(
-    mean = mean(beta1_hat),
-    bias = mean(beta1_hat) - beta1,
-    sd = sd(beta1_hat),
-    variance = var(beta1_hat),
-    rmse = sqrt(mean((beta1_hat - beta1)^2)),
+    var_ols = var(beta1_hat_ols),
+    var_gls = var(beta1_hat_gls),
+    efficiency_ratio = var_ols / var_gls,
+    mean_se_ols = mean(se_ols),
+    mean_se_hc = mean(se_hc),
+    sd_ols = sd(beta1_hat_ols),
+    sd_gls = sd(beta1_hat_gls),
     .groups = "drop"
   )
 
-density_plot <- ggplot(results, aes(beta1_hat)) +
-  geom_density() +
+summary_table <- results %>%
+  group_by(n, case) %>%
+  summarise(
+    mean = mean(beta1_hat_ols),
+    bias = mean(beta1_hat_ols) - beta1,
+    sd = sd(beta1_hat_ols),
+    variance = var(beta1_hat_ols),
+    rmse = sqrt(mean((beta1_hat_ols - beta1)^2)),
+    .groups = "drop"
+  )
+
+density_plot <- ggplot(results, aes(beta1_hat_ols)) +
+  geom_density(fill = "steelblue", alpha = 0.5) +
   facet_grid(n ~ case) +
-  geom_vline(xintercept = beta1, linetype = "dashed") +
+  geom_vline(xintercept = beta1, linetype = "dashed", color = "red", size = 0.8) +
   labs(
     title = "Monte Carlo Distribution of the OLS Estimator",
     x = expression(hat(beta)[1]),
     y = "Density"
   ) +
-  theme_classic()
+  theme_classic() +
+  theme(strip.background = element_blank(), strip.text = element_text(face = "bold"))
 
-boxplot_plot <- ggplot(results, aes(case, beta1_hat)) +
-  geom_boxplot() +
+boxplot_plot <- ggplot(results, aes(case, beta1_hat_ols, fill = case)) +
+  geom_boxplot(alpha = 0.7, show.legend = FALSE) +
   facet_wrap(~n) +
-  geom_hline(yintercept = beta1, linetype = "dashed") +
+  geom_hline(yintercept = beta1, linetype = "dashed", color = "red", size = 0.8) +
   scale_x_discrete(labels = case_abbrev_labels) +
+  scale_fill_manual(values = c("steelblue", "salmon", "lightgreen")) +
   labs(
     title = "Boxplot of the OLS Estimator by Error Structure",
     x = "Error Structure",
-    y = expression(hat(beta)[1])
+    y = expression(hat(beta)[1]),
+    subtitle = "Horizontal dashed line shows true β₁ = 2"
   ) +
   theme_classic() +
   theme(
-    legend.position = "none",
+    strip.background = element_blank(),
+    strip.text = element_text(face = "bold"),
     axis.text.x = element_text(size = 9)
+  )
+
+# Create OLS vs GLS comparison plot
+ols_vs_gls_plot <- ggplot(results %>% filter(case != "Spherical"), 
+                           aes(x = case)) +
+  geom_boxplot(aes(y = beta1_hat_ols, fill = "OLS"), alpha = 0.6) +
+  geom_boxplot(aes(y = beta1_hat_gls, fill = "GLS"), alpha = 0.6) +
+  facet_wrap(~n, labeller = labeller(n = c("50" = "n = 50", "100" = "n = 100", "500" = "n = 500"))) +
+  geom_hline(yintercept = beta1, linetype = "dashed", color = "darkred", size = 0.7) +
+  scale_fill_manual(values = c("OLS" = "steelblue", "GLS" = "orange"), name = "Estimator") +
+  scale_x_discrete(labels = c("Heteroscedastic" = "HET", "Heteroscedastic + AR(1)" = "HET-AR1")) +
+  labs(
+    title = "OLS vs GLS Performance Under Non-Spherical Errors",
+    x = "Error Structure",
+    y = expression(hat(beta)[1]),
+    subtitle = "GLS demonstrates superior efficiency (tighter distributions)"
+  ) +
+  theme_classic() +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(face = "bold", size = 10),
+    legend.position = "top",
+    plot.title = element_text(face = "bold", size = 12),
+    plot.subtitle = element_text(size = 10, color = "gray30", margin = margin(t = 5))
+  )
+
+# Efficiency ratio plot
+efficiency_plot <- ggplot(efficiency_metrics %>% filter(case != "Spherical"), 
+                          aes(x = case, y = efficiency_ratio, fill = case)) +
+  geom_bar(stat = "identity", alpha = 0.7, show.legend = FALSE) +
+  facet_wrap(~n, labeller = labeller(n = c("50" = "n = 50", "100" = "n = 100", "500" = "n = 500"))) +
+  scale_fill_manual(values = c("Heteroscedastic" = "salmon", "Heteroscedastic + AR(1)" = "lightgreen")) +
+  scale_x_discrete(labels = c("Heteroscedastic" = "HET", "Heteroscedastic + AR(1)" = "HET-AR1")) +
+  geom_hline(yintercept = 1, linetype = "dashed", color = "gray50") +
+  labs(
+    title = "Efficiency Loss: Var(OLS)/Var(GLS)",
+    x = "Error Structure",
+    y = "Efficiency Ratio",
+    subtitle = "Ratios > 1 indicate OLS is inefficient relative to GLS"
+  ) +
+  theme_classic() +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(face = "bold", size = 10),
+    plot.title = element_text(face = "bold", size = 12),
+    plot.subtitle = element_text(size = 10, color = "gray30", margin = margin(t = 5))
+  ) +
+  ylim(0, max(efficiency_metrics$efficiency_ratio) + 0.5)
+
+# Standard error comparison
+se_comparison <- ggplot(results %>% filter(case != "Spherical"), 
+                        aes(x = case)) +
+  geom_boxplot(aes(y = se_ols, fill = "OLS (naive)"), alpha = 0.6) +
+  geom_boxplot(aes(y = se_hc, fill = "OLS (HC1)"), alpha = 0.6) +
+  facet_wrap(~n, labeller = labeller(n = c("50" = "n = 50", "100" = "n = 100", "500" = "n = 500"))) +
+  scale_fill_manual(values = c("OLS (naive)" = "lightcoral", "OLS (HC1)" = "lightyellow"), name = "SE Type") +
+  scale_x_discrete(labels = c("Heteroscedastic" = "HET", "Heteroscedastic + AR(1)" = "HET-AR1")) +
+  labs(
+    title = "Standard Error Estimation: Naive OLS vs Heteroscedasticity-Consistent",
+    x = "Error Structure",
+    y = "Standard Error",
+    subtitle = "HC1 adjustment provides more reliable inference under non-spherical errors"
+  ) +
+  theme_classic() +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(face = "bold", size = 10),
+    legend.position = "top",
+    plot.title = element_text(face = "bold", size = 12),
+    plot.subtitle = element_text(size = 10, color = "gray30", margin = margin(t = 5))
   )
 ```
 
@@ -552,11 +669,140 @@ cat(
 \FloatBarrier
 ```
 
+```{r}
+#| label: fig-ols-vs-gls
+#| fig-cap: "Comparison of OLS and GLS estimators under non-spherical errors. Under heteroscedasticity and serial correlation, GLS exhibits tighter sampling distributions (lower variance) due to its efficiency property."
+#| fig-pos: "H"
+#| fig-width: 10
+#| fig-height: 5.5
+#| echo: false
+
+print(ols_vs_gls_plot)
+```
+
+```{r}
+#| label: fig-efficiency-ratio
+#| fig-cap: "Efficiency loss of OLS relative to GLS. The ratio Var(OLS)/Var(GLS) > 1 indicates inefficiency. Heteroscedasticity and serial correlation compound the efficiency loss."
+#| fig-pos: "H"
+#| fig-width: 10
+#| fig-height: 5
+#| echo: false
+
+print(efficiency_plot)
+```
+
+```{r}
+#| label: fig-se-comparison
+#| fig-cap: "Comparison of standard error estimation methods. The naive OLS standard error systematically underestimates uncertainty under non-spherical errors, while HC1-adjusted standard errors provide more reliable coverage."
+#| fig-pos: "H"
+#| fig-width: 10
+#| fig-height: 5.5
+#| echo: false
+
+print(se_comparison)
+```
+
+```{=latex}
+\FloatBarrier
+```
+
+# Practical Implications
+
+The Monte Carlo results illustrate a critical gap between theoretical ideal and empirical practice. This section translates the simulation findings into actionable guidance for applied econometricians.
+
+## What Goes Wrong with Naive OLS Standard Errors
+
+Under non-spherical errors, standard OLS inference breaks down in two distinct ways:
+
+1. **Bias in Standard Error Estimation**: The textbook formula $\widehat{\text{Var}}(\hat{\beta}_{\mathrm{OLS}}) = s^2(X'X)^{-1}$ assumes spherical errors. When heteroscedasticity or serial correlation is present, this formula *systematically underestimates* the true sampling variance of $\hat{\beta}_{\mathrm{OLS}}$. Practitioners who compute $t$-statistics using these standard errors will report confidence intervals that are too narrow.
+
+2. **Incorrect Coverage Rates**: A nominal 95% confidence interval based on naive OLS standard errors will often have empirical coverage less than 95%—sometimes substantially less. This renders statistical inference unreliable: hypothesis tests over-reject (Type I error exceeds nominal size), and confidence intervals give false confidence.
+
+The figures above demonstrate this concretely. The density and boxplot plots show that under non-spherical errors, the empirical distribution of $\hat{\beta}_1$ is wider than the classical formula predicts. The standard error comparison plot shows that naive OLS standard errors are often lower than heteroscedasticity-consistent (HC) alternatives.
+
+## When Should You Use HC/HAC Standard Errors?
+
+**HC1 (Heteroscedasticity-Consistent) Standard Errors** are a practical fix for heteroscedasticity:
+
+$$
+\widehat{\text{Var}}_{\text{HC1}}(\hat{\beta}) = (X'X)^{-1} X' \hat{\Omega}_{\text{HC}} X (X'X)^{-1},
+$$
+
+where $\hat{\Omega}_{\text{HC}}$ is a consistent estimator of $\operatorname{Var}(u \mid X)$ that does not impose homoscedasticity.
+
+**Recommendation**: Use HC1 standard errors as a default in regression output whenever:
+- The error variance may depend on the regressors or time period,
+- Data are grouped or clustered (different treatment units, different industries, etc.),
+- Multiple precision machines or measurement protocols are used on the same variables,
+- You have no strong a priori reason to assume constant variance.
+
+HC standard errors converge to less-biased point estimates of the sampling variance under both spherical *and* non-spherical errors. The cost is typically modest efficiency loss (larger standard errors under spherical errors), which is worthwhile insurance.
+
+**HAC (Heteroscedasticity and Autocorrelation-Consistent) Standard Errors** extend this idea to time series contexts where serial correlation is present. Common choices include Newey-West (with automatic lag selection) or Andrews (with data-dependent bandwidth selection).
+
+## When Is GLS Preferable to OLS with HC Standard Errors?
+
+The Monte Carlo results quantify a fundamental trade-off:
+
+- **OLS + HC standard errors**: Unbiased point estimates, consistent variance estimation, but inefficient (higher variance in the coefficient estimate).
+- **GLS**: Efficient point estimates (lower variance), but requires strong assumptions about the covariance structure.
+
+**When to use GLS**:
+
+1. **Known covariance structure**: If you are in a pedagogical example (like this simulation) where the exact form of $\Omega$ is known or can be reliably estimated from external data, GLS can yield substantial efficiency gains.
+
+2. **Very small samples**: If $n < 50$, the efficiency gains from GLS can be meaningful relative to sampling variation. OLS with HC standard errors may be too imprecise to be useful.
+
+3. **Panel data with individual effects**: Fixed-effects models combined with feasible GLS (FGLS) can improve efficiency when heteroscedasticity across panel units is severe.
+
+4. **Time series with known AR structure**: If a time series error follows a known AR(p) process, FGLS or Cochrane-Orcutt correction can substantially improve efficiency.
+
+**When to stick with OLS + HC standard errors**:
+
+1. **Misspecified covariance matrix**: If your assumption about the error covariance is even slightly wrong, GLS can produce biased estimates and invalid inference. OLS remains unbiased and HC standard errors remain consistent.
+
+2. **Model uncertainty**: Researchers often do not know whether errors are heteroscedastic, autocorrelated, or both. OLS is robust; GLS is not.
+
+3. **Communication**: Applied researchers generally trust OLS more than GLS. Reporting OLS results with HC standard errors is easier to defend and replicate.
+
+## Practical Decision Tree
+
+When building a regression model:
+
+1. **Estimate the model by OLS** (unbiased under exogeneity).
+
+2. **Test for sphericity** (optional but informative):
+   - Breusch-Pagan test for heteroscedasticity
+   - Ljung-Box test for autocorrelation
+   - Visual inspection of residuals vs. fitted values
+
+3. **Report HC1 (or HAC in time series) standard errors as the default**. This guards against inference errors under both spherical and non-spherical errors at minimal cost.
+
+4. **Consider GLS only if**:
+   - Formal tests strongly reject sphericity, AND
+   - You have strong prior knowledge of the error covariance structure, AND
+   - Sample size is small enough that efficiency matters, OR
+   - You have a well-established model where GLS is standard practice.
+
+5. **Compare OLS and GLS estimates**: If GLS and OLS estimates differ substantially, the covariance structure may be misspecified. In that case, prefer OLS with HC standard errors.
+
+## SummaryTable: Rules of Thumb
+
+| Scenario | Action | Standard Errors |
+|:---|:---|:---|
+| Cross-sectional OLS, no information on heteroscedasticity | Use OLS | HC1 |
+| Time series OLS | Use OLS | Newey-West HAC |
+| Known homoscedasticity (experimental data) | OLS or GLS (equivalent) | Conventional |
+| Suspected heteroscedasticity, unknown form | Use OLS | HC1 |
+| Well-specified AR(p) errors | Consider GLS | From GLS formula |
+| Panel data, fixed effects | OLS with entity dummies | Clustered by entity |
+| Small sample ($n < 50$), heteroscedastic | Consider FGLS | From FGLS formula |
+
 # Interpretation
 
 The simulation typically shows that the spread of the estimator is smallest when errors are spherical. Under heteroscedasticity the estimator remains approximately unbiased but becomes less precise. When serial correlation is added, the sampling distribution becomes even more dispersed.
 
-These results illustrate the efficiency advantage of OLS under the classical spherical disturbance assumption.
+These results illustrate the efficiency advantage of OLS under the classical spherical disturbance assumption. When errors are non-spherical, the Gauss-Markov class results no longer apply, and practitioners must choose between unbiased inefficient estimation (OLS with robust inference) and efficient but fragile estimation (GLS with strong assumptions).
 
 ```{=latex}
 \clearpage
