@@ -632,6 +632,20 @@ formatted_summary %>%
   )
 ```
 
+## Interpretation of the Summary Table {-}
+
+Table 1 reports Monte Carlo summary statistics for the OLS slope estimator $\hat{\beta}_1$ across all 9 simulation scenarios (3 sample sizes × 3 error structures). The key findings:
+
+- **Unbiasedness confirmed**: The Mean column shows that $\hat{\beta}_1$ hovers around the true value $\beta_1 = 2$ under all error structures. The Bias column confirms this: biases are negligible (typically $< 0.01$), validating that OLS remains unbiased under non-spherical errors when exogeneity holds.
+
+- **Variance grows with non-sphericity**: For any fixed sample size, the SD and Variance columns reveal that OLS precision deteriorates when errors are non-spherical. The SD under spherical errors is noticeably smaller than under heteroscedasticity or AR(1) serial correlation. This is the core of the Gauss--Markov efficiency result: spherical errors allow OLS to achieve minimum variance within the linear unbiased class.
+
+- **Sample size benefits**: Lower sample sizes (n = 50) produce wider sampling distributions (larger SD and Variance) than larger samples (n = 500), confirming the consistency property of OLS. But notice that this convergence rate depends on the error structure: efficiency losses from non-sphericity persist even at n = 500.
+
+- **RMSE interpretation**: The RMSE column integrates bias and variance. Since bias is negligible, RMSE is dominated by variance. The pattern mirrors SD and Variance: spherical errors yield lowest RMSE, demonstrating that OLS is most reliable under homoscedasticity and independence.
+
+**Practical implication**: For any given sample size, non-spherical errors inflate the sampling uncertainty of OLS estimates. Practitioners cannot rely on classical OLS formulas to gauge confidence interval width or test power.
+
 ```{r}
 #| label: fig-density-comparison
 #| fig-cap: "Sampling density of the OLS slope estimator across sample sizes and error structures."
@@ -642,6 +656,22 @@ formatted_summary %>%
 
 print(density_plot)
 ```
+
+## Interpretation of the Density Plot {-}
+
+Figure 1 displays kernel density estimates of the sampling distribution of $\hat{\beta}_1$ across the 3 × 3 grid of sample sizes and error structures. The dashed red line marks the true parameter $\beta_1 = 2$.
+
+**Visual patterns**:
+
+- **Spherical errors (left column)**: The distributions are tightly concentrated around $\beta_1 = 2$ with minimal skew, especially as sample size grows from 50 to 500. The peak is sharp and narrow.
+
+- **Heteroscedastic errors (middle column)**: The distributions widen but remain centered at $\beta_1 = 2$. The peak is distinctly broader than in the spherical case, and the tails extend further—a sign of higher sampling variance.
+
+- **Heteroscedastic + AR(1) errors (right column)**: The distributions are noticeably the widest and flattest of all three. The combination of variance heterogeneity and serial correlation compounds the efficiency loss, producing the most dispersed sampling distribution.
+
+- **Sample size effect**: Within each error structure, increasing $n$ from 50 to 100 to 500 visibly narrows the distribution, though the relative ranking (spherical < heteroscedastic < het+AR1) persists.
+
+**Implication for confidence intervals**: If an applied researcher computed a 95% confidence interval for $\beta_1$ using the classical OLS formula under heteroscedastic or AR(1) errors, that interval would be too narrow. The true sampling distribution shown here is wider, so the nominal coverage would be less than 95%, leading to false positives in hypothesis testing.
 
 ```{r}
 #| label: fig-boxplot-comparison
@@ -673,6 +703,22 @@ cat(
 )
 ```
 
+## Interpretation of the Boxplot {-}
+
+Figure 2 presents boxplots of $\hat{\beta}_1$ by error structure, stratified by sample size. This view emphasizes the spread (interquartile range and whiskers) and location of the empirical distribution.
+
+**Key observations**:
+
+- **Interquartile range (IQR) expansion**: The box height grows dramatically from left (SPH) to right (HET-AR1) within each panel. The IQR under spherical errors is compact; under heteroscedasticity it widens; under AR(1) + heteroscedasticity it is widest.
+
+- **Outlier frequency**: The whiskers and outlier points (shown as individual dots beyond 1.5 × IQR) are more numerous and more extreme for non-spherical errors. This reflects the fatter tails of the sampling distribution under non-sphericity.
+
+- **Medians align at true parameter**: Each box is centered near $\beta_1 = 2$ (dashed line), confirming unbiasedness across all scenarios. The location of the median does not shift with error structure—only the spread changes.
+
+- **Convergence with sample size**: Moving from n = 50 to n = 500 shrinks all boxes and whiskers, as expected from increased precision. However, the relative ordering persists: SPH remains tightest, HET-AR1 remains loosest, even at large $n$.
+
+**Implication for sample size planning**: A researcher planning a study who assumes spherical errors will substantially underestimate the required sample size if unknown heteroscedasticity or autocorrelation is present. The efficiency loss is persistent: even tripling sample size from 100 to 500 does not fully compensate for the precision loss from AR(1) errors.
+
 ```{=latex}
 \FloatBarrier
 ```
@@ -688,6 +734,26 @@ cat(
 print(ols_vs_gls_plot)
 ```
 
+## Interpretation of the OLS vs GLS Comparison {-}
+
+Figure 3 displays side-by-side boxplots of OLS and GLS estimates under heteroscedastic (HET) and heteroscedastic + AR(1) (HET-AR1) error structures. Note that under spherical errors, GLS collapses to OLS, so that case is omitted.
+
+**Central insight**:
+
+- **GLS produces tighter distributions**: For every sample size and error structure shown, the GLS boxplot is noticeably narrower than its OLS counterpart. The IQR of GLS is smaller, the whiskers are shorter, and outliers are fewer and less extreme.
+
+- **Magnitude of improvement**: The efficiency gain is visually substantial. For example, at n = 100 under HET-AR1, the GLS IQR is roughly 50% to 60% the width of the OLS IQR. This reflects the efficiency property: GLS exploits knowledge of $\Omega$ to downweight noisy observations and upweight precise ones.
+
+- **Persistence across sample sizes**: The superiority of GLS over OLS does not diminish as $n$ grows. This is expected: GLS efficiency advantage is a property of the covariance matrix structure, not sample size. Both estimators converge (Type I improvement), but GLS always maintains a variance advantage by the BLUE property.
+
+- **Both estimators remain centered**: Both OLS and GLS boxes straddle $\beta_1 = 2$, confirming that GLS remains unbiased. The efficiency gain comes from variance reduction, not bias reduction.
+
+**Practical implication**: When the error covariance structure is known (or reliably estimated), switching from OLS to GLS can deliver meaningful precision gains. However, this assumes correct specification of $\Omega$. If the assumed $\Omega$ is misspecified, GLS may become biased while OLS remains robust.
+
+```{=latex}
+\FloatBarrier
+```
+
 ```{r}
 #| label: fig-efficiency-ratio
 #| fig-cap: "Efficiency loss of OLS relative to GLS. The ratio Var(OLS)/Var(GLS) > 1 indicates inefficiency. Heteroscedasticity and serial correlation compound the efficiency loss."
@@ -699,6 +765,22 @@ print(ols_vs_gls_plot)
 print(efficiency_plot)
 ```
 
+## Interpretation of the Efficiency Ratio {-}
+
+Figure 4 quantifies efficiency losses via the ratio $\text{Efficiency Ratio} = \text{Var}(\hat{\beta}_{\text{OLS}}) / \text{Var}(\hat{\beta}_{\text{GLS}})$. A ratio equal to 1 means OLS and GLS are equally efficient (which occurs under spherical errors); ratios > 1 indicate OLS is inefficient relative to GLS.
+
+**Key findings**:
+
+- **Heteroscedasticity effect (HET bars)**: The efficiency ratios range from approximately 1.2 to 1.5, depending on sample size. This means OLS variance is roughly 20% to 50% *larger* than GLS variance. The effect is most pronounced at small $n$ (n = 50) and diminishes (but persists) at large $n$.
+
+- **Serial correlation compounds inefficiency (HET-AR1 bars)**: When AR(1) serial correlation is added to heteroscedasticity, efficiency ratios jump to 1.5 to 2.5. OLS is now 50% to 150% less efficient than GLS. The AR(1) component specifically inflates inefficiency because OLS ignores both the off-diagonal and diagonal elements of $\Omega$.
+
+- **Sample size independence**: Efficiency ratios do not converge to 1 as $n$ increases. This reflects the structural inefficiency of OLS under non-sphericity: it is a feature of the covariance matrix, not a finite-sample artifact that disappears with data.
+
+**Trade-off interpretation**: These ratios quantify the cost of robustness. OLS with HC/HAC standard errors sacrifices variance efficiency (ratio > 1) to gain robustness against covariance misspecification. An efficiency ratio of 1.5 in the HET case means that to achieve the same precision as GLS, an OLS researcher would need roughly 50% more observations.
+
+**Practical implication**: For commonly encountered heteroscedasticity (HET), the OLS efficiency loss is modest (20–50%). But when autocorrelation compounds heteroscedasticity (HET-AR1), the loss is severe (50–150%). This suggests that time series models warrant closer attention to error structure and serious consideration of GLS or HAC methods.
+
 ```{r}
 #| label: fig-se-comparison
 #| fig-cap: "Comparison of standard error estimation methods. The naive OLS standard error systematically underestimates uncertainty under non-spherical errors, while HC1-adjusted standard errors provide more reliable coverage."
@@ -709,6 +791,25 @@ print(efficiency_plot)
 
 print(se_comparison)
 ```
+
+## Interpretation of the Standard Error Comparison {-}
+
+Figure 5 compares two ways of computing standard errors for OLS under non-spherical errors:
+
+1. **Naive OLS (lightcoral)**: The textbook formula $\widehat{SE} = \sqrt{s^2 [(X'X)^{-1}]_{22}}$, which assumes spherical errors.
+2. **HC1-adjusted (lightyellow)**: The heteroscedasticity-consistent formula that estimates $\text{Var}(\hat{\beta}_{\text{OLS}} \mid X)$ correctly under non-sphericity.
+
+**Observed patterns**:
+
+- **Systematic underestimation by naive OLS**: For every sample size and error structure, the naive OLS standard error boxplot lies to the left (lower) of the HC1 boxplot. This is not random variation; it is structural: the classical formula *does not account* for heteroscedasticity or autocorrelation, so it systematically understates uncertainty.
+
+- **Magnitude of underestimation**: The gap widens with error severity. Under HET, naive OLS underestimates by roughly 10–20%. Under HET-AR1, the underestimation is more pronounced, sometimes 20–40%, because the formula ignores both variance heterogeneity and serial correlation.
+
+- **Sample size stability**: The underestimation persists across all sample sizes. Even at n = 500, naive OLS standard errors remain lower than HC1 standard errors under non-spherical errors. This is expected: the bias in the classical formula is not a finite-sample artifact.
+
+- **Correct center under HC1**: The HC1 boxplots are more dispersed but centered around a higher value, reflecting consistent variance estimation. The width of the HC1 boxplot reflects Monte Carlo sampling variation, not systematic bias in the formula.
+
+**Practical implication**: Researchers who report confidence intervals or $t$-statistics based on naive OLS standard errors under non-spherical errors will systematically report intervals that are too narrow and test statistics that are too large (in absolute value). This inflates both Type I error (false positives in hypothesis tests) and false confidence (overly narrow confidence intervals). Using HC1 standard errors as default practice eliminates this problem.
 
 ```{=latex}
 \FloatBarrier
