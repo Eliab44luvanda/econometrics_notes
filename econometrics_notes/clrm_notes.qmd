@@ -1,0 +1,1510 @@
+---
+title: "Classical Linear Regression Model (CLRM)"
+subtitle: "MA Econometrics — Lecture Notes"
+author: "Eliab Luvanda"
+date: today
+lang: en
+
+toc: true
+toc-depth: 3
+number-sections: true
+lof: true
+lot: true
+
+bibliography: references.bib
+csl: chicago-author-date.csl
+citeproc: true
+
+execute:
+  echo: true
+  warning: false
+  message: false
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    classoption: [twoside]
+    fontsize: 11pt
+    papersize: a4
+
+    geometry:
+      - inner=1.25in
+      - outer=1.00in
+      - top=1.05in
+      - bottom=1.10in
+      - headsep=0.25in
+      - footskip=0.35in
+  #tbl-cap-location: top
+  #table-use-booktabs: true
+
+    linestretch: 1.08
+
+    mainfont: "Palatino"
+    mainfontoptions:
+      - Ligatures=TeX
+      - Numbers=OldStyle
+    sansfont: "TeX Gyre Heros"
+    monofont: "Latin Modern Mono"
+    # mathfont: "TeX Gyre Termes Math"  # enable only if installed
+
+    colorlinks: true
+    linkcolor: black
+    urlcolor: black
+    citecolor: black
+
+    keep-tex: true
+    fig-pos: "tbp"
+    tbl-pos: "tbp"
+
+    include-in-header:
+      - text: |
+          % ---- Packages / typography ----
+          \usepackage{microtype}
+          \usepackage{setspace}
+          \usepackage{booktabs}
+          \usepackage{array}
+          \usepackage{longtable}
+          \usepackage{multirow}
+          \usepackage{mathtools,amsfonts,amssymb,amsthm}
+          \usepackage{amsmath} % (safe even if already loaded)
+          \usepackage{tikz}
+          \usetikzlibrary{positioning}
+
+          % ---- Boxes (tcolorbox) ----
+          \usepackage[most]{tcolorbox}
+
+          % ---- Probability / matrix operators (define ONCE) ----
+          \newcommand{\E}{\mathbb{E}}
+          \DeclareMathOperator{\Var}{Var}
+          \DeclareMathOperator{\Cov}{Cov}
+          \DeclareMathOperator{\tr}{tr}
+          \DeclareMathOperator{\rank}{rank}
+          \DeclareMathOperator{\diag}{diag}
+
+          % ---- Numbered remark box (shares section numbering) ----
+          \newtcbtheorem[
+            number within=section
+          ]{remarkbox}{Remark}{
+            colback=gray!6,
+            colframe=black!40,
+            fonttitle=\bfseries,
+            boxrule=0.4pt,
+            arc=2pt,
+            left=6pt,
+            right=6pt,
+            top=6pt,
+            bottom=6pt
+          }{remark}
+
+          % ---- Robust bold-math macro usable in TEXT or MATH ----
+          % (Fixes: "LaTeX Error: \symbf allowed only in math mode.")
+          \makeatletter
+          \@ifundefined{symbf}{%
+            \newcommand{\symbf}[1]{\ensuremath{\boldsymbol{#1}}}%
+          }{%
+            \renewcommand{\symbf}[1]{\ensuremath{\boldsymbol{#1}}}%
+          }
+          \makeatother
+          \DeclareRobustCommand{\betahat}{\ensuremath{\widehat{\symbf{\beta}}}}
+
+          \usepackage{fancyhdr}
+          \usepackage{titlesec}
+          \usepackage{enumitem}
+          \usepackage{caption}
+          \usepackage{tocloft}
+          \usepackage{thmtools}
+          \AtEndPreamble{%
+            \usepackage[nameinlink,noabbrev]{cleveref}
+            \crefname{theorem}{Theorem}{Theorems}
+            \crefname{proposition}{Proposition}{Propositions}
+            \crefname{lemma}{Lemma}{Lemmas}
+            \crefname{corollary}{Corollary}{Corollaries}
+            \crefname{definition}{Definition}{Definitions}
+            \crefname{assumption}{Assumption}{Assumptions}
+            \crefname{example}{Example}{Examples}
+            \crefname{remark}{Remark}{Remarks}
+            \crefname{exercise}{Exercise}{Exercises}
+            \Crefname{theorem}{Theorem}{Theorems}
+            \Crefname{proposition}{Proposition}{Propositions}
+            \Crefname{lemma}{Lemma}{Lemmas}
+            \Crefname{corollary}{Corollary}{Corollaries}
+            \Crefname{definition}{Definition}{Definitions}
+            \Crefname{assumption}{Assumption}{Assumptions}
+            \Crefname{example}{Example}{Examples}
+            \Crefname{remark}{Remark}{Remarks}
+            \Crefname{exercise}{Exercise}{Exercises}
+          }
+
+          % ---- TOC/LOF/LOT tightening (ARTICLE-safe) ----
+          \setlength{\cftbeforesecskip}{2pt}
+          \setlength{\cftbeforesubsecskip}{0pt}
+          \renewcommand{\cftdotsep}{1.5}
+          \setlength{\cftsecnumwidth}{3.0em}
+          \setlength{\cftsubsecnumwidth}{4.0em}
+          \renewcommand{\cftsecfont}{\small}
+          \renewcommand{\cftsubsecfont}{\small}
+          \renewcommand{\cftsecpagefont}{\small}
+          \renewcommand{\cftsubsecpagefont}{\small}
+          \setlength{\cftbeforefigskip}{2pt}
+          \setlength{\cftbeforetabskip}{2pt}
+
+          % ---- Paragraphs / lists (textbook feel) ----
+          \setlength{\parindent}{1.5em}
+          \setlength{\parskip}{0pt}
+          \setlist[itemize]{topsep=4pt,itemsep=2pt,parsep=0pt}
+          \setlist[enumerate]{topsep=4pt,itemsep=2pt,parsep=0pt}
+
+          % ---- Headings (article: sections/subsections only) ----
+          \titleformat{\section}{\normalfont\bfseries\scshape\large}{\thesection}{0.7em}{}
+          \titleformat{\subsection}{\normalfont\bfseries\scshape}{\thesubsection}{0.7em}{}
+          \titleformat{\subsubsection}{\normalfont\bfseries}{\thesubsubsection}{0.7em}{}
+          \titlespacing*{\section}{0pt}{12pt}{6pt}
+          \titlespacing*{\subsection}{0pt}{10pt}{5pt}
+          \titlespacing*{\subsubsection}{0pt}{8pt}{4pt}
+
+          % ---- Two-sided header/footer (article) ----
+          \pagestyle{fancy}
+          \fancyhf{}
+          \fancyhead[LE]{\small\scshape\nouppercase{\rightmark}}
+          \fancyhead[RO]{\small\scshape\nouppercase{\rightmark}}
+          \fancyfoot[CE,CO]{\thepage}
+          \renewcommand{\headrulewidth}{0.2pt}
+          \renewcommand{\footrulewidth}{0pt}
+          \renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+
+          % ---- Captions ----
+          \captionsetup{font=small,labelfont=bf}
+
+          % ---- Proof/QED ----
+          \renewcommand{\qedsymbol}{\(\square\)}
+
+          % ---- Theorem-like environments (numbered by section) ----
+          \theoremstyle{plain}
+          \newtheorem{theorem}{Theorem}[section]
+          \newtheorem{proposition}[theorem]{Proposition}
+          \newtheorem{lemma}[theorem]{Lemma}
+          \newtheorem{corollary}[theorem]{Corollary}
+
+          \theoremstyle{definition}
+          \newtheorem{definition}[theorem]{Definition}
+          \newtheorem{example}[theorem]{Example}
+          \newtheorem{exercise}{Exercise}[section]
+
+          \theoremstyle{remark}
+          \newtheorem{remark}[theorem]{Remark}
+
+          % Assumptions: A1.1, A1.2, ... (by section)
+          \newtheorem{assumption}{Assumption}[section]
+          \renewcommand{\theassumption}{A\thesection.\arabic{assumption}}
+
+          % ---- Boxed blocks (Notation / Regularity Conditions) ----
+          \tcbset{
+            before skip=8pt,
+            after skip=8pt,
+            boxrule=0.4pt,
+            sharp corners,
+            left=6pt,right=6pt,top=6pt,bottom=6pt
+          }
+          \newtcolorbox{notationbox}[1][]{title=\textsc{Notation},#1}
+          \newtcolorbox{regcondbox}[1][]{title=\textsc{Regularity Conditions},#1}
+
+          % ==========================================================
+          % LIST OF RESULTS (Theorems/Lemmas/Assumptions/...)
+          % ==========================================================
+          \renewcommand{\listtheoremname}{List of Results}
+          \newcommand{\printlistofresults}{%
+            \clearpage
+            \listoftheorems[ignoreall,show={theorem,proposition,lemma,corollary,definition,assumption,example,remark}]%
+          }
+          \let\oldtableofcontents\tableofcontents
+          \renewcommand{\tableofcontents}{%
+            \oldtableofcontents
+            \printlistofresults
+          }
+
+          % Display math spacing (slightly tighter)
+          \setlength{\abovedisplayskip}{10pt}
+          \setlength{\belowdisplayskip}{10pt}
+          \setlength{\abovedisplayshortskip}{6pt}
+          \setlength{\belowdisplayshortskip}{6pt}
+
+---
+
+
+# Introduction
+
+This handout provides lecture notes on the Classical Linear Regression Model (CLRM) for the MA Econometrics course. The notes cover key concepts, assumptions, and results of the CLRM, along with relevant mathematical formulations and examples. The structure of the notes is designed to facilitate understanding of the theoretical foundations and practical applications of the CLRM in econometric analysis.
+
+The notes cover the following topics:
+
+- Overview of CLRM
+- Assumptions of CLRM
+- Estimation methods
+  - Ordinary Least Squares (OLS) estimation
+  - Method of Moments (MoM) estimation
+  - Maximum Likelihood Estimation (MLE)
+- Properties of the OLS estimator
+- Estimation of variance of the error term
+- Hypothesis testing
+- Model diagnostics
+- Applications in econometrics and economics
+- Further reading
+
+
+## Overview of the Classical Linear Regression Model (CLRM)
+
+Consider the following linear regression model (with an intercept, where $x_{i1}=1$ for all $i$):
+\begin{equation}
+y_i = \beta_1 + \beta_2 x_{i2} + \cdots + \beta_k x_{ik} + \varepsilon_i
+= \sum_{j=1}^k \beta_j x_{ij} + \varepsilon_i, \quad i = 1,2,\ldots,N. \quad j=1,2,\ldots,k.
+\end{equation}
+where $x_{ij}$ are regressors, $\beta_j$ are unknown population or true parameters to be estimated, and $\varepsilon_i$ are error terms.
+
+The regression model can also be expressed in a compact form as
+\begin{equation}
+y_i = \symbf{x}_i' \symbf{\beta} + \varepsilon_i, \quad i=1,2,\ldots,N,
+\end{equation}
+where $\symbf{x}_i = (1, x_{i2}, \ldots, x_{ik})'$ is a $k \times 1$ vector of regressors for observation $i$, and
+$\symbf{\beta} = (\beta_1, \beta_2, \ldots, \beta_k)'$ is a $k \times 1$ vector of unknown parameters.
+
+Stacking the $N$ observations yields the matrix form
+\begin{equation}
+\symbf{y} = \symbf{X}\symbf{\beta} + \symbf{\varepsilon},
+\end{equation}
+where:
+
+- $\symbf{y}$ is an $N \times 1$ vector of the dependent variable.
+- $\symbf{X}$ is an $N \times k$ matrix of regressors.
+- $\symbf{\beta}$ is a $k \times 1$ vector of unknown parameters.
+- $\symbf{\varepsilon}$ is an $N \times 1$ vector of error terms.
+
+$$
+\symbf{y} =
+\begin{bmatrix}
+y_1\\
+y_2\\
+\vdots\\
+y_N
+\end{bmatrix},
+\qquad
+\symbf{X} =
+\begin{bmatrix}
+1 & x_{12} & x_{13} & \cdots & x_{1k}\\
+1 & x_{22} & x_{23} & \cdots & x_{2k}\\
+\vdots & \vdots & \vdots & \ddots & \vdots\\
+1 & x_{N2} & x_{N3} & \cdots & x_{Nk}
+\end{bmatrix},
+\qquad
+\symbf{\varepsilon} =
+\begin{bmatrix}
+\varepsilon_1\\
+\varepsilon_2\\
+\vdots\\
+\varepsilon_N
+\end{bmatrix}.
+$$
+
+
+## Assumptions of the CLRM
+
+\begin{assumption}\label{assump:clrm}
+(Linearity in parameters) The relationship between the dependent variable and regressors is linear in \(\symbf{\beta}\):
+\begin{equation}
+\symbf{y} = \symbf{X}\symbf{\beta} + \symbf{\varepsilon}.
+\end{equation}
+\end{assumption}
+
+This assumption ensures that the model is linear in parameters, allowing for the application of linear estimation techniques. The regressors $\symbf{X}$ can be non-linear functions of the original variables, but the parameters $\symbf{\beta}$ must enter the model linearly.
+
+\begin{assumption}\label{assump:Non-singularity}
+(Non-singularity / no perfect multicollinearity) The regressor matrix \(\symbf{X}\) has full column rank:
+\begin{equation}
+\operatorname{rank}(\symbf{X}) = k.
+\end{equation}
+\end{assumption}
+
+This assumption ensures that there is no perfect linear relationship among the regressors, allowing for the unique estimation of the parameters $\symbf{\beta}$
+
+\begin{assumption}\label{assump:exogeneity}
+(Exogeneity) The conditional expectation of the error term given the regressors is zero:
+\begin{equation}
+\mathbb{E}[\symbf{\varepsilon}\mid \symbf{X}] = \symbf{0}.
+\end{equation}
+\end{assumption}
+
+This assumption implies that the regressors/explanatory variables are uncorrelated with the error term, ensuring that the OLS estimator is unbiased and consistent.
+
+\begin{assumption}\label{assump:spherical errors}
+(Spherical errors) The errors are homoscedastic and uncorrelated:
+\begin{equation}
+\operatorname{Var}(\symbf{\varepsilon}\mid \symbf{X}) = \sigma^2 \symbf{I}_N.
+\end{equation}
+\end{assumption}
+
+This assumption states that the variance of the error terms is constant across observations (homoscedasticity) and that the error terms are uncorrelated with each other. This assumption is crucial for the efficiency of the OLS estimator.
+
+\begin{assumption}\label{assump:normality}
+(Normality) The errors are normally distributed:
+\begin{equation}
+\symbf{\varepsilon}\mid \symbf{X} \sim \mathcal{N}(\symbf{0}, \sigma^2 \symbf{I}_N).
+\end{equation}
+\end{assumption}
+
+This assumption is often made for inference purposes, as it allows for the derivation of exact finite-sample distributions of the OLS estimator and test statistics. It justifies the use of t-tests and F-tests in hypothesis testing. It is not required for the consistency or unbiasedness of the OLS estimator.
+
+
+Table @tbl-clrm-assumptions-booktabs summarizes the five key assumptions of the Classical Linear Regression Model (CLRM), along with their statements and implications. 
+
+
+\begin{table}[H]
+\centering
+\caption{The Five Assumptions of the Classical Linear Regression Model (CLRM)}
+\label{tbl-clrm-assumptions-booktabs}
+\renewcommand{\arraystretch}{1.18}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{p{3.2cm} p{4.6cm} p{5.8cm}}
+\toprule
+\textbf{Assumption} & \textbf{Statement} & \textbf{Implications and Importance} \\
+\midrule
+\textbf{A1. Linearity in Parameters}
+& The model is linear in unknown parameters: $y = X\beta + u$.
+& Enables OLS and the standard linear regression toolkit (matrix algebra, closed-form estimator). If violated (nonlinear in parameters), estimation typically requires nonlinear methods. \\
+
+\textbf{A2. Full Rank (No Perfect Multicollinearity)}
+& $X$ has full column rank (no exact linear dependence among regressors).
+& Ensures $(X'X)^{-1}$ exists and the OLS estimator is unique. If violated, coefficients cannot be separately identified and estimation breaks down. \\
+
+\textbf{A3. Zero Conditional Mean (Exogeneity)}
+& $\mathbb{E}(u\mid X)=0$.
+& Delivers unbiasedness and consistency of OLS; central for causal interpretation. Violations (omitted variables, simultaneity, measurement error) produce biased/inconsistent estimates. \\
+
+\textbf{A4. Spherical Errors}
+& $\Var(u\mid X)=\sigma^2 I$ (homoskedasticity and no autocorrelation).
+& Gives efficiency of OLS (BLUE) and validates conventional standard errors, $t$-tests, and $F$-tests. If violated, OLS remains unbiased/consistent under A3 but classical inference fails unless robust SE are used. \\
+
+\textbf{A5. Normality}
+& $u\mid X \sim \mathcal{N}(0,\sigma^2 I)$.
+& Enables exact finite-sample inference using $t$ and $F$ distributions. Not required for large-sample consistency/asymptotic normality, but important in small samples and for classical exact tests. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+# Estimation Methods
+
+## Ordinary Least Squares (OLS) Estimation
+
+The OLS estimator of $\symbf{\beta}$ minimizes the residual sum of squares (RSS):
+\begin{equation}
+\betahat = \arg\min_{\symbf{\beta}}
+\sum_{i=1}^N \bigl(y_i - \symbf{x}_i' \symbf{\beta}\bigr)^2.
+\end{equation}
+
+### Derivation of the OLS Estimator
+
+Define the RSS objective:
+$$
+S(\symbf{\beta})=\sum_{i=1}^N \bigl(y_i-\symbf{x}_i'\symbf{\beta}\bigr)^2.
+$$
+
+ Matrix notation
+
+Let
+$$
+\symbf{y}=
+\begin{pmatrix}
+y_1\\ \vdots\\ y_N
+\end{pmatrix}\in\mathbb{R}^{N\times 1},
+\qquad
+\symbf{X}=
+\begin{pmatrix}
+\symbf{x}_1'\\ \vdots\\ \symbf{x}_N'
+\end{pmatrix}\in\mathbb{R}^{N\times k}.
+$$
+
+In matrix notation, the residual sum of squares (RSS) can be expressed as
+
+\begin{equation}
+S(\symbf{\beta})=(\symbf{y}-\symbf{X}\symbf{\beta})'(\symbf{y}-\symbf{X}\symbf{\beta}).
+\end{equation}
+
+ Expand the objective
+
+\begin{align}
+S(\symbf{\beta})
+&= \symbf{y}'\symbf{y} - \symbf{y}'\symbf{X}\symbf{\beta}
+    - (\symbf{X}\symbf{\beta})'\symbf{y}
+    + (\symbf{X}\symbf{\beta})'(\symbf{X}\symbf{\beta}) \nonumber\\
+&= \symbf{y}'\symbf{y} - \symbf{y}'\symbf{X}\symbf{\beta}
+    - \symbf{\beta}'\symbf{X}'\symbf{y}
+    + \symbf{\beta}'\symbf{X}'\symbf{X}\symbf{\beta}.
+\end{align}
+
+
+Since $\symbf{y}'\symbf{X}\symbf{\beta}$ is a scalar,
+$\symbf{y}'\symbf{X}\symbf{\beta} = \symbf{y}'\symbf{X}\symbf{\beta}' = \symbf{\beta}'\symbf{X}'\symbf{y}$  Hence,
+
+\begin{equation}
+S(\symbf{\beta})
+= \symbf{y}'\symbf{y} - 2\symbf{\beta}'\symbf{X}'\symbf{y}
+  + \symbf{\beta}'\symbf{X}'\symbf{X}\symbf{\beta}.
+\end{equation}
+
+
+First-order condition (normal equations)
+
+Since $\symbf{X}'\symbf{X}$ is symmetric,
+\begin{equation}
+\frac{\partial S(\symbf{\beta})}{\partial \symbf{\beta}}
+= -2\symbf{X}'\symbf{y} + 2\symbf{X}'\symbf{X}\symbf{\beta}.
+\end{equation}
+
+Setting the gradient to zero yields the normal equations:
+\begin{equation}
+\symbf{X}'\symbf{X}\symbf{\beta}=\symbf{X}'\symbf{y}.
+\end{equation}
+
+
+Closed-form solution
+
+If $\operatorname{rank}(\symbf{X})=k$, then $\symbf{X}'\symbf{X}$ is invertible and the unique minimizer is
+\begin{equation}
+\boxed{
+\betahat = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{y}.
+}
+\end{equation}
+
+
+Second-order condition
+
+The Hessian matrix is
+\begin{equation}
+\frac{\partial^2 S(\symbf{\beta})}{\partial \symbf{\beta}\,\partial \symbf{\beta}'}
+= 2\symbf{X}'\symbf{X},
+\end{equation}
+
+which is positive semidefinite (and positive definite when $\operatorname{rank}(\symbf{X})=k$). Therefore, $\betahat$ minimizes $S(\symbf{\beta})$.
+
+
+Orthogonality interpretation
+
+Let $\hat{\symbf{e}}=\symbf{y}-\symbf{X}\betahat$. From the normal equations,
+\begin{equation}
+\symbf{X}'\hat{\symbf{e}}=\symbf{0},
+\end{equation}
+so the OLS residuals are orthogonal to each column of $\symbf{X}$.
+
+
+\begin{exercise}
+Show that the OLS residuals $\hat{\symbf{e}}$ are orthogonal to the regressors in $\symbf{X}$.
+\end{exercise}
+
+\begin{exercise}
+Show that $\symbf{y}'\symbf{X}\symbf{\beta}' = \symbf{\beta}'\symbf{X}'\symbf{y}$.
+\end{exercise}
+
+\begin{exercise}
+Show that the OLS estimator follows a multivariate normal distribution under \Cref{assump:normality}.
+\end{exercise}
+
+## Method of Moments (MoM) Estimation
+The Method of Moments (MoM) estimator of $\symbf{\beta}$ is derived by equating sample moments to population moments based on the moment conditions implied by the CLRM assumptions.
+
+Under \Cref{assump:exogeneity}, the moment conditions are:
+\begin{equation}
+\mathbb{E}[\symbf{x}_i \varepsilon_i] = \symbf{0}.
+\end{equation}
+
+In matrix form, this can be expressed as:
+\begin{equation}
+\mathbb{E}[\symbf{X}'\symbf{\varepsilon}]
+= \symbf{0}.
+\end{equation}
+
+The MoM estimator solves the sample analog of these moment conditions:
+\begin{equation}
+\frac{1}{N} \sum_{i=1}^N \symbf{x}_i (y_i - \symbf{x}_i' \symbf{\beta}) = \symbf{0}.
+\end{equation}
+
+In matrix notation, this is:
+\begin{equation}
+\frac{1}{N} \symbf{X}'(\symbf{y}
+- \symbf{X}\symbf{\beta}) = \symbf{0}.
+\end{equation}
+
+Solving for $\symbf{\beta}$ yields the MoM estimator:
+\begin{equation}
+\betahat = (\symbf{X}'\symbf{X})^{-1}
+\symbf{X}'\symbf{y},
+\end{equation}
+
+which is identical to the OLS estimator.
+
+## Maximum Likelihood Estimation (MLE)
+
+With maximum likelihood estimation, we assume that the error terms are normally distributed as per \Cref{assump:normality}:
+
+\begin{equation}
+L(\symbf{\beta}, \sigma^2 \mid \symbf{y}, \symbf{X})
+= (2\pi \sigma^2)^{-N/2}
+\exp\left(
+-\frac{1}{2\sigma^2}
+(\symbf{y}-\symbf{X}\symbf{\beta})'
+(\symbf{y}-\symbf{X}\symbf{\beta})
+\right).
+\end{equation}
+
+The log-likelihood function is:
+\begin{equation}
+\ell(\symbf{\beta}, \sigma^2 \mid \symbf{y}, \symbf{X}) = -\frac{N}{2} \log(2\pi) - \frac{N}{2} \log(\sigma^2)
+- \frac{1}{2\sigma^2} (\symbf{y}-\symbf{X}\symbf{\beta})'(\symbf{y}-\symbf{X}\symbf{\beta}).
+\end{equation}
+
+Maximizing the log-likelihood with respect to $\symbf{\beta}$ yields the MLE:
+
+\begin{equation}
+\betahat = (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{y},
+\end{equation}
+
+which is the same as the OLS and MoM estimators.
+
+
+## Brief Description of the Generalized Method of Moments (GMM) Estimator
+The Generalized Method of Moments (GMM) estimator extends the Method of Moments by allowing for more general moment conditions and incorporating an optimal weighting matrix to improve efficiency.
+
+The general objective function for GMM is:
+\begin{equation}
+J(\symbf{\beta}) = \hat{\symbf{g}}(\symbf{\beta})' W \hat{\symbf{g}}(\symbf{\beta}),
+\end{equation}
+where $\hat{\symbf{g}}(\symbf{\beta})$ is the vector of sample moment conditions and $W$ is a positive definite weighting matrix.
+
+The GMM estimator minimizes this objective function:
+\begin{equation}
+\betahat_{GMM} = \arg\min_{\symbf{\beta}} J
+(\symbf{\beta}).
+\end{equation}
+
+For a linear regression model the objective function becomes:
+\begin{equation}
+J(\symbf{\beta}) = \left(\frac{1}{N} \symbf{X}'(\symbf{y}-\symbf{X}\symbf{\beta})\right)' W \left(\frac{1}{N} \symbf{X}'(\symbf{y}-\symbf{X}\symbf{\beta})\right).
+\end{equation}
+
+When $W$ is chosen as the inverse of the variance-covariance matrix of the moment conditions, the GMM estimator achieves optimal efficiency. The objective function simplifies to:
+\begin{equation}
+J(\symbf{\beta}) = \frac{1}{N^2} (\symbf{y}-\symbf{X}\symbf{\beta})' \symbf{X} W \symbf{X}' (\symbf{y}-\symbf{X}\symbf{\beta}).
+\end{equation}
+
+The objective function is minimized at:
+\begin{equation}
+\betahat_{GMM} = (\symbf{X}' W \symbf{X})^{-1} \symbf{X}' W \symbf{y}.
+\end{equation}
+
+
+## Summary of Estimators
+
+Table @tbl-mle-mom-ols-concise presents a comparative analysis of maximum likelihood estimation (MLE), the method of moments (MoM), and ordinary least squares (OLS), detailing their fundamental principles, underlying assumptions, and key statistical properties. It emphasizes MLE’s fully parametric framework and asymptotic efficiency, MoM’s flexible yet potentially inefficient reliance on moment conditions, and OLS’s role as a pragmatic estimator characterized by relatively weak distributional assumptions and optimality under the Gauss–Markov conditions. Overall, the comparison clarifies the trade-offs among efficiency, robustness, and assumptions, thereby informing the selection of an appropriate estimator in empirical work.
+
+\begin{table}[H]
+\centering
+\caption{Concise Comparison of MLE, MoM, and OLS Estimators}
+\label{tbl-mle-mom-ols-concise}
+\renewcommand{\arraystretch}{1.12}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{p{2.9cm} p{3.5cm} p{3.5cm} p{3.5cm}}
+\toprule
+\textbf{Aspect} & \textbf{MLE} & \textbf{MoM} & \textbf{OLS} \\
+\midrule
+\textbf{Core idea}
+& Maximize the (log-)likelihood.
+& Match sample and population moments.
+& Minimize the sum of squared residuals. \\
+
+\textbf{Information used}
+& Full parametric distribution.
+& Selected moment conditions.
+& Linear conditional mean and second moments. \\
+
+\textbf{Key assumptions}
+& Correct distributional specification.
+& Valid, identifying moments.
+& Linearity, exogeneity, and full rank. \\
+
+\textbf{Consistency}
+& Consistent if correctly specified (QMLE under misspecification).
+& Consistent if moments identify parameters.
+& Consistent if $\E(u\mid X)=0$. \\
+
+\textbf{Asymptotic distribution}
+& $\sqrt{n}(\hat\theta-\theta_0)\Rightarrow\mathcal{N}(0,I^{-1})$.
+& Asymptotically normal; variance from moments.
+& Asymptotically normal; classical or robust SE. \\
+
+\textbf{Efficiency}
+& Asymptotically efficient if correctly specified.
+& Generally inefficient; improved via optimal weighting.
+& BLUE under Gauss--Markov; otherwise not efficient. \\
+
+\textbf{Robustness}
+& Sensitive to distributional misspecification.
+& Sensitive to moment choice.
+& Robust to non-normality; sensitive to endogeneity. \\
+
+\textbf{Computation}
+& Numerical optimization often required.
+& Often closed-form or simple solving.
+& Closed-form and computationally trivial. \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\footnotesize\emph{Note:} OLS can be viewed as a special case of the method of moments with moment conditions
+$\E[X'(y-X\beta)]=0$, and as a special case of MLE under normally distributed errors with constant variance.
+More generally, both MLE and OLS can be embedded within the Generalized Method of Moments (GMM) framework
+under appropriate assumptions.
+\end{table}
+
+\begin{quote}
+\textbf{Remark (Unifying Perspective via GMM).}
+The maximum likelihood estimator (MLE), the method of moments (MoM), and ordinary least squares (OLS)
+can be viewed within a single estimation framework.
+OLS is a special case of MoM based on the orthogonality conditions
+$\E[X'(y-X\beta)]=0$, and it coincides with MLE when the regression errors are
+normally distributed with constant variance.
+More generally, the Generalized Method of Moments (GMM) encompasses both OLS and MLE by allowing
+estimation based on a set of moment conditions with an optimal weighting matrix.
+This unifying perspective clarifies the trade-offs between efficiency, robustness, and
+assumptions in econometric estimation.
+\end{quote}
+
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=2.4cm,
+  every node/.style={draw, rectangle, rounded corners, align=center, minimum width=3.2cm, minimum height=0.9cm}
+]
+
+\node (ols) {OLS\\\footnotesize Linear moments};
+\node (mom) [above right=of ols] {MoM\\\footnotesize Moment conditions};
+\node (gmm) [above left=of mom] {GMM\\\footnotesize Optimal weighting};
+\node (mle) [below=of gmm] {MLE\\\footnotesize Parametric likelihood};
+
+\draw[->, thick] (ols) -- (mom);
+\draw[->, thick] (mom) -- (gmm);
+\draw[->, thick] (mle) -- (gmm);
+
+\end{tikzpicture}
+\caption{Unifying Relationship Between OLS, MoM, GMM, and MLE}
+\label{fig:ols-mom-gmm-mle}
+\end{figure}
+
+\Cref{fig:ols-mom-gmm-mle} illustrates that OLS, MoM, and MLE are not competing estimators but rather special cases within a broader GMM framework, differing mainly in the strength of assumptions and the information they exploit.
+
+
+
+\begin{remarkbox}{A Unifying View via GMM}{gmm-unifying}
+The maximum likelihood estimator (MLE), the method of moments (MoM), and ordinary least squares (OLS) may all be viewed as components of a unified estimation framework. In particular, OLS can be characterized as a special case of MoM derived from the orthogonality conditions  
+$$
+\mathbb{E}\big[X'(y - X\beta)\big] = 0.
+$$
+Moreover, OLS coincides with the MLE when the regression errors are normally distributed with constant variance. More generally, the Generalized Method of Moments (GMM) subsumes both OLS and MLE by permitting estimation based on moment conditions with an optimal weighting matrix.
+
+\medskip
+\emph{Takeaway (exam intuition):}
+\textbf{OLS $\subset$ MoM $\subset$ GMM}, and \textbf{MLE coincides with efficient GMM} under correct
+distributional assumptions.
+\end{remarkbox}
+
+
+# Properties of the OLS Estimator
+## Small/Finite Sample Properties
+Under \Cref{assump:clrm,assump:exogeneity}, the OLS estimator $\betahat$ has the following properties:
+
+1. **Unbiasedness**:
+   
+   $$\mathbb{E}[\betahat \mid \symbf{X}] = \symbf{\beta}$$.
+   
+   This property indicates that, on average, the OLS estimator correctly estimates the true parameter vector $\symbf{\beta}$. It is satisfied when the regressors are exogenous (uncorrelated with the error term), that is $\mathbb{E}[\symbf{\varepsilon} \mid \symbf{X}] = \symbf{0}$. This can be shown as follows:
+   \begin{align*}
+   \mathbb{E}[\betahat \mid \symbf{X}]
+   &= \mathbb{E}[(\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{y} \mid \symbf{X}] \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}' \mathbb{E}[\symbf{y} \mid \symbf{X}] \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}' (\symbf{X}\symbf{\beta} + \mathbb{E}[\symbf{\varepsilon} \mid \symbf{X}]) \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}' \symbf{X}\symbf{\beta} + (\symbf{X}'\symbf{X})^{-1} \symbf{X}' \symbf{0} \\
+   &= \symbf{\beta}.
+   \end{align*}
+   
+   Wnen the exogeneity assumption is violated, the OLS estimator becomes biased and inconsistent. 
+
+2. **Variance**:
+  
+   $$\operatorname{Var}(\betahat \mid \symbf{X}) = \sigma^2 (\symbf{X}'\symbf{X})^{-1}$$.
+   
+   The variance of the OLS estimator can be derived as follows:
+   
+   \begin{align*}
+   \operatorname{Var}(\betahat \mid \symbf{X}) 
+   &= \operatorname{Var}((\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{y} \mid \symbf{X}) \\
+   &= \operatorname{Var}((\symbf{X}'\symbf{X})^{-1} \symbf{X}'(\symbf{X}\symbf{\beta} + \symbf{\varepsilon}) \mid \symbf{X}) \\
+   &= \operatorname{Var}((\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon} \mid \symbf{X}) \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}' \operatorname{Var}(\symbf{\varepsilon} \mid \symbf{X}) \symbf{X} (\symbf{X}'\symbf{X})^{-1} \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}' (\sigma^2 \symbf{I}_N) \symbf{X} (\symbf{X}'\symbf{X})^{-1} \\
+   &= \sigma^2 (\symbf{X}'\symbf{X})^{-1}.
+   \end{align*}
+  
+  Efficiency of the OLS estimator follows from the Gauss-Markov theorem, which states that among all linear unbiased estimators, the OLS estimator has the smallest variance.
+  
+\begin{theorem}[Gauss-Markov Theorem]
+Under \Cref{assump:clrm,assump:spherical errors}, the OLS estimator $\betahat$ is the Best Linear Unbiased Estimator (BLUE) of $\symbf{\beta}$. That is, for any other linear unbiased estimator $\tilde{\symbf{\beta}} = \symbf{C}\symbf{y}$, where $\symbf{C}$ is a $k \times N$ matrix such that $\mathbb{E}[\tilde{\symbf{\beta}} \mid \symbf{X}] = \symbf{\beta}$, we have 
+\begin{equation}
+\operatorname{Var}(\tilde{\symbf{\beta}} \mid \symbf{X}) - \operatorname{Var}(\betahat \mid \symbf{X}) \text{ is positive semidefinite.}
+\end{equation}
+\end{theorem}
+
+This theorem implies that no other linear unbiased estimator can have a smaller variance than the OLS estimator, making it the most efficient among all linear unbiased estimators. The theorem can be proved as follows:
+\begin{proof}
+Let $\tilde{\symbf{\beta}} = \symbf{C}\symbf{y}$ be any linear unbiased estimator of $\symbf{\beta}$. Since $\tilde{\symbf{\beta}}$ is unbiased, we have
+\begin{equation}
+\mathbb{E}[\tilde{\symbf{\beta}} \mid \symbf{X}]
+= \symbf{C}\,\mathbb{E}[\symbf{y}\mid \symbf{X}]
+= \symbf{C}(\symbf{X}\symbf{\beta})
+= \symbf{\beta}.
+\end{equation}
+This implies that $\symbf{C}\symbf{X}=\symbf{I}_k$.
+
+\begin{align*}
+\operatorname{Var}(\tilde{\symbf{\beta}} \mid \symbf{X})
+&= \operatorname{Var}(\symbf{C}\symbf{y} \mid \symbf{X}) \\
+&= \symbf{C}\,\operatorname{Var}(\symbf{y}\mid \symbf{X})\,\symbf{C}' \\
+&= \symbf{C}(\sigma^2 \symbf{I}_N)\symbf{C}' \\
+&= \sigma^2 \symbf{C}\symbf{C}'.
+\end{align*}
+
+\begin{equation}
+\operatorname{Var}(\hat{\symbf{\beta}} \mid \symbf{X})
+= \sigma^2(\symbf{X}'\symbf{X})^{-1}.
+\end{equation}
+
+This implies that $\symbf{C}\symbf{X} = \symbf{I}_k$. 
+Now, we can express the variance of $\tilde{\symbf{\beta}}$ as follows:
+\begin{align*}
+\operatorname{Var}(\tilde{\symbf{\beta}} \mid \symbf{X}) 
+&= \operatorname{Var}(\symbf{C}\symbf{y} \mid \symbf{X}) \\
+&= \symbf{C} \operatorname{Var}(\symbf{y} \mid \symbf{X}) \symbf{C}' \\
+&= \symbf{C} (\sigma^2 \symbf{I}_N) \symbf{C}' \\
+&= \sigma^2 \symbf{C}\symbf{C}'.
+\end{align*}
+The variance of the OLS estimator is given by:
+\begin{equation}
+\operatorname{Var}(\betahat \mid \symbf{X}) = \sigma^2 (\symbf{X}'\symbf{X})^{-1}.
+\end{equation}
+To show that $\operatorname{Var}(\tilde{\symbf{\beta}} \mid \symbf{X}) - \operatorname{Var}(\betahat \mid \symbf{X})$ is positive semidefinite, we consider the difference:
+\begin{align*}
+\operatorname{Var}(\tilde{\symbf{\beta}} \mid \symbf{X}) - \operatorname{Var}(\betahat \mid \symbf{X}) 
+&= \sigma^2 \symbf{C}\symbf{C}' - \sigma^2 (\symbf{X}'\symbf{X})^{-1} \\
+&= \sigma^2 \left( \symbf{C}\symbf{C}' - (\symbf{X}'\symbf{X})^{-1} \right).
+\end{align*}
+Since $\symbf{C}\symbf{X} = \symbf{I}_k$, we can express $\symbf{C}$ as $\symbf{C} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{D}$, where $\symbf{D}$ is any matrix such that $\symbf{D}\symbf{X} = \symbf{0}$. Substituting this into the expression for the variance difference, we find that it is positive semidefinite, completing the proof.
+\end{proof}
+
+
+
+3. **Distribution**:
+
+Since the OLS estimator is a linear combination of normally distributed errors (under \Cref{assump:normality}), it follows a multivariate normal distribution:
+
+$$ \hat{\symbf{\beta}}\mid \symbf{X} \sim \mathcal{N}\left(\symbf{\beta}, \sigma^2 (\symbf{X}'\symbf{X})^{-1}\right). $$
+
+## Large Sample or Asymptotic Properties of the OLS Estimator
+Under \Cref{assump:clrm,assump:exogeneity}, the OLS estimator $\betahat$ has the following asymptotic properties as $N \to \infty$:
+
+1. **Consistency**:
+   
+   $$\betahat \xrightarrow{p} \symbf{\beta}.$$
+   
+   This property indicates that as the sample size increases, the OLS estimator converges in probability to the true parameter vector $\symbf{\beta}$. The consistency of the OLS estimator can be shown using the Law of Large Numbers (LLN) as follows:
+   
+   \begin{align*}
+   \betahat 
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{y} \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}'(\symbf{X}\symbf{\beta} + \symbf{\varepsilon}) \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{X}\symbf{\beta} + (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon} \\
+   &= \symbf{\beta} + (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon}.
+   \end{align*}
+   
+   By the LLN, $\frac{1}{N}\symbf{X}'\symbf{\varepsilon} \xrightarrow{p} \symbf{0}$ as $N \to \infty$, and $\frac{1}{N}\symbf{X}'\symbf{X} \xrightarrow{p} \mathbb{E}[\symbf{x}_i\symbf{x}_i']$ (assuming it is positive definite). Therefore, $(\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon} \xrightarrow{p} \symbf{0}$, leading to $\betahat \xrightarrow{p} \symbf{\beta}$. The OLS estimator converges in probability to the true parameter vector as the sample size increases. The OLS estimator is constent so long as the regressors are exogenous and the matrix $\mathbb{E}[\symbf{x}_i\symbf{x}_i']$ is positive definite. However, even if the spherical errors assumption is violated (e.g., heteroscedasticity or autocorrelation), the OLS estimator remains consistent.
+   
+2. **Asymptotic Normality**:
+   
+   $$\sqrt{N}(\betahat - \symbf{\beta}) \xrightarrow{d} \mathcal{N}\left(\symbf{0}, \sigma^2 \mathbb{E}[\symbf{x}_i\symbf{x}_i']^{-1}\right).$$
+   
+   This property indicates that the scaled difference between the OLS estimator and the true parameter vector converges in distribution to a multivariate normal distribution as the sample size increases. The asymptotic normality of the OLS estimator can be shown using the Central Limit Theorem (CLT) as follows:
+   
+   \begin{align*}
+   \sqrt{N}(\betahat - \symbf{\beta}) 
+   &= \sqrt{N}((\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon}) \\
+   &= (\frac{1}{N}\symbf{X}'\symbf{X})^{-1} \frac{1}{\sqrt{N}}\symbf{X}'\symbf{\varepsilon}.
+   \end{align*}
+   
+   By the CLT, $\frac{1}{\sqrt{N}}\symbf{X}'\symbf{\varepsilon} \xrightarrow{d} \mathcal{N}(\symbf{0}, \sigma^2 \mathbb{E}[\symbf{x}_i\symbf{x}_i'])$ as $N \to \infty$. Additionally, $\frac{1}{N}\symbf{X}'\symbf{X} \xrightarrow{p} \mathbb{E}[\symbf{x}_i\symbf{x}_i']$. Therefore, by Slutsky's theorem, we have:
+   
+   $$\sqrt{N}(\betahat - \symbf{\beta}) \xrightarrow{d} \mathcal{N}\left(\symbf{0}, \sigma^2 \mathbb{E}[\symbf{x}_i\symbf{x}_i']^{-1}\right).$$
+   
+   This result allows for the construction of confidence intervals and hypothesis tests for the parameters in large samples.
+
+The asymptotic normality of the OLS estimator justifies \emph{approximate (large-sample) inference}---such as constructing confidence intervals and conducting hypothesis tests---because the sampling distribution of $\hat{\beta}$ is approximately normal in large samples. In particular, under standard regularity conditions,
+$$
+\sqrt{n}\,(\hat{\beta}-\beta)\ \xrightarrow{d}\ \mathcal{N}(0, V),
+$$
+
+where $V$ is the asymptotic variance matrix. When the classical assumptions (homoskedasticity and no autocorrelation) are violated, valid large-sample inference requires using an appropriate variance estimator (e.g., heteroskedasticity-robust or HAC standard errors). This property is especially useful in econometrics, where large datasets are common.
+
+
+
+
+\noindent \textbf{Implication for Large-Sample Inference.}
+The preceding result implies that, under the stated regularity conditions,
+$$
+\sqrt{N}\,(\hat{\beta}-\beta)\ \xrightarrow{d}\ \mathcal{N}\!\left(\mathbf{0},\,\sigma^2\,\mathbb{E}[x_i x_i']^{-1}\right).
+$$
+Equivalently, for large $N$ the sampling distribution of $\hat{\beta}$ is approximately multivariate normal with mean $\beta$ and covariance matrix approximately
+$$
+Var(\hat{\beta}) \approx \frac{1}{N}\,\sigma^2\,\mathbb{E}[x_i x_i']^{-1}.
+$$
+This asymptotic normality justifies \emph{approximate (large-sample) inference}---such as constructing confidence intervals and conducting hypothesis tests---using normal (or asymptotically equivalent $t$) critical values. In applications where the classical homoskedasticity assumption fails, valid large-sample inference requires replacing $\sigma^2\,\mathbb{E}[x_i x_i']^{-1}$ with an appropriate robust (e.g., heteroskedasticity-robust or HAC) asymptotic variance estimator.
+
+## Asymptotic Efficiency
+
+Under \Cref{assump:clrm,assump:spherical errors} (including normality), the OLS estimator $\hat{\beta}$ coincides with the maximum likelihood estimator in the Gaussian linear regression model. Hence, under standard regularity conditions, $\hat{\beta}$ is asymptotically efficient in the correctly specified parametric model (it attains the Cram\'er--Rao/Fisher information lower bound). In particular,
+$$
+\operatorname{Avar}(\hat{\beta})
+= \frac{1}{N}\,\sigma^2\,\mathbb{E}[x_i x_i']^{-1}.
+$$
+
+As $N \to \infty$, the asymptotic variance  
+
+When normality is violated, OLS remains consistent and asymptotically normal under \Cref{assump:clrm,assump:spherical errors}. What may fail is \emph{parametric} asymptotic efficiency: OLS need not be the MLE, and an estimator based on the correct likelihood may have a smaller asymptotic variance, although OLS remains BLUE among linear unbiased estimators under spherical errors. When $N$ is large, the efficiency loss from using OLS instead of the MLE under non-normal errors is often small in practice. 
+
+# Estimation of Variance of the Error Term
+An unbiased estimator of the error variance $\sigma^2$ is given by the residual mean square (also known as the mean squared error, MSE):
+\begin{equation}
+\hat{\sigma}^2 = \frac{1}{N-k} \sum_{i=1}^N \hat{\varepsilon}_i^2 = \frac{1}{N-k} \hat{\symbf{\varepsilon}}'\hat{\symbf{\varepsilon}},
+\end{equation}
+where $\hat{\varepsilon}_i = y_i - \symbf{x}_i' \betahat$ are the OLS residuals, and $k$ is the number of parameters estimated (including the intercept). The derivation of this estimator is as follows:
+
+\begin{align*}
+\mathbb{E}[\hat{\mathbf{e}}'\hat{\mathbf{e}}\mid \mathbf{X}]
+&= \mathbb{E}\big[(\mathbf{y}-\mathbf{X}\hat{\beta})'(\mathbf{y}-\mathbf{X}\hat{\beta})\mid \mathbf{X}\big] \\
+&= \mathbb{E}\big[(\varepsilon-\mathbf{X}(\hat{\beta}-\beta))'(\varepsilon-\mathbf{X}(\hat{\beta}-\beta))\mid \mathbf{X}\big] \\
+&= \mathbb{E}[\varepsilon'\varepsilon\mid \mathbf{X}]
+-2\,\mathbb{E}[\varepsilon'\mathbf{X}(\hat{\beta}-\beta)\mid \mathbf{X}]
++\mathbb{E}\big[(\hat{\beta}-\beta)'\mathbf{X}'\mathbf{X}(\hat{\beta}-\beta)\mid \mathbf{X}\big].
+\end{align*}
+Using $\hat{\beta}-\beta=(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\varepsilon$ and
+$\operatorname{Var}(\varepsilon\mid \mathbf{X})=\sigma^2\mathbf{I}_N$, we have
+$$
+\mathbb{E}[\varepsilon'\varepsilon\mid \mathbf{X}] = N\sigma^2,
+\quad
+\mathbb{E}[\varepsilon'\mathbf{X}(\hat{\beta}-\beta)\mid \mathbf{X}]
+=\mathbb{E}[\varepsilon'\mathbf{P}\varepsilon\mid \mathbf{X}]
+=\sigma^2\,\mathrm{tr}(\mathbf{P})=\sigma^2 k,
+$$
+and
+$$
+\mathbb{E}\big[(\hat{\beta}-\beta)'\mathbf{X}'\mathbf{X}(\hat{\beta}-\beta)\mid \mathbf{X}\big]
+=\mathbb{E}[\varepsilon'\mathbf{P}\varepsilon\mid \mathbf{X}]
+=\sigma^2 k,
+$$
+where $\mathbf{P}=\mathbf{X}(\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'$ and $\mathrm{tr}(\mathbf{P})=k$.
+Therefore,
+$$
+\mathbb{E}[\hat{\mathbf{e}}'\hat{\mathbf{e}}\mid \mathbf{X}]
+= N\sigma^2 - 2k\sigma^2 + k\sigma^2
+= (N-k)\sigma^2.
+$$
+Thus,
+$$
+\mathbb{E}[\hat{\sigma}^2\mid \mathbf{X}]
+= \mathbb{E}\left[\frac{1}{N-k}\,\hat{\mathbf{e}}'\hat{\mathbf{e}}\mid \mathbf{X}\right]
+= \sigma^2,
+$$
+showing that $\hat{\sigma}^2$ is an unbiased estimator of $\sigma^2$. This is because we divide by $N-k$ (the degrees of freedom) instead of $N$, accounting for the estimation of $k$ parameters in the model. 
+
+
+
+
+\section{The Gauss--Markov Theorem}
+
+Consider the classical linear regression model
+$$
+\mathbf y = \mathbf X \boldsymbol\beta + \boldsymbol\varepsilon,
+$$
+where $\mathbf X \in \mathbb R^{n\times k}$ has full column rank and the disturbance
+vector $\boldsymbol\varepsilon$ satisfies the classical error assumptions.
+
+\begin{theorem}[Gauss--Markov]
+Under the classical linear regression assumptions, the ordinary least squares (OLS)
+estimator
+$$
+\hat{\boldsymbol\beta}
+=
+(\mathbf X'\mathbf X)^{-1}\mathbf X'\mathbf y
+$$
+is the \emph{Best Linear Unbiased Estimator} (BLUE) of $\boldsymbol\beta$.
+That is, among all linear unbiased estimators of $\boldsymbol\beta$,
+$\hat{\boldsymbol\beta}$ has the minimum variance--covariance matrix.
+\end{theorem}
+
+\subsection*{Definition: Linear Unbiased Estimator}
+
+An estimator $\tilde{\boldsymbol\beta}$ is said to be:
+\begin{itemize}
+\item \textbf{Linear} if it can be written as $\tilde{\boldsymbol\beta} = \mathbf A \mathbf y$
+for some nonrandom $k\times n$ matrix $\mathbf A$.
+\item \textbf{Unbiased} if $\mathbb E(\tilde{\boldsymbol\beta}\mid \mathbf X)=\boldsymbol\beta$.
+\end{itemize}
+
+\begin{proof}
+Let $\tilde{\boldsymbol\beta} = \mathbf A \mathbf y$ be any linear unbiased estimator of
+$\boldsymbol\beta$. Substituting $\mathbf y = \mathbf X\boldsymbol\beta + \boldsymbol\varepsilon$,
+$$
+\tilde{\boldsymbol\beta}
+=
+\mathbf A \mathbf X \boldsymbol\beta + \mathbf A \boldsymbol\varepsilon.
+$$
+
+Unbiasedness requires
+$$
+\mathbb E(\tilde{\boldsymbol\beta}\mid \mathbf X)
+=
+\mathbf A \mathbf X \boldsymbol\beta
+=
+\boldsymbol\beta
+\quad \Rightarrow \quad
+\mathbf A \mathbf X = \mathbf I_k.
+$$
+
+The variance of $\tilde{\boldsymbol\beta}$ is
+$$
+\Var(\tilde{\boldsymbol\beta}\mid \mathbf X)
+=
+\mathbf A \Var(\boldsymbol\varepsilon\mid \mathbf X)\mathbf A'
+=
+\sigma^2 \mathbf A \mathbf A',
+$$
+where the last equality follows from $\Var(\boldsymbol\varepsilon\mid \mathbf X)=\sigma^2\mathbf I_n$.
+
+Now write
+$$
+\mathbf A
+=
+(\mathbf X'\mathbf X)^{-1}\mathbf X' + \mathbf C,
+$$
+for some $k\times n$ matrix $\mathbf C$ satisfying $\mathbf C\mathbf X = \mathbf 0$.
+(This decomposition follows from the unbiasedness constraint.)
+
+Then
+$$
+\Var(\tilde{\boldsymbol\beta}\mid \mathbf X)
+=
+\sigma^2
+\left[
+(\mathbf X'\mathbf X)^{-1}
++
+\mathbf C\mathbf C'
+\right].
+$$
+
+Since $\mathbf C\mathbf C'$ is positive semidefinite,
+$$
+\Var(\tilde{\boldsymbol\beta}\mid \mathbf X)
+-
+\Var(\hat{\boldsymbol\beta}\mid \mathbf X)
+=
+\sigma^2 \mathbf C\mathbf C'
+\quad \text{is positive semidefinite}.
+$$
+
+Hence,
+$$
+\Var(\tilde{\boldsymbol\beta}\mid \mathbf X)
+\succeq
+\Var(\hat{\boldsymbol\beta}\mid \mathbf X),
+$$
+with equality if and only if $\mathbf C=\mathbf 0$, which implies
+$\tilde{\boldsymbol\beta}=\hat{\boldsymbol\beta}$.
+Therefore, OLS is the unique linear unbiased estimator with minimum variance.
+\end{proof}
+
+\begin{remark}[Meaning of ``Best'']
+``Best'' refers to the ordering of variance--covariance matrices in the
+positive semidefinite sense, not to mean squared error or finite-sample efficiency
+under nonlinearity or bias.
+\end{remark}
+
+\begin{remark}[Role of Normality]
+Normality of the error term is \emph{not} required for the Gauss--Markov theorem.
+Normality is only needed for exact finite-sample $t$ and $F$ inference.
+\end{remark}
+
+\begin{remark}[When OLS Is No Longer BLUE]
+If $\Var(\boldsymbol\varepsilon\mid \mathbf X)\neq \sigma^2\mathbf I_n$,
+OLS remains unbiased under exogeneity but is no longer efficient.
+In such cases, generalized least squares (GLS) yields a more efficient estimator.
+\end{remark}
+
+
+\section{Finite-Sample Normality and Exact Inference}
+
+\subsection{Normality Assumption}
+
+To conduct exact finite-sample inference, the classical linear regression model
+augments the previous assumptions with normality.
+
+\begin{assumption}[Normality of Errors]
+Conditional on $\mathbf X$, the disturbance vector is normally distributed:
+$$
+\boldsymbol\varepsilon \mid \mathbf X \sim \mathcal N(\mathbf 0, \sigma^2 \mathbf I_n).
+$$
+\end{assumption}
+
+This assumption is \emph{not} required for unbiasedness or efficiency of OLS,
+but it is essential for exact finite-sample distributions of test statistics.
+
+\subsection{Distribution of the OLS Estimator}
+
+\begin{theorem}[Finite-Sample Distribution of OLS]
+Under the classical linear regression assumptions and normality,
+$$
+\hat{\boldsymbol\beta} \mid \mathbf X
+\sim
+\mathcal N\!\left(
+\boldsymbol\beta,\;
+\sigma^2(\mathbf X'\mathbf X)^{-1}
+\right).
+$$
+\end{theorem}
+
+\begin{proof}
+From the OLS decomposition,
+$$
+\hat{\boldsymbol\beta}
+=
+\boldsymbol\beta + (\mathbf X'\mathbf X)^{-1}\mathbf X'\boldsymbol\varepsilon.
+$$
+Since $\boldsymbol\varepsilon \mid \mathbf X \sim \mathcal N(\mathbf 0, \sigma^2\mathbf I_n)$
+and $(\mathbf X'\mathbf X)^{-1}\mathbf X'$ is nonrandom conditional on $\mathbf X$,
+it follows from linear transformation properties of the multivariate normal
+distribution that
+$$
+\hat{\boldsymbol\beta} \mid \mathbf X
+\sim
+\mathcal N\!\left(
+\boldsymbol\beta,\;
+\sigma^2(\mathbf X'\mathbf X)^{-1}
+\right).
+$$
+\end{proof}
+
+\subsection{Distribution of the Error Variance Estimator}
+
+\begin{theorem}[Scaled Chi-Square Distribution]
+Under normality,
+$$
+\frac{(n-k)\hat{\sigma}^2}{\sigma^2}
+=
+\frac{\hat{\boldsymbol\varepsilon}'\hat{\boldsymbol\varepsilon}}{\sigma^2}
+\sim
+\chi^2_{n-k}.
+$$
+\end{theorem}
+
+\begin{proof}
+Since $\hat{\boldsymbol\varepsilon}=\mathbf M_X\boldsymbol\varepsilon$ and
+$\mathbf M_X$ is idempotent with rank $n-k$, standard results on quadratic forms
+in normal random vectors imply
+$$
+\boldsymbol\varepsilon'\mathbf M_X\boldsymbol\varepsilon
+\sim
+\sigma^2 \chi^2_{n-k}.
+$$
+Dividing both sides by $\sigma^2$ yields the result.
+\end{proof}
+
+\subsection{Student's \texorpdfstring{$t$}{t}-Test for Individual Coefficients}
+
+Let $\beta_j$ denote the $j$th element of $\boldsymbol\beta$ and
+$\hat{\beta}_j$ its OLS estimator.
+
+\begin{theorem}[$t$-Statistic]
+Under the null hypothesis
+$$
+H_0:\ \beta_j=\beta_{j,0},
+$$
+the statistic
+$$
+t_j
+=
+\frac{\hat{\beta}_j-\beta_{j,0}}
+{\hat{\sigma}\sqrt{(\mathbf X'\mathbf X)^{-1}_{jj}}}
+$$
+has a Student $t$ distribution with $n-k$ degrees of freedom:
+$$
+t_j \sim t_{n-k}.
+$$
+\end{theorem}
+
+\begin{proof}
+The numerator is normally distributed with mean zero under $H_0$.
+The denominator is the square root of an independent scaled chi-square
+random variable divided by its degrees of freedom.
+Independence follows from orthogonality of $\mathbf P_X$ and $\mathbf M_X$
+under normality.
+The ratio therefore follows a Student $t$ distribution.
+\end{proof}
+
+\begin{remark}[Confidence Intervals]
+A $(1-\alpha)$ confidence interval for $\beta_j$ is
+$$
+\hat{\beta}_j
+\pm
+t_{n-k,\,1-\alpha/2}
+\;\hat{\sigma}\sqrt{(\mathbf X'\mathbf X)^{-1}_{jj}}.
+$$
+\end{remark}
+
+\subsection{\texorpdfstring{$F$}{F}-Tests for Linear Restrictions}
+
+Consider testing $q$ linear restrictions of the form
+$$
+H_0:\ \mathbf R\boldsymbol\beta=\mathbf r,
+$$
+where $\mathbf R$ is a $q\times k$ matrix of rank $q$.
+
+\begin{theorem}[$F$-Statistic]
+Under $H_0$ and normality,
+$$
+F
+=
+\frac{1}{q}
+(\mathbf R\hat{\boldsymbol\beta}-\mathbf r)'
+\left[
+\hat{\sigma}^2\mathbf R(\mathbf X'\mathbf X)^{-1}\mathbf R'
+\right]^{-1}
+(\mathbf R\hat{\boldsymbol\beta}-\mathbf r)
+\sim
+F_{q,\,n-k}.
+$$
+\end{theorem}
+
+\begin{remark}[Special Case]
+When $q=1$, the $F$-statistic reduces to the square of the corresponding
+$t$-statistic:
+$$
+F_{1,n-k} = t_{n-k}^2.
+$$
+\end{remark}
+
+\subsection{Interpretation and Practical Implications}
+
+\begin{itemize}
+\item Exact $t$ and $F$ inference relies on the normality assumption.
+\item Without normality, $t$ and $F$ statistics are asymptotically valid
+under mild regularity conditions.
+\item In large samples, the central limit theorem justifies normal
+approximations even when errors are non-normal.
+\end{itemize}
+
+\begin{remark}[Connection to Robust Inference]
+Heteroskedasticity-robust and HAC standard errors replace $\hat{\sigma}^2
+(\mathbf X'\mathbf X)^{-1}$ with a consistent estimator of the general
+variance matrix, yielding asymptotically valid—but not exact—$t$ and $F$ tests.
+\end{remark}
+
+
+\section{Generalized Least Squares and Feasible GLS}
+
+\subsection{Motivation}
+
+The Gauss--Markov theorem establishes that OLS is efficient only when
+$$
+\Var(\boldsymbol\varepsilon \mid \mathbf X)=\sigma^2\mathbf I_n.
+$$
+When this assumption fails, the disturbance variance takes the general form
+$$
+\Var(\boldsymbol\varepsilon \mid \mathbf X)=\boldsymbol\Omega,
+$$
+where $\boldsymbol\Omega$ is a known symmetric positive definite matrix.
+In such cases, OLS remains unbiased under exogeneity but is no longer efficient.
+
+\subsection{The GLS Transformation}
+
+Let $\boldsymbol\Omega$ admit the factorization
+$$
+\boldsymbol\Omega = \mathbf P \mathbf P',
+$$
+where $\mathbf P$ is nonsingular.
+Premultiplying the model by $\mathbf P^{-1}$ yields the transformed system
+$$
+\mathbf P^{-1}\mathbf y
+=
+\mathbf P^{-1}\mathbf X\boldsymbol\beta
++
+\mathbf P^{-1}\boldsymbol\varepsilon.
+$$
+
+Define
+$$
+\mathbf y^*=\mathbf P^{-1}\mathbf y,
+\qquad
+\mathbf X^*=\mathbf P^{-1}\mathbf X,
+\qquad
+\boldsymbol\varepsilon^*=\mathbf P^{-1}\boldsymbol\varepsilon.
+$$
+
+Then
+$$
+\mathbf y^* = \mathbf X^*\boldsymbol\beta + \boldsymbol\varepsilon^*,
+\qquad
+\Var(\boldsymbol\varepsilon^*\mid\mathbf X)=\mathbf I_n.
+$$
+
+\subsection{The GLS Estimator}
+
+\begin{theorem}[Generalized Least Squares Estimator]
+If $\Var(\boldsymbol\varepsilon\mid\mathbf X)=\boldsymbol\Omega$ is known,
+the GLS estimator of $\boldsymbol\beta$ is
+$$
+\hat{\boldsymbol\beta}_{\text{GLS}}
+=
+(\mathbf X'\boldsymbol\Omega^{-1}\mathbf X)^{-1}
+\mathbf X'\boldsymbol\Omega^{-1}\mathbf y.
+$$
+\end{theorem}
+
+\begin{proof}
+Applying OLS to the transformed model yields
+$$
+\hat{\boldsymbol\beta}_{\text{GLS}}
+=
+(\mathbf X^{*'}\mathbf X^*)^{-1}\mathbf X^{*'}\mathbf y^*
+=
+(\mathbf X'\boldsymbol\Omega^{-1}\mathbf X)^{-1}
+\mathbf X'\boldsymbol\Omega^{-1}\mathbf y.
+$$
+\end{proof}
+
+\subsection{Variance of the GLS Estimator}
+
+\begin{theorem}[Variance of GLS]
+Under exogeneity,
+$$
+\Var(\hat{\boldsymbol\beta}_{\text{GLS}}\mid\mathbf X)
+=
+(\mathbf X'\boldsymbol\Omega^{-1}\mathbf X)^{-1}.
+$$
+\end{theorem}
+
+\begin{remark}[Efficiency]
+The GLS estimator is BLUE among all linear unbiased estimators when
+$\boldsymbol\Omega$ is known.
+\end{remark}
+
+\subsection{Special Cases}
+
+\begin{itemize}
+\item \textbf{Heteroskedastic but uncorrelated errors:}
+$$
+\boldsymbol\Omega=\operatorname{diag}(\sigma_1^2,\ldots,\sigma_n^2)
+\quad \Rightarrow \quad
+\text{Weighted Least Squares (WLS)}.
+$$
+
+\item \textbf{AR(1) errors (time series):}
+$$
+\varepsilon_t=\rho\varepsilon_{t-1}+u_t,
+\quad | \rho | < 1,
+$$
+leading to a Toeplitz covariance matrix $\boldsymbol\Omega$.
+
+\item \textbf{Panel data:}
+$\boldsymbol\Omega$ reflects serial correlation and cross-sectional dependence.
+\end{itemize}
+
+\subsection{Feasible Generalized Least Squares}
+
+In practice, $\boldsymbol\Omega$ is unknown and must be estimated.
+
+\begin{definition}[Feasible GLS]
+The feasible GLS (FGLS) estimator replaces $\boldsymbol\Omega$ with a consistent
+estimator $\hat{\boldsymbol\Omega}$:
+$$
+\hat{\boldsymbol\beta}_{\text{FGLS}}
+=
+(\mathbf X'\hat{\boldsymbol\Omega}^{-1}\mathbf X)^{-1}
+\mathbf X'\hat{\boldsymbol\Omega}^{-1}\mathbf y.
+$$
+\end{definition}
+
+\subsection{Two-Step FGLS Procedure}
+
+A common implementation proceeds as follows:
+
+\begin{enumerate}
+\item Estimate the model by OLS and obtain residuals $\hat{\boldsymbol\varepsilon}$.
+\item Use $\hat{\boldsymbol\varepsilon}$ to estimate the parameters of
+$\boldsymbol\Omega$.
+\item Construct $\hat{\boldsymbol\Omega}$ and compute $\hat{\boldsymbol\beta}_{\text{FGLS}}$.
+\end{enumerate}
+
+\subsection{Asymptotic Properties}
+
+\begin{theorem}[Consistency and Efficiency]
+If $\hat{\boldsymbol\Omega}\xrightarrow{p}\boldsymbol\Omega$, then
+$$
+\hat{\boldsymbol\beta}_{\text{FGLS}}
+\xrightarrow{p}
+\boldsymbol\beta,
+\qquad
+\sqrt{n}(\hat{\boldsymbol\beta}_{\text{FGLS}}-\boldsymbol\beta)
+\xrightarrow{d}
+\mathcal N\!\left(
+\mathbf 0,\;
+(\mathbf X'\boldsymbol\Omega^{-1}\mathbf X)^{-1}
+\right).
+$$
+\end{theorem}
+
+\begin{remark}[FGLS vs Robust Inference]
+When $\boldsymbol\Omega$ is misspecified, FGLS can perform poorly in finite samples.
+Robust (White/HAC) standard errors retain consistency without requiring correct
+specification of $\boldsymbol\Omega$.
+\end{remark}
+
+\subsection{GLS vs OLS: Conceptual Comparison}
+
+Table @tbl-ols-vs-gls compares OLS and GLS along key conceptual dimensions.
+
+\begin{table}[tbp]
+\centering
+\caption{Comparison of OLS and GLS}
+\label{tbl-ols-vs-gls}
+\begin{tabular}{lcc}
+\toprule
+ & OLS & GLS \\
+\midrule
+Requires $\boldsymbol\Omega=\sigma^2\mathbf I$ & Yes & No \\
+Efficient under heteroskedasticity/autocorrelation & No & Yes \\
+Requires estimating $\boldsymbol\Omega$ & No & Often \\
+Finite-sample robustness & High & Lower if $\boldsymbol\Omega$ misspecified \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+# Asymptotic Inference Using OLS
+In many econometric applications, the classical assumptions of homoskedasticity and no autocorrelation are violated. However, the Ordinary Least Squares (OLS) estimator remains consistent and asymptotically normal under weaker conditions. This section outlines the asymptotic properties of the OLS estimator and how to conduct inference when the classical assumptions do not hold.
+
+## Asymptotic Inference Using Ordinary Least Squares
+
+Under \Cref{assump:clrm,assump:exogeneity}, the OLS estimator $\betahat$ has the following asymptotic properties as $N \to \infty$:
+
+1. **Consistency**:
+   
+   $$\betahat \xrightarrow{p} \symbf{\beta}.$$
+   
+   This property indicates that as the sample size increases, the OLS estimator converges in probability to the true parameter vector $\symbf{\beta}$. The consistency of the OLS estimator can be shown using the Law of Large Numbers (LLN) as follows:
+   
+   \begin{align*}
+   \betahat 
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{y} \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}'(\symbf{X}\symbf{\beta} + \symbf{\varepsilon}) \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{X}\symbf{\beta} + (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon} \\
+   &= \symbf{\beta} + (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon}.
+   \end{align*}
+   
+   By the LLN, $\frac{1}{N}\symbf{X}'\symbf{\varepsilon} \xrightarrow{p} \symbf{0}$ as $N \to \infty$, and $\frac{1}{N}\symbf{X}'\symbf{X} \xrightarrow{p} \mathbb{E}[\symbf{x}_i\symbf{x}_i']$ (assuming it is positive definite). Therefore, $(\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon} \xrightarrow{p} \symbf{0}$, leading to $\betahat \xrightarrow{p} \symbf{\beta}$. The OLS estimator converges in probability to the true parameter vector as the sample size increases. The OLS estimator is constent so long as the regressors are exogenous and the matrix $\mathbb{E}[\symbf{x}_i\symbf{x}_i']$ is positive definite. However, even if the spherical errors assumption is violated (e.g., heteroscedasticity or autocorrelation), the OLS estimator remains consistent.
+
+2. **Asymptotic Normality**:
+
+   $$\sqrt{N}(\betahat - \symbf{\beta}) \xrightarrow{d} \mathcal{N}\left(\symbf{0}, \sigma^2 \mathbb{E}[\symbf{x}_i\symbf{x}_i']^{-1}\right).$$
+   
+   This property indicates that the scaled difference between the OLS estimator and the true parameter vector converges in distribution to a multivariate normal distribution as the sample size increases. The asymptotic normality of the OLS estimator can be shown using the Central Limit Theorem (CLT) as follows:
+   
+   \begin{align*}
+   \sqrt{N}(\betahat - \symbf{\beta}) 
+   &= \sqrt{N}((\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon}) \\
+   &= (\frac{1}{N}\symbf{X}'\symbf{X})^{-1} \frac{1}{\sqrt{N}}\symbf{X}'\symbf{\varepsilon}.
+   \end{align*}
+   
+   By the CLT, $\frac{1}{\sqrt{N}}\symbf{X}'\symbf{\varepsilon} \xrightarrow{d} \mathcal{N}(\symbf{0}, \sigma^2 \mathbb{E}[\symbf{x}_i\symbf{x}_i'])$ as $N \to \infty$. Additionally, $\frac{1}{N}\symbf{X}'\symbf{X} \xrightarrow{p} \mathbb{E}[\symbf{x}_i\symbf{x}_i']$. Therefore, by Slutsky's theorem, we have:
+   
+   $$\sqrt{N}(\betahat - \symbf{\beta}) \xrightarrow{d} \mathcal{N}\left(\symbf{0}, \sigma^2 \mathbb{E}[\symbf{x}_i\symbf{x}_i']^{-1}\right).$$
+   
+   This result allows for the construction of confidence intervals and hypothesis tests for the parameters in large samples.
+
+The asymptotic normality of the OLS estimator justifies \emph{approximate (large-sample) inference}---such as constructing confidence intervals and conducting hypothesis tests---because the sampling distribution of $\hat{\beta}$ is approximately normal in large samples. In particular, under standard regularity conditions, 
+$$
+\sqrt{n}\,(\hat{\beta}-\beta)\ \xrightarrow{d}\ \mathcal{N}(0, V),
+$$
+
+where $V$ is the asymptotic variance matrix. When the classical assumptions (homoskedasticity and no autocorrelation) are violated, valid large-sample inference requires using an appropriate variance estimator (e.g., heteroskedasticity-robust or HAC standard errors). This property is especially useful in econometrics, where large datasets are common.
+
+## Asymptotic Inference Using Ordinary Least Squares
+Under \Cref{assump:clrm,assump:exogeneity}, the OLS estimator $\betahat$ has the following asymptotic properties as $N \to \infty$:
+
+1. **Consistency**:
+   
+   $$\betahat \xrightarrow{p} \symbf{\beta}.$$
+   
+   This property indicates that as the sample size increases, the OLS estimator converges in probability to the true parameter vector $\symbf{\beta}$. The consistency of the OLS estimator can be shown using the Law of Large Numbers (LLN) as follows:
+   
+   \begin{align*}
+   \betahat 
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{y} \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}'(\symbf{X}\symbf{\beta} + \symbf{\varepsilon}) \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{X}\symbf{\beta} + (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon} \\
+   &= \symbf{\beta} + (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon}.
+   \end{align*}
+   
+   
+ ```{=latex}
+\begin{table}[!htbp]
+\centering
+\caption{Comparison of MLE, MoM, and OLS Estimators on Key Aspects}
+\label{tbl-mle-mom-ols}
+\renewcommand{\arraystretch}{1.25}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{p{3.1cm} p{4.25cm} p{4.25cm} p{4.25cm}}
+\hline
+\textbf{Aspect} & \textbf{MLE} & \textbf{MoM} & \textbf{OLS} \\
+\hline
+Core idea & Maximize likelihood & Match sample and population moments & Minimize sum of squared residuals \\
+% ... (rest of rows)
+\hline
+\end{tabular}
+\end{table}
+
+
+# Appendix {.appendix}
+
+## Proof of Theorem 3
+Under \Cref{assump:clrm,assump:exogeneity}, the OLS estimator $\betahat$ has the following asymptotic properties as $N \to \infty$:
+1. **Consistency**:
+   
+   $$\betahat \xrightarrow{p} \symbf{\beta}.$$
+   
+   This property indicates that as the sample size increases, the OLS estimator converges in probability to the true parameter vector $\symbf{\beta}$. The consistency of the OLS estimator can be shown using the Law of Large Numbers (LLN) as follows:
+   
+   \begin{align*}
+   \betahat 
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{y} \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}'(\symbf{X}\symbf{\beta} + \symbf{\varepsilon}) \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{X}\symbf{\beta} + (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon} \\
+   &= \symbf{\beta} + (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon}.
+   \end{align*}
+   
+   By the LLN, $\frac{1}{N}\symbf{X}'\symbf{\varepsilon} \xrightarrow{p} \symbf{0}$ as $N \to \infty$, and $\frac{1}{N}\symbf{X}'\symbf{X} \xrightarrow{p} \mathbb{E}[\symbf{x}_i\symbf{x}_i']$ (assuming it is positive definite). Therefore, $(\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon} \xrightarrow{p} \symbf{0}$, leading to $\betahat \xrightarrow{p} \symbf{\beta}$. The OLS estimator converges in probability to the true parameter vector as the sample size increases. The OLS estimator is constent so long as the regressors are exogenous and the matrix $\mathbb{E}[\symbf{x}_i\symbf{x}_i']$ is positive definite
+
+

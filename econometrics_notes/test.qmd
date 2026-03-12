@@ -1,0 +1,95 @@
+
+---
+title: "Econometrics Test II"
+subtitle: "EC Statistical Inference and Econometrics"
+date: 2026-02-28
+
+
+format:
+  pdf:
+    pdf-engine: xelatex
+    documentclass: article
+    papersize: a4
+    fontsize: 11pt
+    geometry:
+      - top=25mm
+      - bottom=25mm
+      - left=25mm
+      - right=25mm
+    mainfont: "Palatino"
+    mathfont: "Palatino"
+    number-sections: false
+    toc: false
+    colorlinks: true
+    linkcolor: black
+    urlcolor: black
+    citecolor: black
+    include-in-header:
+      text: |
+        \usepackage{setspace}
+        \setstretch{1.10}
+        \usepackage{enumitem}
+        \setlist[itemize]{noitemsep,topsep=2pt}
+        \setlist[enumerate]{noitemsep,topsep=2pt}
+---
+
+
+
+# Instructions
+
+Time allowed: **1 hour**. This test contains **three questions**.  
+**Answer any TWO**. Provide complete solutions with clear explanations.
+
+---
+
+# Questions
+
+## **Question 1: The OLS estimator and its variance-covariance matrix** (Total: **10 marks**)
+
+
+Consider the classical linear regression model:
+$$
+\symbf{y} = \symbf{X}\symbf{\beta} + \symbf{\varepsilon},
+$$
+where $\symbf{y}$ is $N \times 1$, $\symbf{X}$ is $N \times k$, $\symbf{\beta}$ is $k \times 1$, and $\symbf{\varepsilon}$ is $N \times 1$.
+
+1. **[5 marks]** Derive the **OLS estimator** $\hat{\beta}$.
+  Solution: The OLS estimator $\hat{\beta}$ is derived by minimizing the sum of squared residuals:
+$$
+\hat{\beta} = \arg\min_{\beta} (\symbf{y} - \symbf{X}\beta)'(\symbf{y} - \symbf{X}\beta).
+$$
+To find the minimum, we take the derivative with respect to $\beta$ and set it to zero:
+$$-2\symbf{X}'(\symbf{y} - \symbf{X}\beta) = 0.$$
+Rearranging gives:
+$$\symbf{X}'\symbf{X}\beta = \symbf{X}'\symbf{y}.$$
+Assuming $\symbf{X}'\symbf{X}$ is invertible, we can solve for $\beta$:
+$$\hat{\beta} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{y}.$$    
+
+2. **[5 marks]** Derive the **variance-covariance matrix** of $\hat{\beta}$ under the classical assumptions.
+
+## **Question 2: Unbiasedness and consistency of OLS estimator** (Total: **10 marks**)
+
+
+Given the model in Question 1:
+1. **[5 marks]** Show that $\hat{\beta}$ is **unbiased** under the classical assumptions.
+2. **[5 marks]** If a regressor in $\symbf{X}$ is correlated with $\symbf{\varepsilon}$, is $\hat{\beta}$ still unbiased? **Explain.**
+
+
+## **Question 3: Normality of the OLS estimator** (Total: **10 marks**)
+
+1. **[5 marks]** Assuming the model in Question 1 and normal errors, show that $\hat{\beta}$ is **normally distributed**. State its mean and variance.
+2. **[5 marks]** Why is the **normality assumption** important for hypothesis tests and confidence intervals for $\hat{\beta}$?
+
+
+
+---
+
+
+---
+
+**End of Test**
+
+*Version: 2026-02-28*
+
+*Version: 2026-02-28*
+

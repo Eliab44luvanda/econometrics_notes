@@ -1,0 +1,961 @@
+---
+title: "Monte Carlo Simulation of Spherical and Non-Spherical Errors"
+subtitle: "Advanced Econometrics Teaching Version"
+author: "Eliab Luvanda"
+date: today
+format:
+  pdf:
+    documentclass: article
+    pdf-engine: xelatex
+    classoption:
+      - twoside
+    fontsize: 11pt
+    papersize: a4
+    mainfont: "Palatino"
+    toc: true
+    number-sections: true
+    colorlinks: true
+    include-in-header:
+      - text: |
+          \usepackage{float}
+          \usepackage{placeins}
+editor: source
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+# Introduction
+
+This note presents a Monte Carlo experiment designed to illustrate a central result of regression analysis: when the disturbance term is spherical, the sampling distribution of the ordinary least squares estimator tends to be more concentrated than when the disturbance term exhibits heteroscedasticity or serial correlation.
+
+A simple setup is this:
+
+$$
+y_i = \beta_0 + \beta_1 x_i + u_i
+$$
+
+Then simulate many datasets under three cases:
+
+1. Spherical errors:
+
+$$
+u_i \sim \mathcal{N}(0, \sigma^2)
+$$
+
+with constant variance and no correlation.
+
+2. Heteroscedastic errors:
+
+$$
+u_i \sim \mathcal{N}(0, \sigma_i^2), \qquad \sigma_i^2 = \sigma^2(1 + \gamma x_i^2)
+$$
+
+3. Serially correlated and heteroscedastic errors, for example:
+
+$$
+u_t = \rho u_{t-1} + \varepsilon_t, \qquad \varepsilon_t \sim \mathcal{N}(0, \sigma_t^2)
+$$
+
+with $\sigma_t^2$ varying over $t$.
+
+Then, across many replications, compare the empirical distribution of $\hat{\beta}_1$. Under spherical errors, OLS is unbiased and efficient within the Gauss--Markov class, so its sampling distribution should usually be tighter, meaning that it has smaller variance. Under heteroscedasticity and serial correlation, OLS may remain unbiased under exogeneity, but it is no longer efficient, so the Monte Carlo distribution of $\hat{\beta}_1$ will typically be more spread out.
+
+# Theoretical Background
+
+The heuristic inequality
+
+$$
+\operatorname{Var}(\hat{\beta}_1 \mid \Omega = \sigma^2 I)
+<
+\operatorname{Var}(\hat{\beta}_1 \mid \Omega \neq \sigma^2 I)
+$$
+
+is not a universal theorem for every imaginable non-spherical covariance matrix. The precise theoretical result is the Gauss--Markov statement: within the class of linear unbiased estimators, OLS has minimum variance when the errors are spherical. Once the error covariance matrix is no longer proportional to the identity, OLS loses efficiency and, in general, another linear unbiased estimator can achieve a smaller variance.
+
+## Linear Model and OLS Variance
+
+Start from the linear model
+
+$$
+y = X\beta + u,
+$$
+
+where
+
+- $y$ is an $n$-vector of observations,
+- $X$ is an $n$ by $k$ matrix of regressors with full column rank,
+- $\beta$ is a $k$-vector of parameters, and
+- $u$ is an $n$-vector of disturbances.
+
+Assume
+
+$$
+\mathbb{E}(u \mid X) = 0.
+$$
+
+The OLS estimator is
+
+$$
+\hat{\beta}_{\mathrm{OLS}} = (X'X)^{-1}X'y.
+$$
+
+Its conditional variance is
+
+$$
+\operatorname{Var}(\hat{\beta}_{\mathrm{OLS}} \mid X)
+=
+(X'X)^{-1} X'\Omega X (X'X)^{-1},
+$$
+
+where
+
+$$
+\Omega = \operatorname{Var}(u \mid X).
+$$
+
+This formula is valid under exogeneity.
+
+## Spherical Errors
+
+If the errors are spherical, then
+
+$$
+\Omega = \sigma^2 I.
+$$
+
+Hence
+
+$$
+\operatorname{Var}(\hat{\beta}_{\mathrm{OLS}} \mid X)
+=
+\sigma^2 (X'X)^{-1}.
+$$
+
+This variance matrix plays a central role in classical regression theory.
+
+For the slope coefficient $\beta_1$, assuming it is the second parameter, this gives
+
+$$
+\operatorname{Var}(\hat{\beta}_1 \mid X, \Omega = \sigma^2 I)
+=
+\sigma^2 \bigl[(X'X)^{-1}\bigr]_{22}.
+$$
+
+## Heteroscedastic or Serially Correlated Errors
+
+If the errors are non-spherical, then
+
+$$
+\Omega \neq \sigma^2 I,
+$$
+
+and therefore
+
+$$
+\operatorname{Var}(\hat{\beta}_{\mathrm{OLS}} \mid X)
+=
+(X'X)^{-1} X'\Omega X (X'X)^{-1}.
+$$
+
+This is no longer equal to $\sigma^2 (X'X)^{-1}$. Its magnitude depends on the exact form of $\Omega$, so a blanket coefficient-by-coefficient inequality for every non-spherical covariance matrix is not the cleanest theorem.
+
+## Gauss--Markov Argument
+
+Under the assumptions
+
+1. $\mathbb{E}(u \mid X) = 0$
+2. $\operatorname{Var}(u \mid X) = \sigma^2 I_n$
+
+the Gauss--Markov theorem states that the ordinary least squares estimator $\hat{\beta}_{\mathrm{OLS}}$ has minimum variance among all linear unbiased estimators of $\beta$. Thus OLS is BLUE.
+
+To prove this, take any linear unbiased estimator of $\beta$ of the form
+
+$$
+\beta^\star = Ay, \qquad AX = I.
+$$
+
+Under spherical errors,
+
+$$
+\operatorname{Var}(\beta^\star \mid X) = \sigma^2 AA'.
+$$
+
+Because $AX = I$, one can write
+
+$$
+A = (X'X)^{-1}X' + C, \qquad CX = 0.
+$$
+
+Then
+
+$$
+\operatorname{Var}(\beta^\star \mid X)
+=
+\sigma^2 \left[(X'X)^{-1} + CC'\right].
+$$
+
+Since $CC'$ is positive semidefinite,
+
+$$
+\operatorname{Var}(\beta^\star \mid X)
+-
+\operatorname{Var}(\hat{\beta}_{\mathrm{OLS}} \mid X)
+=
+\sigma^2 CC'
+$$
+
+is positive semidefinite. Therefore OLS has the smallest variance matrix among all linear unbiased estimators. This is the theoretical proof of OLS efficiency under spherical errors.
+
+## GLS Under Non-Spherical Errors
+
+When
+
+$$
+\Omega \neq \sigma^2 I,
+$$
+
+the generalized least squares estimator is
+
+$$
+\hat{\beta}_{\mathrm{GLS}}
+=
+(X'\Omega^{-1}X)^{-1} X'\Omega^{-1} y,
+$$
+
+with conditional variance
+
+$$
+\operatorname{Var}(\hat{\beta}_{\mathrm{GLS}} \mid X)
+=
+(X'\Omega^{-1}X)^{-1}.
+$$
+
+Under non-spherical errors, GLS is BLUE, not OLS. Equivalently, the matrix
+
+$$
+\operatorname{Var}(\hat{\beta}_{\mathrm{OLS}} \mid X)
+-
+\operatorname{Var}(\hat{\beta}_{\mathrm{GLS}} \mid X)
+$$
+
+is positive semidefinite, with strict improvement in nondegenerate cases.
+
+## Why the Simple Inequality Needs Care
+
+The intuitive comparison in this note is between the variance of OLS under spherical errors and the variance of OLS under heteroscedastic or serially correlated errors. That comparison is often supported by simulation evidence, but it is not the central theorem. The central theorem is instead:
+
+- under spherical errors, OLS is efficient within the class of linear unbiased estimators;
+- under non-spherical errors, OLS is generally inefficient; and
+- under non-spherical errors, GLS achieves the relevant BLUE property.
+
+So the strongest theoretical comparison is between GLS and OLS under the same non-spherical covariance structure, not necessarily between OLS under two different covariance structures for every individual coefficient.
+
+## Special Cases with One Regressor
+
+If the model has an intercept and one regressor, then the OLS slope can be written as
+
+$$
+\hat{\beta}_1
+=
+\beta_1 + \frac{\sum_{t=1}^n (x_t - \bar{x})u_t}{\sum_{t=1}^n (x_t - \bar{x})^2}.
+$$
+
+Therefore, for a general covariance matrix $\Omega = (\omega_{ts})$, its conditional variance is
+
+$$
+\operatorname{Var}(\hat{\beta}_1 \mid X)
+=
+\frac{\sum_{t=1}^n \sum_{s=1}^n (x_t - \bar{x})(x_s - \bar{x})\omega_{ts}}{\left(\sum_{t=1}^n (x_t - \bar{x})^2\right)^2}.
+$$
+
+Under spherical errors this reduces to
+
+$$
+\operatorname{Var}(\hat{\beta}_1 \mid X)
+=
+\frac{\sigma^2}{\sum_{t=1}^n (x_t - \bar{x})^2}.
+$$
+
+Under heteroscedasticity with diagonal covariance matrix
+
+$$
+\Omega = \mathrm{diag}(\sigma_1^2, \ldots, \sigma_n^2),
+$$
+
+the OLS slope variance becomes
+
+$$
+\operatorname{Var}(\hat{\beta}_1 \mid X)
+=
+\frac{\sum_{t=1}^n (x_t - \bar{x})^2 \sigma_t^2}{\left(\sum_{t=1}^n (x_t - \bar{x})^2\right)^2}.
+$$
+
+Under serial correlation, the off-diagonal covariances matter directly. Writing $\omega_{ts} = \operatorname{Cov}(u_t, u_s \mid X)$, one can decompose the variance as
+
+$$
+\operatorname{Var}(\hat{\beta}_1 \mid X)
+=
+\frac{\sum_{t=1}^n (x_t - \bar{x})^2 \omega_{tt} + 2\sum_{t < s} (x_t - \bar{x})(x_s - \bar{x})\omega_{ts}}{\left(\sum_{t=1}^n (x_t - \bar{x})^2\right)^2}.
+$$
+
+The second term is exactly the serial-correlation contribution. It vanishes when the disturbances are uncorrelated over time, but under autocorrelation it enters through the off-diagonal elements of $\Omega$. When nearby disturbances are positively correlated and the centered regressors tend to have the same sign over nearby dates, these cross-products are often positive and the variance of OLS increases.
+
+For a homoskedastic AR(1) benchmark,
+
+$$
+u_t = \rho u_{t-1} + \varepsilon_t, \qquad \varepsilon_t \sim \mathcal{N}(0, \sigma_\varepsilon^2), \qquad |\rho| < 1,
+$$
+
+the covariance matrix has elements
+
+$$
+\omega_{ts} = \frac{\sigma_\varepsilon^2}{1 - \rho^2}\rho^{|t-s|}.
+$$
+
+So the OLS variance depends on weighted sums of these autocovariances. In the simulation used in this note, the third case is more general still: it combines heteroscedastic innovations with serial dependence, so both the diagonal and off-diagonal parts of $\Omega$ contribute to the wider sampling distribution.
+
+## Bottom Line
+
+The rigorous conclusion is:
+
+- OLS is BLUE under spherical errors;
+- GLS is BLUE under non-spherical errors; and
+- serial correlation affects OLS precision through the off-diagonal elements of $\Omega$; and
+- sphericity is exactly the condition under which OLS attains minimum variance within the class of linear unbiased estimators.
+
+That is the correct theoretical foundation for interpreting the Monte Carlo results in this note.
+
+# Setup
+
+The Monte Carlo calculations in this section are executed with hidden R chunks so that the main text can focus on the results. The full R implementation is reported in Appendix A.1, and equivalent Python and Julia scripts are reported in Appendix A.2 and Appendix A.3.
+
+```{r}
+#| label: setup-simulation
+#| include: false
+
+library(ggplot2)
+library(dplyr)
+library(purrr)
+library(sandwich)
+
+set.seed(12345)
+
+R <- 2000
+sample_sizes <- c(50, 100, 500)
+
+beta0 <- 1
+beta1 <- 2
+
+sigma <- 1
+gamma <- 2
+rho <- 0.7
+
+cases <- c("spherical", "heteroscedastic", "het_ar1")
+case_labels <- c(
+  spherical = "Spherical",
+  heteroscedastic = "Heteroscedastic",
+  het_ar1 = "Heteroscedastic + AR(1)"
+)
+case_abbrev_labels <- c(
+  Spherical = "SPH",
+  Heteroscedastic = "HET",
+  `Heteroscedastic + AR(1)` = "HET-AR1"
+)
+
+generate_data <- function(case, n) {
+  x <- rnorm(n)
+
+  if (case == "spherical") {
+    u <- rnorm(n, 0, sigma)
+    sd_true <- rep(sigma, n)
+  }
+
+  if (case == "heteroscedastic") {
+    sd_true <- sigma * sqrt(1 + gamma * x^2)
+    u <- rnorm(n, 0, sd_true)
+  }
+
+  if (case == "het_ar1") {
+    sd_true <- sigma * sqrt(1 + gamma * x^2)
+    eps <- rnorm(n, 0, sd_true)
+
+    u <- numeric(n)
+    u[1] <- eps[1]
+
+    for (t in 2:n) {
+      u[t] <- rho * u[t - 1] + eps[t]
+    }
+  }
+
+  y <- beta0 + beta1 * x + u
+
+  data.frame(y, x, sd_true)
+}
+
+run_rep <- function(case, n) {
+  dat <- generate_data(case, n)
+  fit <- lm(y ~ x, data = dat)
+
+  b_ols <- coef(fit)[2]
+  se_ols <- summary(fit)$coefficients[2, 2]
+  se_hc <- sqrt(diag(vcovHC(fit, type = "HC1")))[2]
+
+  c(b_ols, se_ols, se_hc)
+}
+
+results <- map_dfr(sample_sizes, function(n) {
+  map_dfr(cases, function(case) {
+    est <- replicate(R, run_rep(case, n))
+
+    tibble(
+      n = n,
+      case = case,
+      beta1_hat = est[1, ],
+      se_ols = est[2, ],
+      se_hc = est[3, ]
+    )
+  })
+}) %>%
+  mutate(case = factor(case, levels = cases, labels = unname(case_labels[cases])))
+
+summary_table <- results %>%
+  group_by(n, case) %>%
+  summarise(
+    mean = mean(beta1_hat),
+    bias = mean(beta1_hat) - beta1,
+    sd = sd(beta1_hat),
+    variance = var(beta1_hat),
+    rmse = sqrt(mean((beta1_hat - beta1)^2)),
+    .groups = "drop"
+  )
+
+density_plot <- ggplot(results, aes(beta1_hat)) +
+  geom_density() +
+  facet_grid(n ~ case) +
+  geom_vline(xintercept = beta1, linetype = "dashed") +
+  labs(
+    title = "Monte Carlo Distribution of the OLS Estimator",
+    x = expression(hat(beta)[1]),
+    y = "Density"
+  ) +
+  theme_classic()
+
+boxplot_plot <- ggplot(results, aes(case, beta1_hat)) +
+  geom_boxplot() +
+  facet_wrap(~n) +
+  geom_hline(yintercept = beta1, linetype = "dashed") +
+  scale_x_discrete(labels = case_abbrev_labels) +
+  labs(
+    title = "Boxplot of the OLS Estimator by Error Structure",
+    x = "Error Structure",
+    y = expression(hat(beta)[1])
+  ) +
+  theme_classic() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(size = 9)
+  )
+```
+
+```{r}
+#| label: tbl-monte-carlo-summary
+#| tbl-cap: "Monte Carlo summary statistics for the OLS slope estimator across sample sizes and error structures."
+#| tbl-pos: "H"
+#| echo: false
+
+formatted_summary <- summary_table %>%
+  arrange(n, case) %>%
+  group_by(n) %>%
+  mutate(best_rmse = rmse == min(rmse)) %>%
+  ungroup() %>%
+  mutate(row_id = row_number())
+
+best_rows <- formatted_summary %>%
+  filter(best_rmse) %>%
+  pull(row_id)
+
+formatted_summary %>%
+  select(
+    `Error Structure` = case,
+    Mean = mean,
+    Bias = bias,
+    SD = sd,
+    Variance = variance,
+    RMSE = rmse
+  ) %>%
+  knitr::kable(
+    format = "latex",
+    booktabs = TRUE,
+    digits = 3,
+    linesep = "",
+    align = c("l", "r", "r", "r", "r", "r")
+  ) %>%
+  kableExtra::kable_styling(
+    latex_options = "hold_position",
+    full_width = FALSE,
+    position = "center",
+    font_size = 9
+  ) %>%
+  kableExtra::row_spec(best_rows, bold = TRUE) %>%
+  kableExtra::column_spec(1, width = "4.2cm") %>%
+  kableExtra::column_spec(2:6, width = "1.55cm") %>%
+  kableExtra::pack_rows(
+    index = c("\\emph{Sample Size: 50}" = 3, "\\emph{Sample Size: 100}" = 3, "\\emph{Sample Size: 500}" = 3),
+    escape = FALSE
+  )
+```
+
+```{r}
+#| label: fig-density-comparison
+#| fig-cap: "Sampling density of the OLS slope estimator across sample sizes and error structures."
+#| fig-pos: "H"
+#| fig-width: 9
+#| fig-height: 6
+#| echo: false
+
+print(density_plot)
+```
+
+```{r}
+#| label: fig-boxplot-comparison
+#| results: asis
+#| echo: false
+
+boxplot_dir <- file.path("monte_carlo_spherical_errors_advanced_files", "custom-figures")
+if (!dir.exists(boxplot_dir)) {
+  dir.create(boxplot_dir, recursive = TRUE)
+}
+
+boxplot_path <- file.path(boxplot_dir, "fig-boxplot-comparison.pdf")
+grDevices::pdf(boxplot_path, width = 9, height = 5)
+print(boxplot_plot)
+grDevices::dev.off()
+
+cat(
+  paste0(
+    "\\begin{figure}[H]\n",
+    "\\centering\n",
+    "\\includegraphics[width=0.95\\linewidth]{", boxplot_path, "}\n",
+    "\\par\\vspace{0.35em}\n",
+    "\\begin{minipage}{0.95\\linewidth}\\footnotesize ",
+    "\\emph{Note:} SPH = spherical errors, HET = heteroscedastic errors, and HET-AR1 = heteroscedastic errors with AR(1) serial correlation.\\par",
+    "\\end{minipage}\n",
+    "\\caption{Boxplots of the OLS slope estimator across sample sizes and error structures.}\\label{fig-boxplot-comparison}\n",
+    "\\end{figure}\n"
+  )
+)
+```
+
+```{=latex}
+\FloatBarrier
+```
+
+# Interpretation
+
+The simulation typically shows that the spread of the estimator is smallest when errors are spherical. Under heteroscedasticity the estimator remains approximately unbiased but becomes less precise. When serial correlation is added, the sampling distribution becomes even more dispersed.
+
+These results illustrate the efficiency advantage of OLS under the classical spherical disturbance assumption.
+
+```{=latex}
+\clearpage
+\appendix
+```
+
+# Code Appendix
+
+This appendix collects code listings for the Monte Carlo experiment. Appendix A.1 reproduces the R workflow used to generate the results in this document, while Appendix A.2 and Appendix A.3 provide parallel Python and Julia implementations of the same simulation design.
+
+## R Implementation
+
+```r
+library(ggplot2)
+library(dplyr)
+library(purrr)
+
+set.seed(12345)
+
+R <- 2000
+sample_sizes <- c(50, 100, 500)
+
+beta0 <- 1
+beta1 <- 2
+
+sigma <- 1
+gamma <- 2
+rho <- 0.7
+
+cases <- c("spherical", "heteroscedastic", "het_ar1")
+case_labels <- c(
+  spherical = "Spherical",
+  heteroscedastic = "Heteroscedastic",
+  het_ar1 = "Heteroscedastic + AR(1)"
+)
+
+generate_data <- function(case, n) {
+  x <- rnorm(n)
+
+  if (case == "spherical") {
+  u <- rnorm(n, 0, sigma)
+  } else if (case == "heteroscedastic") {
+  sd_true <- sigma * sqrt(1 + gamma * x^2)
+  u <- rnorm(n, 0, sd_true)
+  } else if (case == "het_ar1") {
+  sd_true <- sigma * sqrt(1 + gamma * x^2)
+  eps <- rnorm(n, 0, sd_true)
+  u <- numeric(n)
+  u[1] <- eps[1]
+
+  for (t in 2:n) {
+    u[t] <- rho * u[t - 1] + eps[t]
+  }
+  } else {
+  stop("Unknown case.")
+  }
+
+  y <- beta0 + beta1 * x + u
+  data.frame(y = y, x = x)
+}
+
+run_rep <- function(case, n) {
+  dat <- generate_data(case, n)
+  fit <- lm(y ~ x, data = dat)
+  coef(fit)[2]
+}
+
+results <- map_dfr(sample_sizes, function(n) {
+  map_dfr(cases, function(case) {
+  tibble(
+    n = n,
+    case = case_labels[[case]],
+    beta1_hat = replicate(R, run_rep(case, n))
+  )
+  })
+}) %>%
+  mutate(
+  case = factor(
+    case,
+    levels = unname(case_labels[cases])
+  )
+  )
+
+summary_table <- results %>%
+  group_by(n, case) %>%
+  summarise(
+  mean = mean(beta1_hat),
+  bias = mean(beta1_hat) - beta1,
+  sd = sd(beta1_hat),
+  variance = var(beta1_hat),
+  rmse = sqrt(mean((beta1_hat - beta1)^2)),
+  .groups = "drop"
+  )
+
+density_plot <- ggplot(results, aes(beta1_hat)) +
+  geom_density() +
+  facet_grid(n ~ case) +
+  geom_vline(xintercept = beta1, linetype = "dashed") +
+  labs(
+  title = "Monte Carlo Distribution of the OLS Estimator",
+  x = expression(hat(beta)[1]),
+  y = "Density"
+  ) +
+  theme_classic()
+
+boxplot_plot <- ggplot(results, aes(case, beta1_hat)) +
+  geom_boxplot() +
+  facet_wrap(~n) +
+  geom_hline(yintercept = beta1, linetype = "dashed") +
+  scale_x_discrete(labels = c("SPH", "HET", "HET-AR1")) +
+  labs(
+  title = "Boxplot of the OLS Estimator by Error Structure",
+  x = "Error Structure",
+  y = expression(hat(beta)[1])
+  ) +
+  theme_classic()
+
+print(summary_table)
+ggsave("density_plot_r.pdf", density_plot, width = 9, height = 6)
+ggsave("boxplot_plot_r.pdf", boxplot_plot, width = 9, height = 5)
+```
+
+## Python Implementation
+
+```python
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import statsmodels.api as sm
+
+rng = np.random.default_rng(12345)
+
+R = 2000
+SAMPLE_SIZES = [50, 100, 500]
+
+BETA0 = 1.0
+BETA1 = 2.0
+
+SIGMA = 1.0
+GAMMA = 2.0
+RHO = 0.7
+
+CASE_LABELS = {
+  "spherical": "Spherical",
+  "heteroscedastic": "Heteroscedastic",
+  "het_ar1": "Heteroscedastic + AR(1)",
+}
+
+ORDERED_CASES = [
+  "Spherical",
+  "Heteroscedastic",
+  "Heteroscedastic + AR(1)",
+]
+
+
+def generate_data(case, n, rng):
+  x = rng.normal(size=n)
+
+  if case == "spherical":
+    u = rng.normal(loc=0.0, scale=SIGMA, size=n)
+  elif case == "heteroscedastic":
+    sd_true = SIGMA * np.sqrt(1.0 + GAMMA * x ** 2)
+    u = rng.normal(loc=0.0, scale=sd_true, size=n)
+  elif case == "het_ar1":
+    sd_true = SIGMA * np.sqrt(1.0 + GAMMA * x ** 2)
+    eps = rng.normal(loc=0.0, scale=sd_true, size=n)
+    u = np.empty(n)
+    u[0] = eps[0]
+
+    for t in range(1, n):
+      u[t] = RHO * u[t - 1] + eps[t]
+  else:
+    raise ValueError("Unknown case.")
+
+  y = BETA0 + BETA1 * x + u
+  return pd.DataFrame({"y": y, "x": x})
+
+
+def run_rep(case, n, rng):
+  dat = generate_data(case, n, rng)
+  X = sm.add_constant(dat["x"])
+  fit = sm.OLS(dat["y"], X).fit()
+  return fit.params["x"]
+
+
+records = []
+for n in SAMPLE_SIZES:
+  for case in CASE_LABELS:
+    label = CASE_LABELS[case]
+
+    for _ in range(R):
+      records.append(
+        {
+          "n": n,
+          "case": label,
+          "beta1_hat": run_rep(case, n, rng),
+        }
+      )
+
+results = pd.DataFrame.from_records(records)
+results["case"] = pd.Categorical(
+  results["case"],
+  categories=ORDERED_CASES,
+  ordered=True,
+)
+
+summary_table = (
+  results.groupby(["n", "case"], observed=True)["beta1_hat"]
+  .agg(
+    mean="mean",
+    bias=lambda x: x.mean() - BETA1,
+    sd="std",
+    variance="var",
+    rmse=lambda x: np.sqrt(np.mean((x - BETA1) ** 2)),
+  )
+  .reset_index()
+)
+
+print(summary_table.round(3))
+
+grid = sns.FacetGrid(
+  results,
+  row="n",
+  col="case",
+  sharex=True,
+  sharey=False,
+)
+grid.map(sns.kdeplot, "beta1_hat", fill=False)
+
+for ax in grid.axes.flat:
+  ax.axvline(BETA1, linestyle="--", color="black")
+
+grid.set_axis_labels("beta1_hat", "Density")
+grid.figure.suptitle(
+  "Monte Carlo Distribution of the OLS Estimator",
+  y=1.02,
+)
+grid.savefig("density_plot_python.pdf", bbox_inches="tight")
+
+plt.figure(figsize=(9, 5))
+sns.boxplot(
+  data=results,
+  x="case",
+  y="beta1_hat",
+  order=ORDERED_CASES,
+)
+plt.axhline(BETA1, linestyle="--", color="black")
+plt.xticks(
+  ticks=range(len(ORDERED_CASES)),
+  labels=["SPH", "HET", "HET-AR1"],
+)
+plt.xlabel("Error Structure")
+plt.ylabel("beta1_hat")
+plt.title("Boxplot of the OLS Estimator by Error Structure")
+plt.tight_layout()
+plt.savefig("boxplot_plot_python.pdf", bbox_inches="tight")
+```
+
+## Julia Implementation
+
+```julia
+using Random
+using Distributions
+using DataFrames
+using Statistics
+using StatsModels
+using GLM
+using StatsPlots
+
+Random.seed!(12345)
+
+const R = 2000
+const SAMPLE_SIZES = [50, 100, 500]
+
+const BETA0 = 1.0
+const BETA1 = 2.0
+
+const SIGMA = 1.0
+const GAMMA = 2.0
+const RHO = 0.7
+
+const CASES = ["spherical", "heteroscedastic", "het_ar1"]
+const CASE_LABELS = Dict(
+  "spherical" => "Spherical",
+  "heteroscedastic" => "Heteroscedastic",
+  "het_ar1" => "Heteroscedastic + AR(1)",
+)
+
+const ORDERED_CASES = [
+  "Spherical",
+  "Heteroscedastic",
+  "Heteroscedastic + AR(1)",
+]
+
+
+function generate_data(case, n)
+  x = randn(n)
+
+  if case == "spherical"
+    u = rand(Normal(0, SIGMA), n)
+  elseif case == "heteroscedastic"
+    sd_true = SIGMA .* sqrt.(1 .+ GAMMA .* x .^ 2)
+    u = [rand(Normal(0, s)) for s in sd_true]
+  elseif case == "het_ar1"
+    sd_true = SIGMA .* sqrt.(1 .+ GAMMA .* x .^ 2)
+    eps = [rand(Normal(0, s)) for s in sd_true]
+    u = similar(eps)
+    u[1] = eps[1]
+
+    for t in 2:n
+      u[t] = RHO * u[t - 1] + eps[t]
+    end
+  else
+    error("Unknown case.")
+  end
+
+  y = BETA0 .+ BETA1 .* x .+ u
+  return DataFrame(y = y, x = x)
+end
+
+
+function run_rep(case, n)
+  dat = generate_data(case, n)
+  fit = lm(@formula(y ~ x), dat)
+  return coef(fit)[2]
+end
+
+
+results = DataFrame(
+  n = Int[],
+  case = String[],
+  beta1_hat = Float64[],
+)
+
+for n in SAMPLE_SIZES
+  for case in CASES
+    label = CASE_LABELS[case]
+
+    for _ in 1:R
+      push!(results, (n, label, run_rep(case, n)))
+    end
+  end
+end
+
+summary_table = combine(
+  groupby(results, [:n, :case]),
+  :beta1_hat => mean => :mean,
+  :beta1_hat => (x -> mean(x) - BETA1) => :bias,
+  :beta1_hat => std => :sd,
+  :beta1_hat => var => :variance,
+  :beta1_hat => (x -> sqrt(mean((x .- BETA1) .^ 2))) => :rmse,
+)
+
+sort!(summary_table, [:n, :case])
+show(summary_table, allrows = true, allcols = true)
+
+density_panels = []
+for n in SAMPLE_SIZES
+  for case in ORDERED_CASES
+    sub = results[(results.n .== n) .& (results.case .== case), :]
+    p = @df sub density(
+      :beta1_hat,
+      legend = false,
+      title = "n = $(n), $(case)",
+      xlabel = "beta1_hat",
+      ylabel = "Density",
+    )
+    vline!(p, [BETA1], linestyle = :dash, color = :black)
+    push!(density_panels, p)
+  end
+end
+
+density_plot = plot(
+  density_panels...,
+  layout = (length(SAMPLE_SIZES), length(ORDERED_CASES)),
+  size = (1100, 800),
+)
+savefig(density_plot, "density_plot_julia.pdf")
+
+boxplot_panels = []
+for n in SAMPLE_SIZES
+  sub = results[results.n .== n, :]
+  p = @df sub boxplot(
+    :case,
+    :beta1_hat,
+    legend = false,
+    title = "n = $(n)",
+    xlabel = "Error Structure",
+    ylabel = "beta1_hat",
+  )
+  hline!(p, [BETA1], linestyle = :dash, color = :black)
+  push!(boxplot_panels, p)
+end
+
+boxplot_plot = plot(
+  boxplot_panels...,
+  layout = (1, length(SAMPLE_SIZES)),
+  size = (1100, 400),
+)
+savefig(boxplot_plot, "boxplot_plot_julia.pdf")
+```

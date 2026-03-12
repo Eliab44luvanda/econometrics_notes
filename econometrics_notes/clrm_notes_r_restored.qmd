@@ -1,0 +1,1820 @@
+---
+title: "Classical Linear Regression Model (CLRM)"
+subtitle: "MA Econometrics — Lecture Notes"
+author: "Eliab Luvanda"
+date: today
+lang: en
+
+toc: true
+toc-depth: 3
+number-sections: true
+lof: true
+lot: true
+
+bibliography: references.bib
+csl: chicago-author-date.csl
+citeproc: true
+
+execute:
+  echo: true
+  warning: false
+  message: false
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    classoption: [twoside]
+    fontsize: 11pt
+    papersize: a4
+    mainfont: "Palatino"
+---
+
+# Assumptions of the CLRM
+
+::: {.assumption}
+**Linearity:** The model is linear in parameters:
+
+$$
+y = X\beta + \varepsilon.
+$$
+:::
+
+::: {.assumption}
+**Full rank:** $X$ has full column rank:
+
+$$
+\operatorname{rank}(X) = k.
+$$
+:::
+
+::: {.assumption}
+**Exogeneity:** Errors have zero conditional mean:
+
+$$
+\mathbb{E}[\varepsilon\mid X] = 0.
+$$
+:::
+
+::: {.assumption}
+**Spherical errors:** Errors are homoscedastic and uncorrelated:
+
+$$
+\operatorname{Var}(\varepsilon\mid X) = \sigma^2 I_N.
+$$
+:::
+
+::: {.assumption}
+**Normality:** Errors are normally distributed:
+
+$$
+\varepsilon\mid X \sim \mathcal{N}(0, \sigma^2 I_N).
+$$
+:::
+
+*Notes: Linearity and full rank allow linear estimation. Exogeneity ensures unbiasedness. Spherical errors give OLS efficiency. Normality is only needed for exact inference (t, F tests), not for unbiasedness or consistency.*
+
+| **Assumption** | **Statement** | **Implications and Importance** |
+|:---|:---|:---|
+| **A1. Linearity in Parameters** | The model is linear in unknown parameters: $y = X\beta + u$. | Enables OLS and the standard linear regression toolkit (matrix algebra, closed-form estimator). If violated (nonlinear in parameters), estimation typically requires nonlinear methods. |
+| **A2. Full Rank (No Perfect Multicollinearity)** | $X$ has full column rank (no exact linear dependence among regressors). | Ensures $(X'X)^{-1}$ exists and the OLS estimator is unique. If violated, coefficients cannot be separately identified and estimation breaks down. |
+| **A3. Zero Conditional Mean (Exogeneity)** | $\mathbb{E}(u\mid X)=0$. | Delivers unbiasedness and consistency of OLS; central for causal interpretation. Violations (omitted variables, simultaneity, measurement error) produce biased/inconsistent estimates. |
+| **A4. Spherical Errors** | $\operatorname{Var}(u\mid X)=\sigma^2 I$ (homoskedasticity and no autocorrelation). | Gives efficiency of OLS (BLUE) and validates conventional standard errors, $t$-tests, and $F$-tests. If violated, OLS remains unbiased/consistent under A3 but classical inference fails unless robust SE are used. |
+| **A5. Normality** | $u\mid X \sim \mathcal{N}(0,\sigma^2 I)$. | Enables exact finite-sample inference using $t$ and $F$ distributions. Not required for large-sample consistency/asymptotic normality, but important in small samples and for classical exact tests. |
+
+# Estimation Methods
+
+## Ordinary Least Squares (OLS)
+
+The OLS estimator minimizes the sum of squared residuals:
+
+$$
+\hat{\beta} = \arg\min_{\beta} \sum_{i=1}^N (y_i - x_i'\beta)^2.
+$$
+
+In matrix form:
+
+$$
+S(\beta) = (y - X\beta)'(y - X\beta).
+$$
+
+Setting the gradient to zero gives the normal equations:
+
+$$
+X'X\hat{\beta} = X'y.
+$$
+
+If $X'X$ is invertible:
+
+$$
+\hat{\beta} = (X'X)^{-1}X'y.
+$$
+
+The OLS residuals $\hat{e} = y - X\hat{\beta}$ are orthogonal to the columns of $X$:
+
+$$
+X'\hat{e} = 0.
+$$
+
+### Exercises
+
+1. Show that the OLS residuals $\hat{e}$ are orthogonal to the regressors in $X$.
+2. Show that $y'X\beta = \beta'X'y$.
+3. Show that the OLS estimator follows a multivariate normal distribution under the normality assumption.
+4. Show that if the errors are homoscedastic and uncorrelated, then the variance-covariance matrix of the error term is $\operatorname{Var}(\varepsilon\mid X) = \mathbb{E}[\varepsilon\varepsilon'\mid X] = \sigma^2 I_N$.
+5. Verify the second-order condition for the OLS problem: show that the Hessian $\frac{\partial^2 S(\beta)}{\partial \beta\,\partial \beta'} = 2X'X$ is positive definite when $\operatorname{rank}(X)=k$, and explain why this guarantees that $\hat{\beta}$ is a minimiser rather than a maximiser of $S(\beta)$.
+6. Define the hat matrix $H = X(X'X)^{-1}X'$ and the residual-maker matrix $M = I_N - H$. Show that both $H$ and $M$ are symmetric and idempotent, i.e. $H^2 = H$ and $M^2 = M$.
+7. Using the hat matrix, show that the OLS fitted values can be written as $\hat{y} = Hy$ and the residuals as $\hat{e} = My$. Interpret $H$ as a projection matrix and explain what it projects onto.
+8. Consider the simple regression model $y_i = \beta_0 + \beta_1 x_i + \varepsilon_i$. Write out the normal equations $X'X\hat{\beta} = X'y$ explicitly in terms of sums $\sum x_i$, $\sum x_i^2$, $\sum y_i$, and $\sum x_i y_i$, and solve for $\hat{\beta}_0$ and $\hat{\beta}_1$.
+
+#### Solution Example
+
+By definition, the variance-covariance matrix of the error term is given by
+
+$$
+\operatorname{Var}(\varepsilon\mid X) = \mathbb{E}[(\varepsilon - \mathbb{E}[\varepsilon\mid X])(\varepsilon - \mathbb{E}[\varepsilon\mid X])' \mid X].
+$$
+
+Under exogeneity, $\mathbb{E}[\varepsilon\mid X] = 0$. Therefore, the variance-covariance matrix simplifies to
+
+$$
+\operatorname{Var}(\varepsilon\mid X) = \mathbb{E}[\varepsilon\varepsilon'\mid X].
+$$
+
+Under spherical errors, the errors are homoscedastic and uncorrelated, which implies
+
+$$
+\operatorname{Var}(\varepsilon\mid X) = \sigma^2 I_N.
+$$
+
+Thus, we have shown that if the errors are homoscedastic and uncorrelated, then the variance-covariance matrix of the error term is $\operatorname{Var}(\varepsilon\mid X) = \sigma^2 I_N$.
+
+
+
+## Method of Moments (MoM)
+
+The MoM estimator equates sample and population moments. Under exogeneity:
+\begin{equation}
+\E[\symbf{x}_i \varepsilon_i] = 0.
+\end{equation}
+Sample analog:
+\begin{equation}
+\frac{1}{N} \sum_{i=1}^N \symbf{x}_i (y_i - \symbf{x}_i' \symbf{\beta}) = 0.
+\end{equation}
+Solving yields:
+\begin{equation}
+\betahat = (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{y},
+\end{equation}
+which matches OLS.
+
+
+## Maximum Likelihood Estimation (MLE)
+
+Assume errors are normal:
+\begin{equation}
+\symbf{\varepsilon} \mid \symbf{X} \sim \mathcal{N}(0, \sigma^2 \symbf{I}_N).
+\end{equation}
+The log-likelihood is:
+\begin{equation}
+\ell(\symbf{\beta}, \sigma^2) = -\frac{N}{2} \log(2\pi) - \frac{N}{2} \log(\sigma^2) - \frac{1}{2\sigma^2} (\symbf{y}-\symbf{X}\symbf{\beta})'(\symbf{y}-\symbf{X}\symbf{\beta}).
+\end{equation}
+Maximizing with respect to $\symbf{\beta}$ gives:
+\begin{equation}
+\betahat = (\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{y},
+\end{equation}
+identical to OLS and MoM.
+
+
+## Brief Description of the Generalized Method of Moments (GMM) Estimator
+The Generalized Method of Moments (GMM) estimator extends the Method of Moments by allowing for more general moment conditions and incorporating an optimal weighting matrix to improve efficiency [see @Hayashi2000, ch. 3; @Hansen2022, ch. 13].
+
+The general objective function for GMM is:
+\begin{equation}
+J(\symbf{\beta}) = \hat{\symbf{g}}(\symbf{\beta})' W \hat{\symbf{g}}(\symbf{\beta}),
+\end{equation}
+where $\hat{\symbf{g}}(\symbf{\beta})$ is the vector of sample moment conditions and $W$ is a positive definite weighting matrix.
+
+The GMM estimator minimizes this objective function:
+\begin{equation}
+\betahat_{GMM} = \arg\min_{\symbf{\beta}} J
+(\symbf{\beta}).
+\end{equation}
+
+
+
+
+## Summary of Estimators
+
+
+Table @tbl-mle-mom-ols-concise compares MLE, MoM, and OLS: their principles, assumptions, and properties. MLE is fully parametric and efficient if correctly specified. MoM is flexible but may be inefficient. OLS is practical, requires weak assumptions, and is optimal under Gauss–Markov conditions. The table highlights trade-offs among efficiency, robustness, and assumptions.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Concise Comparison of MLE, MoM, and OLS Estimators}
+\label{tbl-mle-mom-ols-concise}
+\renewcommand{\arraystretch}{1.12}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{p{2.6cm} p{3.2cm} p{3.2cm} p{3.2cm}}
+\toprule
+\textbf{Aspect} & \textbf{MLE} & \textbf{MoM} & \textbf{OLS} \\
+\midrule
+\textbf{Core idea}
+& Maximize the (log-)likelihood.
+& Match sample and population moments.
+& Minimize the sum of squared residuals. \\
+
+\textbf{Information used}
+& Full parametric distribution.
+& Selected moment conditions.
+& Linear conditional mean and second moments. \\
+
+\textbf{Key assumptions}
+& Correct distributional specification.
+& Valid, identifying moments.
+& Linearity, exogeneity, and full rank. \\
+
+\textbf{Consistency}
+& Consistent if correctly specified (QMLE under misspecification).
+& Consistent if moments identify parameters.
+& Consistent if $\E(u\mid X)=0$. \\
+
+\textbf{Asymptotic distribution}
+& $\sqrt{N}(\hat\theta-\theta_0)\Rightarrow\mathcal{N}(0,I^{-1})$.
+& Asymptotically normal; variance from moments.
+& Asymptotically normal; classical or robust SE. \\
+
+\textbf{Efficiency}
+& Asymptotically efficient if correctly specified.
+& Generally inefficient; improved via optimal weighting.
+& BLUE under Gauss--Markov; otherwise not efficient. \\
+
+\textbf{Robustness}
+& Sensitive to distributional misspecification.
+& Sensitive to moment choice.
+& Robust to non-normality; sensitive to endogeneity. \\
+
+\textbf{Computation}
+& Numerical optimization often required.
+& Often closed-form or simple solving.
+& Closed-form and computationally trivial. \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\footnotesize\emph{Note:} OLS can be viewed as a special case of the method of moments with moment conditions
+$\E[X'(y-X\beta)]=0$, and as a special case of MLE under normally distributed errors with constant variance.
+More generally, both MLE and OLS can be embedded within the Generalized Method of Moments (GMM) framework
+under appropriate assumptions.
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw, rectangle, rounded corners, align=center,
+              minimum width=3.6cm, minimum height=1.6cm,
+              inner sep=6pt, font=\small},
+  arr/.style={->, thick, >=stealth},
+  note/.style={font=\scriptsize\itshape, text width=2.4cm, align=center, draw=none}
+]
+
+% --- Nodes (top → bottom, diamond layout) ---
+\node[box] (gmm) {\textbf{GMM}\\[2pt]\footnotesize General moment conditions\\[-1pt]\footnotesize + optimal weighting};
+\node[box, below left=2.5cm and 2.5cm of gmm]  (mom) {\textbf{MoM}\\[2pt]\footnotesize Moment conditions};
+\node[box, below right=2.5cm and 2.5cm of gmm] (mle) {\textbf{MLE}\\[2pt]\footnotesize Full parametric\\[-1pt]\footnotesize likelihood};
+\node[box, below=5.5cm of gmm] (ols) {\textbf{OLS}\\[2pt]\footnotesize $\E[X'(y-X\beta)]=0$};
+
+% --- Arrows (special case → general) ---
+\draw[arr] (ols) -- (mom) node[note, midway, left=2pt] {linear\\moment conditions};
+\draw[arr] (ols) -- (mle) node[note, midway, right=2pt] {+ normality\\of errors};
+\draw[arr] (mom) -- (gmm) node[note, midway, left=2pt] {general moments\\+ weighting};
+\draw[arr] (mle) -- (gmm) node[note, midway, right=2pt] {score eqns\\as moments};
+\draw[arr] (ols) -- (gmm);
+
+\end{tikzpicture}
+\caption{Unifying Relationship Between OLS, MoM, GMM, and MLE.
+  Arrows point from special case to generalisation.
+  OLS is simultaneously a special case of MoM (via orthogonality conditions),
+  of MLE (under normal errors), and of GMM.}
+\label{fig:ols-mom-gmm-mle}
+\end{figure}
+
+
+\Cref{fig:ols-mom-gmm-mle} shows the hierarchy: OLS is a special case of both MoM (using linear moment conditions) and MLE (with normal errors). Both MoM and MLE are subsumed by GMM, which allows general moment conditions and optimal weighting. OLS is the most restrictive but simplest; GMM is the most general but complex. The estimators are not competitors but points on a spectrum of assumptions and information.
+
+
+\begin{remarkbox}{A Unifying View via GMM}{gmm-unifying}
+The maximum likelihood estimator (MLE), the method of moments (MoM), and ordinary least squares (OLS) may all be viewed as components of a unified estimation framework. In particular, OLS can be characterized as a special case of MoM derived from the orthogonality conditions  
+$$
+\E\big[X'(y - X\beta)\big] = 0.
+$$
+Moreover, OLS coincides with the MLE when the regression errors are normally distributed with constant variance. More generally, the Generalized Method of Moments (GMM) subsumes both OLS and MLE by permitting estimation based on moment conditions with an optimal weighting matrix.
+
+\medskip
+\emph{Takeaway (exam intuition):}
+\textbf{OLS $\subset$ MoM $\subset$ GMM}, and \textbf{MLE coincides with efficient GMM} under correct
+distributional assumptions.
+\end{remarkbox}
+
+
+## Exercises
+
+\begin{exercise}
+What is the underlying principle behind the OLS estimator, and how does it differ from the principles of MLE and MoM?
+\end{exercise}
+
+\begin{exercise}
+Show that the OLS estimator can be derived as a special case of the maximum likelihood estimator by assuming that the errors are normally distributed with constant variance.
+\end{exercise}
+
+\begin{exercise}
+Show that the OLS estimator can be derived as a special case of the method of moments by using the moment conditions $\E[X'(y - X\beta)] = 0$.
+\end{exercise}
+
+\begin{exercise}
+Write down the log-likelihood function for the classical normal linear regression model. Derive the MLE of $\sigma^2$ and show that it equals $\hat{\sigma}^2_{\text{ML}} = \frac{1}{N}\hat{\symbf{\varepsilon}}'\hat{\symbf{\varepsilon}}$. Is this estimator unbiased? Why or why not?
+\end{exercise}
+
+\begin{exercise}
+Explain what it means for a GMM estimator to use an ``optimal weighting matrix.'' Why does the identity weighting matrix used by OLS fail to be optimal when errors are heteroskedastic?
+\end{exercise}
+
+\begin{exercise}
+Consider an overidentified model with $m > k$ moment conditions. Explain conceptually why GMM uses a weighting matrix to combine the moment conditions, and describe the role of the $J$-test (Hansen's test of overidentifying restrictions) in this context.
+\end{exercise}
+
+\begin{exercise}
+Suppose you have the model $y_i = \beta_0 + \beta_1 x_i + \varepsilon_i$ with $\E[\varepsilon_i] = 0$ and $\E[x_i \varepsilon_i] = 0$. Write down the two MoM estimating equations explicitly, solve for $\hat{\beta}_0$ and $\hat{\beta}_1$, and verify that the solution coincides with the OLS estimator.
+\end{exercise}
+
+# Properties of the OLS Estimator
+
+## Properties of the OLS Estimator
+
+### Finite Sample Properties
+
+- **Unbiasedness:**
+  $$\E[\betahat \mid \symbf{X}] = \symbf{\beta}$$
+  OLS is unbiased if regressors are exogenous ($\E[\symbf{\varepsilon} \mid \symbf{X}] = 0$). If exogeneity fails, OLS is biased and inconsistent.
+
+- **Variance:**
+  $$\operatorname{Var}(\betahat \mid \symbf{X}) = \sigma^2 (\symbf{X}'\symbf{X})^{-1}$$
+  OLS has minimum variance among linear unbiased estimators (Gauss–Markov theorem).
+
+- **Distribution:**
+  If errors are normal, $\betahat \mid \symbf{X} \sim \mathcal{N}(\symbf{\beta}, \sigma^2 (\symbf{X}'\symbf{X})^{-1})$.
+
+Simulations in the Appendix illustrate unbiasedness and the effect of omitted variables.
+
+```{r}
+#| label: fig-bias-simulation
+#| fig-cap: "Sampling distributions of the OLS slope estimator under correct specification (unbiased) and omitted-variable bias."
+#| fig-width: 10
+#| fig-height: 4.5
+#| echo: false
+#| warning: false
+#| message: false
+
+library(ggplot2)
+library(patchwork)
+
+set.seed(42)
+
+# --- Simulation parameters ---
+n_obs  <- 20         # observations per sample (small sample)
+n_sims <- 2000       # number of replications
+beta_0 <- 2          # intercept
+beta_1 <- 1.5        # slope of x1 (parameter of interest)
+beta_2 <- 3          # slope of x2 (omitted in biased model)
+rho    <- 0.6        # correlation between x1 and x2
+
+# --- Storage ---
+beta1_unbiased <- numeric(n_sims)
+beta1_biased   <- numeric(n_sims)
+
+for (s in seq_len(n_sims)) {
+  # Generate correlated regressors
+  x1 <- rnorm(n_obs)
+  x2 <- rho * x1 + sqrt(1 - rho^2) * rnorm(n_obs)
+  eps <- rnorm(n_obs, sd = 2)
+  
+  y <- beta_0 + beta_1 * x1 + beta_2 * x2 + eps
+  
+  # Correctly specified model (unbiased)
+  beta1_unbiased[s] <- coef(lm(y ~ x1 + x2))[["x1"]]
+  
+  # Omitted-variable model (biased)
+  beta1_biased[s] <- coef(lm(y ~ x1))[["x1"]]
+}
+
+sim_df <- data.frame(
+  estimate = c(beta1_unbiased, beta1_biased),
+  model    = rep(c("Unbiased (correct spec.)", "Biased (omitted x2)"),
+                 each = n_sims)
+)
+
+# --- Common theme ---
+theme_notes <- theme_classic(base_size = 12) +
+  theme(plot.title = element_text(face = "bold", size = 11))
+
+# --- Plot 1: Unbiased (with normal density overlay) ---
+# Theoretical sampling distribution: N(beta_1, sigma^2 / sum(x1_resid^2))
+# Under correct spec with n=100, sigma=2, Var(x1|x2) = 1-rho^2 = 0.64
+# se(beta1) ≈ sigma / sqrt(n * Var(x1|x2))
+se_theory <- 2 / sqrt(n_obs * (1 - rho^2))
+
+p1 <- ggplot(subset(sim_df, model == "Unbiased (correct spec.)"),
+             aes(x = estimate)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 40, fill = "#4393C3", colour = "white", alpha = 0.85) +
+  stat_function(fun = dnorm,
+                args = list(mean = beta_1, sd = sd(beta1_unbiased)),
+                colour = "black", linewidth = 0.8) +
+  geom_vline(xintercept = beta_1, linewidth = 0.8, linetype = "dashed") +
+  labs(title = "Unbiased OLS",
+       x = expression(hat(beta)[1]),
+       y = "Density") +
+  annotate("text", x = beta_1 + 0.03, y = Inf, vjust = 1.5, hjust = 0,
+           label = paste0("True  β₁ = ", beta_1), size = 3.4) +
+  theme_notes
+
+# --- Plot 2: Biased ---
+biased_mean <- mean(beta1_biased)
+
+p2 <- ggplot(subset(sim_df, model == "Biased (omitted x2)"),
+             aes(x = estimate)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 40, fill = "#D6604D", colour = "white", alpha = 0.85) +
+  geom_vline(xintercept = beta_1, linewidth = 0.8, linetype = "dashed") +
+  geom_vline(xintercept = biased_mean, linewidth = 0.8,
+             linetype = "dotted", colour = "#B2182B") +
+  labs(title = "Biased OLS (omitted variable)",
+       x = expression(hat(beta)[1]),
+       y = "Density") +
+  annotate("text", x = beta_1 + 0.03, y = Inf, vjust = 1.5, hjust = 0,
+           label = paste0("True  β₁ = ", beta_1), size = 3.4) +
+  annotate("text", x = biased_mean + 0.03, y = Inf, vjust = 3, hjust = 0,
+           label = paste0("E[β̂₁] ≈ ", round(biased_mean, 2)), size = 3.4,
+           colour = "black") +
+  theme_notes
+
+# --- Side-by-side ---
+p1 + p2
+```
+
+  @fig-bias-simulation illustrates the finite-sample behaviour of the OLS slope estimator under correct specification and under omitted-variable bias. In the left panel, the model includes both regressors $x_1$ and $x_2$, so the exogeneity condition $\E[\varepsilon \mid \symbf{X}] = \symbf{0}$ is satisfied. As the theory predicts, the sampling distribution of $\hat\beta_1$ is centred on the true value $\beta_1 = 1.5$: across 2 000 replications the sample mean of the estimates is virtually indistinguishable from the population parameter, confirming unbiasedness. ***Under the assumption of normally distributed errors, the OLS estimator itself follows a normal distribution---the overlaid $\mathcal{N}\!\bigl(\beta_1,\; \sigma^2 / \textstyle\sum_{i=1}^{N}(x_{1i}-\bar x_1)^2\bigr)$ curve in the left panel confirms that the histogram of $\hat\beta_1$ matches the theoretical normal density almost exactly, even in finite samples.*** In the right panel, the correlated regressor $x_2$ is omitted from the regression. Because $x_1$ and $x_2$ are positively correlated ($\rho = 0.6$) and $\beta_2 > 0$, the omission induces an upward bias: the entire distribution shifts to the right, and the average estimate $\E[\hat\beta_1] \approx 3.3$ substantially overstates the true effect. This is a direct consequence of the omitted-variable bias formula $\text{bias} = \beta_2\,\hat\delta$, where $\hat\delta$ is the coefficient from regressing $x_2$ on $x_1$. The simulation thus reinforces a key practical lesson: OLS is unbiased only when the model is correctly specified; omitting a relevant variable that is correlated with an included regressor biases the coefficient of interest toward the effect of the omitted variable.
+
+2. **Variance**:
+  
+   $$\operatorname{Var}(\betahat \mid \symbf{X}) = \sigma^2 (\symbf{X}'\symbf{X})^{-1}$$.
+   
+   The variance of the OLS estimator can be derived as follows:
+   
+   \begin{align*}
+   \operatorname{Var}(\betahat \mid \symbf{X}) 
+   &= \operatorname{Var}((\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{y} \mid \symbf{X}) \\
+   &= \operatorname{Var}((\symbf{X}'\symbf{X})^{-1} \symbf{X}'(\symbf{X}\symbf{\beta} + \symbf{\varepsilon}) \mid \symbf{X}) \\
+   &= \operatorname{Var}((\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon} \mid \symbf{X}) \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}' \operatorname{Var}(\symbf{\varepsilon} \mid \symbf{X}) \symbf{X} (\symbf{X}'\symbf{X})^{-1} \\
+   &= (\symbf{X}'\symbf{X})^{-1} \symbf{X}' (\sigma^2 \symbf{I}_N) \symbf{X} (\symbf{X}'\symbf{X})^{-1} \\
+   &= \sigma^2 (\symbf{X}'\symbf{X})^{-1}.
+   \end{align*}
+  
+  Efficiency of the OLS estimator follows from the Gauss--Markov theorem, which states that among all linear unbiased estimators, the OLS estimator has the smallest variance [see @Greene2020, ch. 4; @Davidson2000, ch. 3].
+  
+
+
+### Gauss--Markov Theorem
+
+Consider the classical linear regression model
+$$
+\symbf{y} = \symbf{X} \symbf{\beta} + \symbf{\varepsilon},
+$$
+where $\symbf{X} \in \mathbb R^{N\times k}$ has full column rank and the disturbance
+vector $\symbf{\varepsilon}$ satisfies the classical error assumptions.
+
+\begin{theorem}[Gauss--Markov]
+Under the classical linear regression assumptions, the ordinary least squares (OLS)
+estimator
+$$
+\betahat
+=
+(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{y}
+$$
+is the \emph{Best Linear Unbiased Estimator} (BLUE) of $\symbf{\beta}$.
+That is, among all linear unbiased estimators of $\symbf{\beta}$,
+$\betahat$ has the minimum variance--covariance matrix.
+\end{theorem}
+
+Or equivalently,
+
+Under \Cref{assump:clrm,assump:spherical-errors}, the OLS estimator $\betahat$ is the Best Linear Unbiased Estimator (BLUE) of $\symbf{\beta}$. That is, for any other linear unbiased estimator $\tilde{\symbf{\beta}} = \symbf{C}\symbf{y}$, where $\symbf{C}$ is a $k \times N$ matrix such that $\E[\tilde{\symbf{\beta}} \mid \symbf{X}] = \symbf{\beta}$, we have 
+\begin{equation}
+\operatorname{Var}(\tilde{\symbf{\beta}} \mid \symbf{X}) - \operatorname{Var}(\betahat \mid \symbf{X}) \text{ is positive semidefinite.}
+\end{equation}
+
+\subsection*{Definition: Linear Unbiased Estimator}
+
+An estimator $\tilde{\symbf{\beta}}$ is said to be:
+\begin{itemize}
+\item \textbf{Linear} if it can be written as $\tilde{\symbf{\beta}} = \symbf{A} \symbf{y}$
+for some nonrandom $k\times N$ matrix $\symbf{A}$.
+\item \textbf{Unbiased} if $\E(\tilde{\symbf{\beta}}\mid \symbf{X})=\symbf{\beta}$.
+\end{itemize}
+
+\begin{proof}
+Let $\tilde{\symbf{\beta}} = \symbf{A} \symbf{y}$ be any linear unbiased estimator of
+$\symbf{\beta}$. Substituting $\symbf{y} = \symbf{X}\symbf{\beta} + \symbf{\varepsilon}$,
+$$
+\tilde{\symbf{\beta}}
+=
+\symbf{A} \symbf{X} \symbf{\beta} + \symbf{A} \symbf{\varepsilon}.
+$$
+
+Unbiasedness requires
+$$
+\E(\tilde{\symbf{\beta}}\mid \symbf{X})
+=
+\symbf{A} \symbf{X} \symbf{\beta}
+=
+\symbf{\beta}
+\quad \Rightarrow \quad
+\symbf{A} \symbf{X} = \symbf{I}_k.
+$$
+
+The variance of $\tilde{\symbf{\beta}}$ is
+$$
+\Var(\tilde{\symbf{\beta}}\mid \symbf{X})
+=
+\symbf{A} \Var(\symbf{\varepsilon}\mid \symbf{X})\symbf{A}'
+=
+\sigma^2 \symbf{A} \symbf{A}',
+$$
+where the last equality follows from $\Var(\symbf{\varepsilon}\mid \symbf{X})=\sigma^2\symbf{I}_N$.
+
+Now write
+$$
+\symbf{A}
+=
+(\symbf{X}'\symbf{X})^{-1}\symbf{X}' + \symbf{C},
+$$
+for some $k\times N$ matrix $\symbf{C}$ satisfying $\symbf{C}\symbf{X} = \symbf{0}$.
+(This decomposition follows from the unbiasedness constraint.)
+
+Then
+$$
+\Var(\tilde{\symbf{\beta}}\mid \symbf{X})
+=
+\sigma^2
+\left[
+(\symbf{X}'\symbf{X})^{-1}
++
+\symbf{C}\symbf{C}'
+\right].
+$$
+
+Since $\symbf{C}\symbf{C}'$ is positive semidefinite,
+$$
+\Var(\tilde{\symbf{\beta}}\mid \symbf{X})
+-
+\Var(\betahat\mid \symbf{X})
+=
+\sigma^2 \symbf{C}\symbf{C}'
+\quad \text{is positive semidefinite}.
+$$
+
+Hence,
+$$
+\Var(\tilde{\symbf{\beta}}\mid \symbf{X})
+\succeq
+\Var(\betahat\mid \symbf{X}),
+$$
+with equality if and only if $\symbf{C}=\symbf{0}$, which implies
+$\tilde{\symbf{\beta}}=\betahat$.
+Therefore, OLS is the unique linear unbiased estimator with minimum variance.
+\end{proof}
+
+\begin{remark}[Meaning of ``Best'']
+``Best'' refers to the ordering of variance--covariance matrices in the
+positive semidefinite sense, not to mean squared error or finite-sample efficiency
+under nonlinearity or bias.
+\end{remark}
+
+\begin{remark}[Role of Normality]
+Normality of the error term is \emph{not} required for the Gauss--Markov theorem.
+Normality is only needed for exact finite-sample $t$ and $F$ inference.
+\end{remark}
+
+\begin{remark}[When OLS Is No Longer BLUE]
+If $\Var(\symbf{\varepsilon}\mid \symbf{X})\neq \sigma^2\symbf{I}_N$,
+OLS remains unbiased under exogeneity but is no longer efficient.
+In such cases, generalized least squares (GLS) yields a more efficient estimator.
+\end{remark}
+
+
+
+
+3. **Distribution**:
+
+Since the OLS estimator is a linear combination of normally distributed errors (under \Cref{assump:normality}), it follows a multivariate normal distribution:
+
+$$ \hat{\symbf{\beta}}\mid \symbf{X} \sim \mathcal{N}\left(\symbf{\beta}, \sigma^2 (\symbf{X}'\symbf{X})^{-1}\right). $$
+
+
+### Asymptotic Properties
+
+- **Consistency:**
+  $$\betahat \xrightarrow{p} \symbf{\beta}$$
+  As $N$ increases, OLS converges in probability to the true parameter if regressors are exogenous and $\E[\symbf{x}_i\symbf{x}_i']$ is positive definite. OLS remains consistent even if errors are heteroskedastic or autocorrelated.
+
+- **Asymptotic normality:**
+  $$\sqrt{N}(\betahat - \symbf{\beta}) \xrightarrow{d} \mathcal{N}(0, \sigma^2 \E[\symbf{x}_i\symbf{x}_i']^{-1})$$
+  In large samples, the distribution of OLS is approximately normal, justifying standard inference.
+
+Simulations in the Appendix show consistency and asymptotic normality, even with non-normal errors.
+
+```{r}
+#| label: fig-consistency-simulation
+#| fig-cap: "OLS slope estimate as a function of sample size under correct specification (consistent) and endogeneity (inconsistent)."
+#| fig-width: 10
+#| fig-height: 4.5
+#| echo: false
+#| warning: false
+#| message: false
+
+library(ggplot2)
+library(patchwork)
+
+set.seed(2024)
+
+# --- Parameters ---
+beta_0 <- 1
+beta_1 <- 2            # true slope
+sample_sizes <- seq(25, 5000, by = 25)
+n_grid <- length(sample_sizes)
+
+# --- Storage ---
+est_consistent   <- numeric(n_grid)
+est_inconsistent <- numeric(n_grid)
+
+for (i in seq_along(sample_sizes)) {
+  n <- sample_sizes[i]
+  
+  # --- Consistent case: exogenous regressor ---
+  x  <- rnorm(n)
+  eps <- rnorm(n, sd = 2)
+  y  <- beta_0 + beta_1 * x + eps
+  est_consistent[i] <- coef(lm(y ~ x))[["x"]]
+  
+  # --- Inconsistent case: endogenous regressor (x correlated with eps) ---
+  u   <- rnorm(n)
+  eps2 <- rnorm(n, sd = 2)
+  x2  <- 0.7 * eps2 + u          # x2 is correlated with the error
+  y2  <- beta_0 + beta_1 * x2 + eps2
+  est_inconsistent[i] <- coef(lm(y2 ~ x2))[["x2"]]
+}
+
+df <- data.frame(
+  N        = rep(sample_sizes, 2),
+  estimate = c(est_consistent, est_inconsistent),
+  scenario = rep(c("Consistent (exogenous x)",
+                    "Inconsistent (endogenous x)"), each = n_grid)
+)
+
+theme_notes <- theme_classic(base_size = 12) +
+  theme(plot.title = element_text(face = "bold", size = 11))
+
+# --- Plot 1: Consistent ---
+p1 <- ggplot(subset(df, scenario == "Consistent (exogenous x)"),
+             aes(x = N, y = estimate)) +
+  geom_line(colour = "#4393C3", linewidth = 0.6) +
+  geom_hline(yintercept = beta_1, linetype = "dashed", linewidth = 0.7) +
+  annotate("text", x = 4000, y = beta_1 + 0.08,
+           label = paste0("plim~hat(beta)[1] == ", beta_1),
+           parse = TRUE, size = 3.6) +
+  labs(title = "Consistent OLS (exogenous regressor)",
+       x = "Sample size (N)",
+       y = expression(hat(beta)[1])) +
+  theme_notes
+
+# --- Plot 2: Inconsistent ---
+# Theoretical plim: beta_1 + Cov(x, eps)/Var(x)
+# x = 0.7*eps + u, eps ~ N(0,4), u ~ N(0,1)
+# Cov(x, eps) = 0.7 * Var(eps) = 0.7 * 4 = 2.8
+# Var(x) = 0.49 * 4 + 1 = 2.96
+plim_val <- beta_1 + (0.7 * 4) / (0.49 * 4 + 1)   # = 2 + 2.8/2.96 ≈ 2.946
+
+p2 <- ggplot(subset(df, scenario == "Inconsistent (endogenous x)"),
+             aes(x = N, y = estimate)) +
+  geom_line(colour = "#D6604D", linewidth = 0.6) +
+  geom_hline(yintercept = beta_1, linetype = "dashed", linewidth = 0.7) +
+  geom_hline(yintercept = plim_val, linetype = "dotted",
+             colour = "#B2182B", linewidth = 0.7) +
+  annotate("text", x = 4000, y = beta_1 + 0.06,
+           label = paste0("beta[1] == ", beta_1),
+           parse = TRUE, size = 3.6) +
+  annotate("text", x = 4000, y = plim_val - 0.06,
+           label = paste0("plim~hat(beta)[1] == beta[1] + frac(Cov(x*','*epsilon), Var(x)) %~~% ", round(plim_val, 2)),
+           parse = TRUE, size = 3.4, colour = "#B2182B") +
+  labs(title = "Inconsistent OLS (endogenous regressor)",
+       x = "Sample size (N)",
+       y = expression(hat(beta)[1])) +
+  theme_notes
+
+# --- Side-by-side ---
+p1 + p2
+```
+
+  @fig-consistency-simulation confirms the theoretical results. In the left panel, the OLS slope estimate fluctuates around the true value $\beta_1 = 2$ for small $N$ but settles ever closer to it as the sample grows, illustrating convergence in probability. The oscillations diminish because the variance of $\betahat$ shrinks at rate $1/N$. In the right panel, the regressor $x$ is constructed to be correlated with the error term, violating exogeneity. Consequently, the OLS estimate does not converge to the true $\beta_1$; instead it stabilises near a different value (the probability limit under endogeneity), regardless of how large $N$ becomes. Increasing the sample size cannot cure the bias introduced by endogeneity---it merely brings the estimate closer to the wrong target. This underscores that consistency is fundamentally an assumption-dependent property: OLS is consistent when $\E[\varepsilon \mid \symbf{X}] = \symbf{0}$, but no amount of data can remedy a violation of this condition.
+   
+2. **Asymptotic Normality**:
+   
+  $$\sqrt{N}(\betahat - \symbf{\beta}) \xrightarrow{d} \mathcal{N}\left(\symbf{0}, \sigma^2 \E[\symbf{x}_i\symbf{x}_i']^{-1}\right).$$
+   
+   This property indicates that the scaled difference between the OLS estimator and the true parameter vector converges in distribution to a multivariate normal distribution as the sample size increases. The asymptotic normality of the OLS estimator can be shown using the Central Limit Theorem (CLT) as follows:
+   
+   \begin{align*}
+   \sqrt{N}(\betahat - \symbf{\beta}) 
+   &= \sqrt{N}((\symbf{X}'\symbf{X})^{-1} \symbf{X}'\symbf{\varepsilon}) \\
+   &= (\frac{1}{N}\symbf{X}'\symbf{X})^{-1} \frac{1}{\sqrt{N}}\symbf{X}'\symbf{\varepsilon}.
+   \end{align*}
+   
+  By the CLT, $\frac{1}{\sqrt{N}}\symbf{X}'\symbf{\varepsilon} \xrightarrow{d} \mathcal{N}(\symbf{0}, \sigma^2 \E[\symbf{x}_i\symbf{x}_i'])$ as $N \to \infty$. Additionally, $\frac{1}{N}\symbf{X}'\symbf{X} \xrightarrow{p} \E[\symbf{x}_i\symbf{x}_i']$. Therefore, by Slutsky's theorem, we have:
+   
+  $$\sqrt{N}(\betahat - \symbf{\beta}) \xrightarrow{d} \mathcal{N}\left(\symbf{0}, \sigma^2 \E[\symbf{x}_i\symbf{x}_i']^{-1}\right).$$
+   
+   This result allows for the construction of confidence intervals and hypothesis tests for the parameters in large samples.
+
+
+The asymptotic normality of the OLS estimator justifies \emph{approximate (large-sample) inference}---such as constructing confidence intervals and conducting hypothesis tests---because the sampling distribution of $\betahat$ is approximately normal in large samples. In particular, under standard regularity conditions,
+$$
+\sqrt{N}\,(\betahat-\beta)\ \xrightarrow{d}\ \mathcal{N}(0, V),
+$$
+
+where $V$ is the asymptotic variance matrix. When the classical assumptions (homoskedasticity and no autocorrelation) are violated, valid large-sample inference requires using an appropriate variance estimator (e.g., heteroskedasticity-robust or HAC standard errors). This property is especially useful in econometrics, where large datasets are common.
+
+
+
+
+\noindent \textbf{Implication for Large-Sample Inference.}
+The preceding result implies that, under the stated regularity conditions,
+$$
+\sqrt{N}\,(\betahat-\beta)\ \xrightarrow{d}\ \mathcal{N}\!\left(\symbf{0},\,\sigma^2\,\E[x_i x_i']^{-1}\right).
+$$
+Equivalently, for large $N$ the sampling distribution of $\betahat$ is approximately multivariate normal with mean $\beta$ and covariance matrix approximately
+$$
+Var(\betahat) \approx \frac{1}{N}\,\sigma^2\,\E[x_i x_i']^{-1}.
+$$
+This asymptotic normality justifies \emph{approximate (large-sample) inference}---such as constructing confidence intervals and conducting hypothesis tests---using normal (or asymptotically equivalent $t$) critical values. In applications where the classical homoskedasticity assumption fails, valid large-sample inference requires replacing $\sigma^2\,\E[x_i x_i']^{-1}$ with an appropriate robust (e.g., heteroskedasticity-robust or HAC) asymptotic variance estimator [@White1980].
+
+A natural question is whether asymptotic normality still holds when the errors themselves are far from normal. The following simulation addresses this directly (see \Cref{sec:sim-code-julia-normality} in the Appendix for the full Julia code). We generate data from the model $y_i = 2 + 1.5\,x_i + \varepsilon_i$ where the errors $\varepsilon_i$ are drawn from a \emph{Pareto} distribution---heavily right-skewed with a thick right tail---re-centred to have mean zero. Specifically, $\tilde\varepsilon_i \sim \text{Pareto}(\alpha = 2.5,\, x_m = 1)$ and $\varepsilon_i = \tilde\varepsilon_i - \E[\tilde\varepsilon_i]$, where $\E[\tilde\varepsilon_i] = \alpha x_m/(\alpha-1)$. The Pareto$(2.5)$ distribution has skewness $\approx 4.65$ and (finite) variance, yet its shape is strikingly non-Gaussian. For each sample size $N \in \{10,\, 50,\, 200,\, 1000\}$ we estimate $\hat\beta_1$ by OLS across $R = 5{,}000$ replications and overlay the resulting kernel density of the \emph{standardised} estimator,
+$$
+Z_N = \frac{\hat\beta_1 - \beta_1}{\widehat{\mathrm{se}}(\hat\beta_1)},
+$$
+against the standard normal density $\phi(z)$.
+
+```{r}
+#| label: fig-asymptotic-normality-simulation
+#| fig-cap: "Convergence to normality of the standardised OLS slope estimator when the errors follow a (re-centred) Pareto$(2.5)$ distribution. As the sample size $N$ grows, the sampling distribution of $Z_N$ approaches the $\\mathcal{N}(0,1)$ density (black curve) despite the pronounced skewness of the underlying error distribution."
+#| fig-width: 10
+#| fig-height: 7
+#| echo: false
+#| warning: false
+#| message: false
+
+library(ggplot2)
+library(patchwork)
+
+set.seed(2026)
+
+# --- Parameters ---
+beta_0  <- 2
+beta_1  <- 1.5
+n_reps  <- 5000
+sample_sizes <- c(10, 50, 200, 1000)
+
+# Pareto parameters: shape alpha = 2.5, scale x_m = 1
+alpha_par <- 2.5
+x_m       <- 1
+mu_eps    <- alpha_par * x_m / (alpha_par - 1)   # E[Pareto] for re-centring
+
+# Pareto(alpha, x_m) random draw via inverse-CDF: x_m * U^{-1/alpha}
+rpareto <- function(n, alpha, xm) xm * runif(n)^(-1/alpha)
+
+# --- Run replications and collect standardised estimates ---
+all_results <- do.call(rbind, lapply(sample_sizes, function(n) {
+  z_vals <- replicate(n_reps, {
+    x   <- rnorm(n)
+    eps <- rpareto(n, alpha_par, x_m) - mu_eps   # re-centred to mean 0
+    y   <- beta_0 + beta_1 * x + eps
+    fit <- lm(y ~ x)
+    b1  <- coef(fit)[["x"]]
+    se1 <- summary(fit)$coefficients["x", "Std. Error"]
+    (b1 - beta_1) / se1                          # standardised
+  })
+  data.frame(
+    z_stat      = z_vals,
+    sample_size = paste0("N = ", n)
+  )
+}))
+
+all_results$sample_size <- factor(all_results$sample_size,
+                                   levels = paste0("N = ", sample_sizes))
+
+theme_notes <- theme_classic(base_size = 11) +
+  theme(plot.title = element_text(face = "bold", size = 10))
+
+# --- One facet per sample size ---
+ggplot(all_results, aes(x = z_stat)) +
+  geom_density(fill = "#4393C3", colour = "#2166AC",
+               alpha = 0.55, linewidth = 0.6) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1),
+                colour = "black", linewidth = 0.7, linetype = "solid") +
+  facet_wrap(~ sample_size, scales = "free_y", ncol = 2) +
+  coord_cartesian(xlim = c(-4, 4)) +
+  labs(x = expression(Z[N] == frac(hat(beta)[1] - beta[1],
+                                    widehat(se)(hat(beta)[1]))),
+       y = "Density") +
+  theme_notes +
+  theme(strip.text = element_text(face = "bold", size = 10))
+```
+
+@fig-asymptotic-normality-simulation provides striking visual evidence that asymptotic normality does not require normal errors. The error distribution used here---a re-centred Pareto$(2.5)$ with skewness $\approx 4.65$ and a heavy right tail---departs dramatically from the Gaussian bell curve. At $N = 10$ the standardised sampling distribution of $\hat\beta_1$ is visibly asymmetric: the right tail is heavier than the left, and the peak is shifted, reflecting the strong skewness of the underlying errors. By $N = 50$ the shape is already closer to a bell curve, though some asymmetry persists. At $N = 200$ the departure from $\mathcal{N}(0,1)$ is modest, and by $N = 1{,}000$ the kernel density of $Z_N$ is virtually indistinguishable from the standard-normal curve (solid black line). This is a direct consequence of the CLT: $\frac{1}{\sqrt{N}}\symbf{X}'\symbf{\varepsilon}$ converges in distribution to a Gaussian regardless of the shape of $\varepsilon_i$, provided $\varepsilon_i$ has finite variance. The Pareto$(2.5)$ distribution satisfies this requirement ($\operatorname{Var}(\varepsilon_i) < \infty$ for $\alpha > 2$), so convergence is guaranteed---but the simulation makes clear that it can be \emph{slow}, especially with very small samples. The practical implication is that in small samples drawn from heavily skewed populations, inference based on the normal approximation should be treated with caution; with moderate-to-large $N$, however, OLS-based $t$-statistics and confidence intervals retain their approximate validity.
+
+## Asymptotic Efficiency
+
+Under \Cref{assump:clrm,assump:spherical-errors} (including normality), the OLS estimator $\betahat$ coincides with the maximum likelihood estimator in the Gaussian linear regression model. Hence, under standard regularity conditions, $\betahat$ is asymptotically efficient in the correctly specified parametric model (it attains the Cram\'er--Rao/Fisher information lower bound). In particular,
+$$
+\operatorname{Avar}(\betahat)
+= \frac{1}{N}\,\sigma^2\,\E[x_i x_i']^{-1}.
+$$
+
+As $N \to \infty$, the asymptotic variance shrinks at rate $1/N$, so $\betahat$ converges to $\symbf{\beta}$ ever more precisely.
+
+When normality is violated, OLS remains consistent and asymptotically normal under \Cref{assump:clrm,assump:spherical-errors}. What may fail is \emph{parametric} asymptotic efficiency: OLS need not be the MLE, and an estimator based on the correct likelihood may have a smaller asymptotic variance, although OLS remains BLUE among linear unbiased estimators under spherical errors. When $N$ is large, the efficiency loss from using OLS instead of the MLE under non-normal errors is often small in practice. 
+
+The following simulation demonstrates this variance-shrinkage phenomenon visually (see \Cref{sec:sim-code-julia} in the Appendix for the full Julia code). We generate data from the model $y_i = 2 + 1.5\,x_i + \varepsilon_i$, $\varepsilon_i \sim \mathcal{N}(0,4)$, and estimate $\hat\beta_1$ by OLS across $R = 5{,}000$ replications for each sample size $N \in \{30, 100, 500, 2000\}$. @fig-asymptotic-efficiency-simulation overlays the resulting kernel density estimates; as $N$ grows, the sampling distribution of $\hat\beta_1$ collapses around the true value $\beta_1 = 1.5$, confirming that $\operatorname{Var}(\hat\beta_1)$ shrinks at rate $1/N$.
+
+```{r}
+#| label: fig-asymptotic-efficiency-simulation
+#| fig-cap: "Sampling distribution of the OLS slope estimator $\\hat{\\beta}_1$ for increasing sample sizes. As $N$ grows the distribution concentrates around the true value $\\beta_1 = 1.5$, illustrating asymptotic efficiency."
+#| fig-width: 7
+#| fig-height: 4.5
+#| echo: false
+#| warning: false
+#| message: false
+
+library(ggplot2)
+
+set.seed(2025)
+
+# --- Simulation parameters ---
+beta_0     <- 2
+beta_1     <- 1.5
+sigma      <- 2
+n_reps     <- 5000
+sample_sizes <- c(30, 100, 500, 2000)
+
+# --- Run replications ---
+results <- do.call(rbind, lapply(sample_sizes, function(n) {
+  estimates <- replicate(n_reps, {
+    x   <- rnorm(n)
+    eps <- rnorm(n, sd = sigma)
+    y   <- beta_0 + beta_1 * x + eps
+    coef(lm(y ~ x))[["x"]]
+  })
+  data.frame(
+    beta1_hat   = estimates,
+    sample_size = factor(paste0("N = ", n), levels = paste0("N = ", sample_sizes))
+  )
+}))
+
+theme_notes <- theme_classic(base_size = 12) +
+  theme(plot.title = element_text(face = "bold", size = 11))
+
+ggplot(results, aes(x = beta1_hat, fill = sample_size, colour = sample_size)) +
+  geom_density(alpha = 0.35, linewidth = 0.6) +
+  geom_vline(xintercept = beta_1, linetype = "dashed", linewidth = 0.7) +
+  annotate("text", x = beta_1 + 0.02, y = Inf, vjust = 1.5,
+           label = expression(beta[1] == 1.5), size = 3.8) +
+  scale_fill_manual(
+    name   = "Sample size",
+    values = c("N = 30" = "#FFE066", "N = 100" = "#9ECAE1",
+               "N = 500" = "#4292C6", "N = 2000" = "#084594")
+  ) +
+  scale_colour_manual(
+    name   = "Sample size",
+    values = c("N = 30" = "black", "N = 100" = "#2171B5",
+               "N = 500" = "#08519C", "N = 2000" = "#08306B")
+  ) +
+  labs(
+    x = expression(hat(beta)[1]),
+    y = "Density"
+  ) +
+  theme_notes +
+  theme(legend.position = c(0.88, 0.75))
+```
+
+@fig-asymptotic-efficiency-simulation vividly demonstrates asymptotic efficiency in action. For $N = 30$ the sampling distribution is wide, reflecting the relatively large variance of $\hat\beta_1$ in small samples. As the sample size increases through $N = 100$, $500$, and $2{,}000$, the density becomes progressively taller and narrower, concentrating ever more tightly around the true parameter $\beta_1 = 1.5$. This is a direct visual manifestation of the $1/N$ variance decay: doubling the sample size roughly halves the variance and thereby tightens the distribution by a factor of $\sqrt{2}$. In the limit, the sampling distribution degenerates to a point mass at $\beta_1$, which is simply another view of consistency. For inference, the practical implication is clear: with larger samples, OLS estimates are not only centred on the truth (unbiasedness/consistency) but are also increasingly \emph{precise}, producing shorter confidence intervals and more powerful hypothesis tests.
+
+## Exercises
+
+\begin{exercise}
+Distinguish between the small-sample and large-sample properties of the OLS estimator. Why is it important to understand both when conducting empirical research?
+\end{exercise}
+
+\begin{exercise}
+Show that under suitable condition(s), the OLS estimator is unbiased and consistent. What happens to these properties if the exogeneity assumption is violated?
+\end{exercise}
+
+\begin{exercise}
+What is the importance of the variance-covariance matrix of the OLS estimator, $\operatorname{Var}(\betahat \mid X)= \sigma^2(X'X)^{-1}$, in econometric analysis? 
+\end{exercise}
+
+\begin{exercise}
+State the Gauss--Markov theorem precisely. What does ``Best Linear Unbiased Estimator'' (BLUE) mean, and which assumptions are required for the result to hold? Does the theorem say anything about nonlinear estimators?
+\end{exercise}
+
+\begin{exercise}
+Consider the model $y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \varepsilon_i$ where $x_2$ is relevant ($\beta_2 \neq 0$) and $\operatorname{Corr}(x_1, x_2) = \rho \neq 0$. Derive the omitted-variable bias formula for the short regression of $y$ on $x_1$ alone, and discuss the sign of the bias in terms of $\beta_2$ and $\rho$.
+\end{exercise}
+
+\begin{exercise}
+Explain the difference between \emph{unbiasedness} and \emph{consistency}. Construct a simple example of an estimator that is biased but consistent, and another that is unbiased but inconsistent.
+\end{exercise}
+
+\begin{exercise}
+Suppose the true model is $y_i = \beta_0 + \beta_1 x_i + \varepsilon_i$ with $\varepsilon_i \sim \text{i.i.d.}(0, \sigma^2)$, but a researcher adds an irrelevant variable $z_i$ (with $\beta_z = 0$) that is uncorrelated with $x_i$. Is the OLS estimator of $\beta_1$ from the longer regression still unbiased? What happens to its variance compared with the correctly specified model?
+\end{exercise}
+
+\begin{exercise}
+Using the asymptotic normality result $\sqrt{N}(\betahat - \symbf{\beta}) \xrightarrow{d} \mathcal{N}(\symbf{0},\, \sigma^2\, \E[\symbf{x}_i\symbf{x}_i']^{-1})$, explain how one constructs asymptotically valid confidence intervals and Wald test statistics for individual coefficients. How do these differ from the exact $t$-based intervals under normality?
+\end{exercise}
+
+
+
+# Estimating Error Variance
+
+The unbiased estimator of error variance is:
+\begin{equation}
+\hat{\sigma}^2 = \frac{1}{N-k} \sum_{i=1}^N \hat{\varepsilon}_i^2 = \frac{1}{N-k} \hat{\symbf{\varepsilon}}'\hat{\symbf{\varepsilon}},
+\end{equation}
+where $\hat{\varepsilon}_i$ are OLS residuals and $k$ is the number of estimated parameters.
+
+We divide by $N-k$ (not $N$) to account for the loss of degrees of freedom from estimating $k$ parameters. This makes $\hat{\sigma}^2$ unbiased for $\sigma^2$.
+
+
+## Exercise
+
+\begin{exercise}
+Derive the estimator $\hat{\sigma}^2$ for the variance of the error term in the classical linear regression model. Explain why we need this estimator and how it is used in inference.
+\end{exercise}
+
+\begin{exercise}
+Show that the naive estimator $\tilde{\sigma}^2 = \frac{1}{N}\hat{\symbf{\varepsilon}}'\hat{\symbf{\varepsilon}}$ is biased for $\sigma^2$. Derive the exact bias and show that it vanishes as $N \to \infty$.
+\end{exercise}
+
+\begin{exercise}
+Explain intuitively why we divide by $N - k$ rather than $N$ when estimating $\sigma^2$. Relate your answer to the concept of degrees of freedom and the fact that $\hat{\symbf{\varepsilon}} = \symbf{M}_X \symbf{\varepsilon}$ where $\symbf{M}_X$ has rank $N - k$.
+\end{exercise}
+
+
+
+## Finite-Sample Normality and Exact Inference
+
+Assuming normal errors:
+$$
+\symbf{\varepsilon} \mid \symbf{X} \sim \mathcal N(0, \sigma^2 \symbf{I}_N)
+$$
+is not needed for unbiasedness or efficiency, but is required for exact finite-sample inference.
+
+**Distribution of OLS estimator:**
+$$
+\betahat \mid \symbf{X} \sim \mathcal N(\symbf{\beta}, \sigma^2 (\symbf{X}'\symbf{X})^{-1})
+$$
+
+**Distribution of error variance estimator:**
+$$
+\frac{(N-k)\hat{\sigma}^2}{\sigma^2} \sim \chi^2_{N-k}
+$$
+
+**$t$-test for coefficients:**
+$$
+t_j = \frac{\hat{\beta}_j - \beta_{j,0}}{\hat{\sigma} \sqrt{(\symbf{X}'\symbf{X})^{-1}_{jj}}} \sim t_{N-k}
+$$
+A $(1-\alpha)$ confidence interval for $\beta_j$ is:
+$$
+\hat{\beta}_j \pm t_{N-k,1-\alpha/2} \; \hat{\sigma} \sqrt{(\symbf{X}'\symbf{X})^{-1}_{jj}}
+$$
+
+**$F$-test for $q$ linear restrictions:**
+$$
+F = \frac{1}{q} (\symbf{R}\betahat-\symbf{r})' [\hat{\sigma}^2 \symbf{R}(\symbf{X}'\symbf{X})^{-1}\symbf{R}']^{-1} (\symbf{R}\betahat-\symbf{r}) \sim F_{q, N-k}
+$$
+For $q=1$, $F = t^2$.
+
+**Notes:**
+- Exact $t$ and $F$ inference needs normality.
+- Without normality, $t$ and $F$ are asymptotically valid.
+- In large samples, the central limit theorem justifies normal approximations.
+- Robust (heteroskedasticity-consistent) standard errors yield asymptotically valid, but not exact, inference.
+
+## Exercises
+
+\begin{exercise}
+Explain the importance of the normality assumption in the classical linear regression model. What are the consequences of violating this assumption for inference?
+\end{exercise}
+
+\begin{exercise}
+Derive the distribution of the OLS estimator under the normality assumption. How does this distribution facilitate hypothesis testing and confidence interval construction?
+\end{exercise}
+
+\begin{exercise}
+Prove the following theorem:
+
+\begin{theorem}[Finite-Sample Distribution of OLS]
+Under the classical linear regression assumptions and normality,
+$$
+\betahat \mid \symbf{X}
+\sim
+\mathcal N\!\left(
+\symbf{\beta},\;
+\sigma^2(\symbf{X}'\symbf{X})^{-1}
+\right).
+$$
+\end{theorem}
+\end{exercise}
+
+\begin{exercise}
+Explain why $\betahat$ and $\hat{\sigma}^2$ are statistically independent under the normality assumption. \emph{Hint:} consider the roles of the projection matrix $\symbf{H}$ and the residual-maker matrix $\symbf{M}_X$.
+\end{exercise}
+
+\begin{exercise}
+A researcher wishes to test $H_0\!: \beta_1 = 0$ against $H_1\!: \beta_1 \neq 0$ at the 5\% significance level using a $t$-test. The estimated coefficient is $\hat{\beta}_1 = 2.4$ with $\widehat{\mathrm{se}}(\hat{\beta}_1) = 1.1$, and there are $N = 30$ observations and $k = 3$ parameters. Compute the $t$-statistic and state your conclusion.
+\end{exercise}
+
+\begin{exercise}
+Consider a model with $k = 5$ regressors and $N = 50$ observations. A researcher wishes to test the joint hypothesis $H_0\!: \beta_2 = 0,\; \beta_3 = 0,\; \beta_4 = 0$ using an $F$-test. Write down the $\symbf{R}$ matrix and $\symbf{r}$ vector for this hypothesis. If the restricted RSS is 120 and the unrestricted RSS is 90, compute the $F$-statistic and determine the degrees of freedom.
+\end{exercise}
+
+\begin{exercise}
+Show that when testing a single restriction ($q = 1$), the $F$-statistic equals the square of the corresponding $t$-statistic: $F_{1,N-k} = t_{N-k}^2$. Why does this relationship hold?
+\end{exercise}
+
+\begin{exercise}
+A researcher reports a 95\% confidence interval for $\beta_1$ of $[0.8,\, 3.6]$. Can you determine the point estimate $\hat{\beta}_1$ and the standard error from this information alone? If the researcher tests $H_0\!: \beta_1 = 0$, what do you conclude without computing the $t$-statistic?
+\end{exercise}
+
+
+\section{Model Diagnostics}
+
+A careful empirical analysis does not stop at estimation; the researcher must also
+assess whether the model assumptions are tenable. The key diagnostics for the CLRM concern
+linearity, heteroskedasticity, autocorrelation, normality, and multicollinearity.
+
+
+
+The Breusch--Pagan test is a simpler alternative that regresses $\hat\varepsilon_i^2$ on the original regressors only.
+
+# Appendix {.appendix}
+
+## Applications: Empirical Example in R
+
+This section demonstrates how to estimate a multiple linear regression model, test hypotheses, and perform diagnostic checks using empirical data in R. Regression results are presented using the `modelsummary` package.
+
+
+## Example: Estimating a Multiple Linear Regression
+
+We demonstrate with a synthetic dataset. If you have your own data with columns `y`, `x1`, and `x2`, you can replace this chunk with your data import.
+
+```{r}
+#| label: model-estimation-appx4
+#| message: false
+#| warning: false
+#| cache: true
+set.seed(123)
+n <- 100
+data <- data.frame(
+  x1 = rnorm(n, mean = 5, sd = 2),
+  x2 = rnorm(n, mean = 10, sd = 3)
+)
+data$y <- 1.5 + 2 * data$x1 - 1 * data$x2 + rnorm(n)
+model <- lm(y ~ x1 + x2, data = data)
+```
+
+
+## Hypothesis Testing
+
+Test $H_0: \beta_1 = 0$ vs $H_1: \beta_1 \neq 0$ using the t-test in the regression output. For joint tests (e.g., $\beta_1 = \beta_2 = 0$), use the `car` package:
+
+```{r}
+#| label: joint-hypothesis-appx2
+library(car)
+linearHypothesis(model, c("x1 = 0", "x2 = 0"))
+```
+
+## Diagnostic Tests
+
+### Residual Plots
+```{r}
+#| label: residual-plot-appx2
+par(mfrow = c(2,2))
+plot(model)
+par(mfrow = c(1,1))
+```
+
+### Heteroskedasticity Test (Breusch-Pagan)
+```{r}
+#| label: bp-test-appx2
+library(lmtest)
+bptest(model)
+```
+
+### Normality Test (Jarque-Bera)
+```{r}
+#| label: jb-test-appx2
+library(tseries)
+jarque.bera.test(residuals(model))
+```
+
+### Multicollinearity (VIF)
+```{r}
+#| label: vif-appx2
+library(car)
+vif(model)
+```
+
+Then
+$$
+\symbf{y}^* = \symbf{X}^*\symbf{\beta} + \symbf{\varepsilon}^*,
+\qquad
+\Var(\symbf{\varepsilon}^*\mid\symbf{X})=\symbf{I}_N.
+$$
+
+\subsection{The GLS Estimator}
+
+\begin{theorem}[Generalized Least Squares Estimator]
+If $\Var(\symbf{\varepsilon}\mid\symbf{X})=\symbf{\Omega}$ is known,
+the GLS estimator of $\symbf{\beta}$ is
+$$
+\betahat_{\text{GLS}}
+=
+(\symbf{X}'\symbf{\Omega}^{-1}\symbf{X})^{-1}
+\symbf{X}'\symbf{\Omega}^{-1}\symbf{y}.
+$$
+\end{theorem}
+
+\begin{proof}
+Applying OLS to the transformed model yields
+$$
+\betahat_{\text{GLS}}
+=
+(\symbf{X}^{*'}\symbf{X}^*)^{-1}\symbf{X}^{*'}\symbf{y}^*
+=
+(\symbf{X}'\symbf{\Omega}^{-1}\symbf{X})^{-1}
+\symbf{X}'\symbf{\Omega}^{-1}\symbf{y}.
+$$
+\end{proof}
+
+\subsection{Variance of the GLS Estimator}
+
+\begin{theorem}[Variance of GLS]
+Under exogeneity,
+$$
+\Var(\betahat_{\text{GLS}}\mid\symbf{X})
+=
+(\symbf{X}'\symbf{\Omega}^{-1}\symbf{X})^{-1}.
+$$
+\end{theorem}
+
+\begin{remark}[Efficiency]
+The GLS estimator is BLUE among all linear unbiased estimators when
+$\symbf{\Omega}$ is known.
+\end{remark}
+
+\subsection{Special Cases}
+
+\begin{itemize}
+\item \textbf{Heteroskedastic but uncorrelated errors:}
+$$
+\symbf{\Omega}=\operatorname{diag}(\sigma_1^2,\ldots,\sigma_N^2)
+\quad \Rightarrow \quad
+\text{Weighted Least Squares (WLS)}.
+$$
+
+\item \textbf{AR(1) errors (time series):}
+$$
+\varepsilon_t=\rho\varepsilon_{t-1}+u_t,
+\quad |\rho| < 1,
+$$
+leading to a Toeplitz covariance matrix $\symbf{\Omega}$.
+
+\item \textbf{Panel data:}
+$\symbf{\Omega}$ reflects serial correlation and cross-sectional dependence.
+\end{itemize}
+
+\subsection{Feasible Generalized Least Squares}
+
+In practice, $\symbf{\Omega}$ is unknown and must be estimated.
+
+\begin{definition}[Feasible GLS]
+The feasible GLS (FGLS) estimator replaces $\symbf{\Omega}$ with a consistent
+estimator $\hat{\symbf{\Omega}}$:
+$$
+\betahat_{\text{FGLS}}
+=
+(\symbf{X}'\hat{\symbf{\Omega}}^{-1}\symbf{X})^{-1}
+\symbf{X}'\hat{\symbf{\Omega}}^{-1}\symbf{y}.
+$$
+\end{definition}
+
+\subsection{Two-Step FGLS Procedure}
+
+A common implementation proceeds as follows:
+
+\begin{enumerate}
+\item Estimate the model by OLS and obtain residuals $\hat{\symbf{\varepsilon}}$.
+\item Use $\hat{\symbf{\varepsilon}}$ to estimate the parameters of
+$\symbf{\Omega}$.
+\item Construct $\hat{\symbf{\Omega}}$ and compute $\betahat_{\text{FGLS}}$.
+\end{enumerate}
+
+\subsection{Asymptotic Properties}
+
+\begin{theorem}[Consistency and Efficiency]
+If $\hat{\symbf{\Omega}}\xrightarrow{p}\symbf{\Omega}$, then
+$$
+\betahat_{\text{FGLS}}
+\xrightarrow{p}
+\symbf{\beta},
+\qquad
+\sqrt{N}(\betahat_{\text{FGLS}}-\symbf{\beta})
+\xrightarrow{d}
+\mathcal N\!\left(
+\symbf{0},\;
+(\symbf{X}'\symbf{\Omega}^{-1}\symbf{X})^{-1}
+\right).
+$$
+\end{theorem}
+
+\begin{remark}[FGLS vs Robust Inference]
+When $\symbf{\Omega}$ is misspecified, FGLS can perform poorly in finite samples.
+Robust (White/HAC) standard errors retain consistency without requiring correct
+specification of $\symbf{\Omega}$.
+\end{remark}
+
+\subsection{Exercises}
+
+\begin{exercise}
+Explain what the White test and the Breusch--Pagan test have in common and how they differ. Under what circumstances would you prefer one over the other?
+\end{exercise}
+
+\begin{exercise}
+A Jarque--Bera test on OLS residuals yields a $p$-value of 0.03. Does this necessarily mean that OLS estimates are unreliable? Discuss the implications for (i)~finite-sample inference and (ii)~large-sample inference.
+\end{exercise}
+
+\begin{exercise}
+A researcher computes a VIF of 25 for regressor $x_3$ in a multiple regression. Interpret this number. Does high multicollinearity introduce bias into the OLS estimates? What practical problems does it cause, and what remedies might the researcher consider?
+\end{exercise}
+
+\begin{exercise}
+Describe how you would use a residuals-versus-fitted-values plot to detect (i)~heteroskedasticity and (ii)~functional form misspecification. What patterns would you look for in each case?
+\end{exercise}
+
+\subsection{GLS vs OLS: Conceptual Comparison}
+
+Table @tbl-ols-vs-gls compares OLS and GLS along key conceptual dimensions.
+
+\begin{table}[H]
+\centering
+\caption{Comparison of OLS and GLS}
+\label{tbl-ols-vs-gls}
+\begin{tabular}{lcc}
+\toprule
+ & OLS & GLS \\
+\midrule
+Requires $\symbf{\Omega}=\sigma^2\symbf{I}$ & Yes & No \\
+Efficient under heteroskedasticity/autocorrelation & No & Yes \\
+Requires estimating $\symbf{\Omega}$ & No & Often \\
+Finite-sample robustness & High & Lower if $\symbf{\Omega}$ misspecified \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Exercises}
+
+\begin{exercise}
+Derive the GLS estimator $\betahat_{\text{GLS}} = (\symbf{X}'\symbf{\Omega}^{-1}\symbf{X})^{-1}\symbf{X}'\symbf{\Omega}^{-1}\symbf{y}$ by applying OLS to a suitably transformed model. Show each step of the transformation explicitly.
+\end{exercise}
+
+\begin{exercise}
+Show that when $\symbf{\Omega} = \sigma^2 \symbf{I}_N$ (homoskedastic, uncorrelated errors), the GLS estimator reduces to the OLS estimator.
+\end{exercise}
+
+\begin{exercise}
+Suppose $\Var(\varepsilon_i \mid \symbf{x}_i) = \sigma^2 h(\symbf{x}_i)$ for some known positive function $h(\cdot)$. Derive the Weighted Least Squares (WLS) estimator for this model as a special case of GLS, and state the weights explicitly.
+\end{exercise}
+
+\begin{exercise}
+Explain the difference between GLS and Feasible GLS (FGLS). Under what conditions is FGLS consistent? Why might FGLS perform poorly in small samples even when GLS would be efficient?
+\end{exercise}
+
+\begin{exercise}
+A researcher suspects that the errors in a time-series regression follow an AR(1) process $\varepsilon_t = \rho\,\varepsilon_{t-1} + u_t$ with $|\rho| < 1$. Outline the two-step FGLS procedure (Cochrane--Orcutt or Prais--Winsten) used to estimate the model. What is the role of the first-step OLS residuals in this procedure?
+\end{exercise}
+
+\begin{exercise}
+A colleague argues: ``I always use heteroskedasticity-robust (White) standard errors, so I never need GLS.'' Critically evaluate this statement. Under what circumstances might GLS or FGLS be preferable to OLS with robust standard errors?
+\end{exercise}
+
+
+
+# Appendix {.appendix}
+
+## Matrix Algebra Review
+
+\begin{lemma}[Idempotent Projection Matrices]
+\label{lem:idempotent}
+Define the projection matrix $\symbf{P}_X = \symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$ and the residual-maker matrix $\symbf{M}_X = \symbf{I}_N - \symbf{P}_X$. Then:
+\begin{enumerate}
+\item $\symbf{P}_X$ and $\symbf{M}_X$ are symmetric and idempotent: $\symbf{P}_X^2 = \symbf{P}_X$, $\symbf{M}_X^2 = \symbf{M}_X$.
+\item $\symbf{P}_X \symbf{X} = \symbf{X}$ and $\symbf{M}_X \symbf{X} = \symbf{0}$.
+\item $\symbf{P}_X \symbf{M}_X = \symbf{0}$.
+\item $\tr(\symbf{P}_X) = k$ and $\tr(\symbf{M}_X) = N - k$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+Symmetry and idempotency follow directly from the definition. For instance,
+$$
+\symbf{P}_X^2 = \symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}' = \symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}' = \symbf{P}_X.
+$$
+The orthogonality $\symbf{M}_X\symbf{X} = \symbf{X} - \symbf{P}_X\symbf{X} = \symbf{X} - \symbf{X} = \symbf{0}$ follows immediately. 
+Since $\tr(\symbf{P}_X) = \tr(\symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}') = \tr((\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}) = \tr(\symbf{I}_k) = k$, and $\tr(\symbf{M}_X) = N - k$.
+\end{proof}
+
+## Selected Exercise Solutions
+
+\begin{exercise}[Unbiasedness of $s^2$]
+\label{ex:s2-unbiased-sol}
+Show that $s^2 = \hat{\symbf{\varepsilon}}'\hat{\symbf{\varepsilon}}/(N-k)$ is an unbiased estimator of $\sigma^2$.
+\end{exercise}
+
+\begin{proof}[Solution]
+Write $\hat{\symbf{\varepsilon}} = \symbf{M}_X \symbf{y} = \symbf{M}_X \symbf{\varepsilon}$ (since $\symbf{M}_X\symbf{X}=\symbf{0}$). Then
+$$
+\hat{\symbf{\varepsilon}}'\hat{\symbf{\varepsilon}} = \symbf{\varepsilon}'\symbf{M}_X'\symbf{M}_X\symbf{\varepsilon} = \symbf{\varepsilon}'\symbf{M}_X\symbf{\varepsilon},
+$$
+using $\symbf{M}_X' = \symbf{M}_X$ and $\symbf{M}_X^2 = \symbf{M}_X$. Taking the conditional expectation:
+$$
+\E[\symbf{\varepsilon}'\symbf{M}_X\symbf{\varepsilon}\mid\symbf{X}]
+= \tr(\symbf{M}_X\,\Var(\symbf{\varepsilon}\mid\symbf{X}))
+= \tr(\symbf{M}_X\,\sigma^2\symbf{I}_N) = \sigma^2(N-k).
+$$
+Hence $\E[s^2\mid\symbf{X}] = \sigma^2$.
+\end{proof}
+
+\begin{exercise}[Partitioned Regression (Frisch--Waugh--Lovell)]
+\label{ex:fwl-sol}
+Consider $\symbf{y} = \symbf{X}_1\symbf{\beta}_1 + \symbf{X}_2\symbf{\beta}_2 + \symbf{\varepsilon}$. Show that the OLS estimate of $\symbf{\beta}_2$ can be obtained by regressing $\symbf{M}_{X_1}\symbf{y}$ on $\symbf{M}_{X_1}\symbf{X}_2$.
+\end{exercise}
+
+\begin{proof}[Solution]
+From the normal equations partitioned by $[\symbf{X}_1 \;\; \symbf{X}_2]$, the block for $\symbf{\beta}_2$ yields
+$$
+\symbf{X}_2'\symbf{M}_{X_1}\symbf{y} = \symbf{X}_2'\symbf{M}_{X_1}\symbf{X}_2\,\betahat_2,
+$$
+since $\symbf{M}_{X_1}\symbf{X}_1 = \symbf{0}$. Solving: $\betahat_2 = (\symbf{X}_2'\symbf{M}_{X_1}\symbf{X}_2)^{-1}\symbf{X}_2'\symbf{M}_{X_1}\symbf{y}$, which is the OLS estimator from the regression of $\symbf{M}_{X_1}\symbf{y}$ on $\symbf{M}_{X_1}\symbf{X}_2$.
+\end{proof}
+
+## Notation Reference
+
+| Symbol | Meaning |
+|--------|---------|
+| $N$ | Number of observations |
+| $k$ | Number of regressors (including intercept) |
+| $\symbf{y}$ | $N \times 1$ vector of dependent variable |
+| $\symbf{X}$ | $N \times k$ matrix of regressors |
+| $\symbf{\beta}$ | $k \times 1$ parameter vector |
+| $\symbf{\varepsilon}$ | $N \times 1$ error vector |
+| $\betahat$ | OLS estimator of $\symbf{\beta}$ |
+| $\hat{\symbf{\varepsilon}}$ | OLS residuals |
+| $s^2$ | Unbiased estimator of $\sigma^2$ |
+| $\symbf{P}_X$ | Projection matrix $\symbf{X}(\symbf{X}'\symbf{X})^{-1}\symbf{X}'$ |
+| $\symbf{M}_X$ | Residual-maker $\symbf{I}_N - \symbf{P}_X$ |
+| $\symbf{\Omega}$ | General variance--covariance matrix of $\symbf{\varepsilon}$ |
+
+: Notation used throughout these notes {#tbl-notation}
+
+## Simulation Code {#sec:sim-code}
+
+The R code below generates @fig-bias-simulation (unbiasedness simulation) and @fig-consistency-simulation (consistency simulation) shown in the main text.
+
+**Code for @fig-bias-simulation:**
+
+```{r}
+#| ref-label: fig-bias-simulation
+#| eval: false
+#| echo: true
+```
+
+**Code for @fig-consistency-simulation:**
+
+```{r}
+#| ref-label: fig-consistency-simulation
+#| eval: false
+#| echo: true
+```
+
+## Julia Simulation Code {#sec:sim-code-julia}
+
+The Julia code below reproduces the asymptotic-efficiency simulation displayed in @fig-asymptotic-efficiency-simulation. It requires the packages `Distributions`, `DataFrames`, `GLM`, `CairoMakie`, and `CategoricalArrays`.
+
+```julia
+using Random, Distributions, DataFrames, GLM, CategoricalArrays
+using CairoMakie
+
+Random.seed!(2025)
+
+# ── Simulation parameters ──────────────────────────────────
+β₀ = 2.0
+β₁ = 1.5
+σ  = 2.0
+R  = 5_000                        # replications
+Ns = [30, 100, 500, 2_000]        # sample sizes
+
+# ── Run replications ───────────────────────────────────────
+results = DataFrame(beta1_hat = Float64[], N_label = String[])
+
+for n in Ns
+    estimates = Vector{Float64}(undef, R)
+    for r in 1:R
+        x = randn(n)
+        ε = rand(Normal(0, σ), n)
+        y = β₀ .+ β₁ .* x .+ ε
+        df = DataFrame(y = y, x = x)
+        fit = lm(@formula(y ~ x), df)
+        estimates[r] = coef(fit)[2]       # slope coefficient
+    end
+    append!(results, DataFrame(
+        beta1_hat = estimates,
+        N_label   = fill("N = $n", R)
+    ))
+end
+
+# ── Plot overlaid densities ────────────────────────────────
+results.N_label = categorical(results.N_label;
+                              levels = ["N = $n" for n in Ns])
+
+fig = Figure(size = (700, 450))
+ax  = Axis(fig[1, 1];
+           xlabel = "beta1_hat",
+           ylabel = "Density")
+
+colours = cgrad(:Blues, length(Ns) + 1; categorical = true)[2:end]
+
+for (i, n) in enumerate(Ns)
+    sub = filter(:N_label => ==("N = $n"), results)
+    density!(ax, sub.beta1_hat;
+             color  = (colours[i], 0.30),
+             strokecolor = colours[i],
+             strokewidth = 1.2,
+             label  = "N = $n")
+end
+
+vlines!(ax, [β₁]; linestyle = :dash, color = :black, linewidth = 1)
+text!(ax, β₁ + 0.02, maximum(ax.yaxis.attributes.limits[]); 
+      text = "β₁ = 1.5", fontsize = 12)
+
+axislegend(ax; position = :rt)
+fig
+```
+
+## Julia Code: Asymptotic Normality Simulation {#sec:sim-code-julia-normality}
+
+The Julia code below reproduces the asymptotic-normality simulation displayed in @fig-asymptotic-normality-simulation. The errors are drawn from a re-centred Pareto$(2.5)$ distribution (heavily right-skewed), and the standardised OLS slope estimate $Z_N = (\hat\beta_1 - \beta_1)/\widehat{\mathrm{se}}(\hat\beta_1)$ is compared with the $\mathcal{N}(0,1)$ density as $N$ grows.
+
+```julia
+using Random, Distributions, DataFrames, GLM
+using CairoMakie
+
+Random.seed!(2026)
+
+# ── Parameters ─────────────────────────────────────────────
+β₀ = 2.0
+β₁ = 1.5
+R  = 5_000                            # replications
+Ns = [10, 50, 200, 1_000]             # sample sizes
+
+# Pareto error distribution: shape α = 2.5, scale xₘ = 1
+α_par  = 2.5
+xₘ     = 1.0
+par_dist = Pareto(α_par, xₘ)          # Pareto(α, xₘ)
+μ_ε      = mean(par_dist)             # E[Pareto] for re-centring
+
+# ── Run replications ───────────────────────────────────────
+results = DataFrame(z_stat = Float64[], N_label = String[])
+
+for n in Ns
+    zvals = Vector{Float64}(undef, R)
+    for r in 1:R
+        x = randn(n)
+        ε = rand(par_dist, n) .- μ_ε          # skewed, mean-zero errors
+        y = β₀ .+ β₁ .* x .+ ε
+        df = DataFrame(y = y, x = x)
+        fit = lm(@formula(y ~ x), df)
+        b1  = coef(fit)[2]
+        se1 = stderror(fit)[2]
+        zvals[r] = (b1 - β₁) / se1            # standardised estimate
+    end
+    append!(results, DataFrame(
+        z_stat  = zvals,
+        N_label = fill("N = $n", R)
+    ))
+end
+
+# ── Plot: faceted densities vs N(0,1) ─────────────────────
+fig = Figure(size = (800, 600))
+zgrid = range(-4, 4; length = 300)
+ϕ = pdf.(Normal(), zgrid)              # standard normal density
+
+for (idx, n) in enumerate(Ns)
+    row, col = divrem(idx - 1, 2) .+ (1, 1)
+    ax = Axis(fig[row, col];
+              title  = "N = $n",
+              xlabel = idx > 2 ? L"Z_N" : "",
+              ylabel = col == 1 ? "Density" : "")
+
+    sub = filter(:N_label => ==("N = $n"), results)
+    density!(ax, sub.z_stat;
+             color       = (:steelblue, 0.35),
+             strokecolor = :steelblue,
+             strokewidth = 1.0)
+    lines!(ax, zgrid, ϕ; color = :black, linewidth = 1.2)
+    xlims!(ax, -4, 4)
+
+end
+
+fig
+```
+
+
+# Applications: Empirical Example in R
+
+This section demonstrates how to estimate a multiple linear regression model, test hypotheses, and perform diagnostic checks using empirical data in R. Regression results are presented using the `modelsummary` package.
+
+
+## Example: Estimating a Multiple Linear Regression
+
+We demonstrate with a synthetic dataset. If you have your own data with columns `y`, `x1`, and `x2`, you can replace this chunk with your data import.
+
+```{r}
+#| label: model-estimation-appx5
+#| message: false
+#| warning: false
+#| cache: true
+set.seed(123)
+n <- 100
+data <- data.frame(
+  x1 = rnorm(n, mean = 5, sd = 2),
+  x2 = rnorm(n, mean = 10, sd = 3)
+)
+data$y <- 1.5 + 2 * data$x1 - 1 * data$x2 + rnorm(n)
+model <- lm(y ~ x1 + x2, data = data)
+```
+
+
+## Hypothesis Testing
+
+Test $H_0: \beta_1 = 0$ vs $H_1: \beta_1 \neq 0$ using the t-test in the regression output. For joint tests (e.g., $\beta_1 = \beta_2 = 0$), use the `car` package:
+
+```{r}
+#| label: joint-hypothesis-appx
+library(car)
+linearHypothesis(model, c("x1 = 0", "x2 = 0"))
+```
+
+## Diagnostic Tests
+
+### Residual Plots
+```{r}
+#| label: residual-plot-appx
+par(mfrow = c(2,2))
+plot(model)
+par(mfrow = c(1,1))
+```
+
+### Heteroskedasticity Test (Breusch-Pagan)
+```{r}
+#| label: bp-test-appx
+library(lmtest)
+bptest(model)
+```
+
+### Normality Test (Jarque-Bera)
+```{r}
+#| label: jb-test-appx
+library(tseries)
+jarque.bera.test(residuals(model))
+```
+
+### Multicollinearity (VIF)
+```{r}
+#| label: vif-appx
+library(car)
+vif(model)
+```
+
+Then
+$$
+\symbf{y}^* = \symbf{X}^*\symbf{\beta} + \symbf{\varepsilon}^*,
+\qquad
+\Var(\symbf{\varepsilon}^*\mid\symbf{X})=\symbf{I}_N.
+$$
+
+\subsection{The GLS Estimator}
+
+\begin{theorem}[Generalized Least Squares Estimator]
+If $\Var(\symbf{\varepsilon}\mid\symbf{X})=\symbf{\Omega}$ is known,
+the GLS estimator of $\symbf{\beta}$ is
+$$
+\betahat_{\text{GLS}}
+=
+(\symbf{X}'\symbf{\Omega}^{-1}\symbf{X})^{-1}
+\symbf{X}'\symbf{\Omega}^{-1}\symbf{y}.
+$$
+\end{theorem}
+
+\begin{proof}
+Applying OLS to the transformed model yields
+$$
+\betahat_{\text{GLS}}
+=
+(\symbf{X}^{*'}\symbf{X}^*)^{-1}\symbf{X}^{*'}\symbf{y}^*
+=
+(\symbf{X}'\symbf{\Omega}^{-1}\symbf{X})^{-1}
+\symbf{X}'\symbf{\Omega}^{-1}\symbf{y}.
+$$
+\end{proof}
+
+\subsection{Variance of the GLS Estimator}
+
+\begin{theorem}[Variance of GLS]
+Under exogeneity,
+$$
+\Var(\betahat_{\text{GLS}}\mid\symbf{X})
+=
+(\symbf{X}'\symbf{\Omega}^{-1}\symbf{X})^{-1}.
+$$
+\end{theorem}
+
+\begin{remark}[Efficiency]
+The GLS estimator is BLUE among all linear unbiased estimators when
+$\symbf{\Omega}$ is known.
+\end{remark}
+
+\subsection{Special Cases}
+
+\begin{itemize}
+\item \textbf{Heteroskedastic but uncorrelated errors:}
+$$
+\symbf{\Omega}=\operatorname{diag}(\sigma_1^2,\ldots,\sigma_N^2)
+\quad \Rightarrow \quad
+\text{Weighted Least Squares (WLS)}.
+$$
+
+\item \textbf{AR(1) errors (time series):}
+$$
+\varepsilon_t=\rho\varepsilon_{t-1}+u_t,
+\quad |\rho| < 1,
+$$
+leading to a Toeplitz covariance matrix $\symbf{\Omega}$.
+
+\item \textbf{Panel data:}
+$\symbf{\Omega}$ reflects serial correlation and cross-sectional dependence.
+\end{itemize}
+
+\subsection{Feasible Generalized Least Squares}
+
+In practice, $\symbf{\Omega}$ is unknown and must be estimated.
+
+\begin{definition}[Feasible GLS]
+The feasible GLS (FGLS) estimator replaces $\symbf{\Omega}$ with a consistent
+estimator $\hat{\symbf{\Omega}}$:
+$$
+\betahat_{\text{FGLS}}
+=
+(\symbf{X}'\hat{\symbf{\Omega}}^{-1}\symbf{X})^{-1}
+\symbf{X}'\hat{\symbf{\Omega}}^{-1}\symbf{y}.
+$$
+\end{definition}
+
+\subsection{Two-Step FGLS Procedure}
+
+A common implementation proceeds as follows:
+
+\begin{enumerate}
+\item Estimate the model by OLS and obtain residuals $\hat{\symbf{\varepsilon}}$.
+\item Use $\hat{\symbf{\varepsilon}}$ to estimate the parameters of
+$\symbf{\Omega}$.
+\item Construct $\hat{\symbf{\Omega}}$ and compute $\betahat_{\text{FGLS}}$.
+\end{enumerate}
+
+\subsection{Asymptotic Properties}
+
+\begin{theorem}[Consistency and Efficiency]
+If $\hat{\symbf{\Omega}}\xrightarrow{p}\symbf{\Omega}$, then
+$$
+\betahat_{\text{FGLS}}
+\xrightarrow{p}
+\symbf{\beta},
+\qquad
+\sqrt{N}(\betahat_{\text{FGLS}}-\symbf{\beta})
+\xrightarrow{d}
+\mathcal N\!\left(
+\symbf{0},\;
+(\symbf{X}'\symbf{\Omega}^{-1}\symbf{X})^{-1}
+\right).
+$$
+\end{theorem}
+
+\begin{remark}[FGLS vs Robust Inference]
+When $\symbf{\Omega}$ is misspecified, FGLS can perform poorly in finite samples.
+Robust (White/HAC) standard errors retain consistency without requiring correct
+specification of $\symbf{\Omega}$.
+\end{remark}
+
+\subsection{Exercises}
+
+\begin{exercise}
+Explain what the White test and the Breusch--Pagan test have in common and how they differ. Under what circumstances would you prefer one over the other?
+\end{exercise}
+
+\begin{exercise}
+A Jarque--Bera test on OLS residuals yields a $p$-value of 0.03. Does this necessarily mean that OLS estimates are unreliable? Discuss the implications for (i)~finite-sample inference and (ii)~large-sample inference.
+\end{exercise}
+
+\begin{exercise}
+A researcher computes a VIF of 25 for regressor $x_3$ in a multiple regression. Interpret this number. Does high multicollinearity introduce bias into the OLS estimates? What practical problems does it cause, and what remedies might the researcher consider?
+\end{exercise}
+
+\begin{exercise}
+Describe how you would use a residuals-versus-fitted-values plot to detect (i)~heteroskedasticity and (ii)~functional form misspecification. What patterns would you look for in each case?
+\end{exercise}
+
+\subsection{GLS vs OLS: Conceptual Comparison}
+
+Table @tbl-ols-vs-gls compares OLS and GLS along key conceptual dimensions.
+
+\begin{table}[H]
+\centering
+\caption{Comparison of OLS and GLS}
+\label{tbl-ols-vs-gls}
+\begin{tabular}{lcc}
+\toprule
+ & OLS & GLS \\
+\midrule
+Requires $\symbf{\Omega}=\sigma^2\symbf{I}$ & Yes & No \\
+Efficient under heteroskedasticity/autocorrelation & No & Yes \\
+Requires estimating $\symbf{\Omega}$ & No & Often \\
+Finite-sample robustness & High & Lower if $\symbf{\Omega}$ misspecified \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Exercises}
+
+\begin{exercise}
+Derive the GLS estimator $\betahat_{\text{GLS}} = (\symbf{X}'\symbf{\Omega}^{-1}\symbf{X})^{-1}\symbf{X}'\symbf{\Omega}^{-1}\symbf{y}$ by applying OLS to a suitably transformed model. Show each step of the transformation explicitly.
+\end{exercise}
+
+\begin{exercise}
+Show that when $\symbf{\Omega} = \sigma^2 \symbf{I}_N$ (homoskedastic, uncorrelated errors), the GLS estimator reduces to the OLS estimator.
+\end{exercise}
+
+\begin{exercise}
+Suppose $\Var(\varepsilon_i \mid \symbf{x}_i) = \sigma^2 h(\symbf{x}_i)$ for some known positive function $h(\cdot)$. Derive the Weighted Least Squares (WLS) estimator for this model as a special case of GLS, and state the weights explicitly.
+\end{exercise}
+
+\begin{exercise}
+Explain the difference between GLS and Feasible GLS (FGLS). Under what conditions is FGLS consistent? Why might FGLS perform poorly in small samples even when GLS would be efficient?
+\end{exercise}
+
+\begin{exercise}
+A researcher suspects that the errors in a time-series regression follow an AR(1) process $\varepsilon_t = \rho\,\varepsilon_{t-1} + u_t$ with $|\rho| < 1$. Outline the two-step FGLS procedure (Cochrane--Orcutt or Prais--Winsten) used to estimate the model. What is the role of the first-step OLS residuals in this procedure?
+\end{exercise}
+
+\begin{exercise}
+A colleague argues: ``I always use heteroskedasticity-robust (White) standard errors, so I never need GLS.'' Critically evaluate this statement. Under what circumstances might GLS or FGLS be preferable to OLS with robust standard errors?
+\end{exercise}
+````
+This is the description of what the code block changes:
+<changeDescription>
+Add definition for the 'exercise' environment to header-includes in clrm_notes_r.qmd.
+</changeDescription>
+
+This is the code block that represents the suggested code change:
+```quarto
+% ---- Exercise environment ----
+            \newtheorem{exercise}{Exercise}[section]
+```

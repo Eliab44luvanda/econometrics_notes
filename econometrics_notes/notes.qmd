@@ -1,0 +1,453 @@
+
+---
+title: "Classical Linear Regression Model (CLRM)"
+subtitle: "MA Econometrics — Lecture Notes"
+author: "Eliab Luvanda"
+date: today
+lang: en
+
+toc: true
+toc-depth: 3
+number-sections: true
+#lof: true
+#lot: true
+
+bibliography: references.bib
+csl: chicago-author-date.csl
+citeproc: true
+
+execute:
+  echo: true
+  warning: false
+  message: false
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    classoption: [twoside]
+    fontsize: 11pt
+    papersize: a4
+
+    geometry:
+      - inner=1.25in
+      - outer=1.00in
+      - top=1.05in
+      - bottom=1.10in
+      - headsep=0.25in
+      - footskip=0.35in
+
+    linestretch: 1.08
+
+    mainfont: "Palatino"
+    mainfontoptions:
+      - Ligatures=TeX
+      - Numbers=OldStyle
+    sansfont: "TeX Gyre Heros"
+    monofont: "Latin Modern Mono"
+    # mathfont: "TeX Gyre Termes Math"  # enable only if installed
+
+    colorlinks: true
+    linkcolor: black
+    urlcolor: black
+    citecolor: black
+
+    keep-tex: true
+    fig-pos: "tbp"
+    tbl-pos: "tbp"
+
+    include-in-header:
+      - text: |
+          % ---- Typography & layout ----
+          \usepackage{microtype}
+          \usepackage{setspace}
+          \usepackage{booktabs}
+          \usepackage{array}
+          \usepackage{longtable}
+          \usepackage{multirow}
+          \usepackage{mathtools,amsfonts,amssymb,amsthm}
+
+          % ---- Robust bold-math macro usable in TEXT or MATH ----
+          % (Fixes: "LaTeX Error: \symbf allowed only in math mode.")
+          \makeatletter
+          \@ifundefined{symbf}{%
+            \newcommand{\symbf}[1]{\ensuremath{\boldsymbol{#1}}}%
+          }{%
+            \renewcommand{\symbf}[1]{\ensuremath{\boldsymbol{#1}}}%
+          }
+          \makeatother
+          \DeclareRobustCommand{\betahat}{\ensuremath{\widehat{\symbf{\beta}}}}
+
+          % Optional (remove if unused)
+          % \usepackage{physics}
+
+          \usepackage{fancyhdr}
+          \usepackage{titlesec}
+          \usepackage{enumitem}
+          \usepackage{caption}
+
+          % ---- TOC/LOF/LOT tightening (ARTICLE-safe) ----
+          \usepackage{tocloft}
+
+          \setlength{\cftbeforesecskip}{2pt}
+          \setlength{\cftbeforesubsecskip}{0pt}
+
+          \renewcommand{\cftdotsep}{1.5}
+          \setlength{\cftsecnumwidth}{3.0em}
+          \setlength{\cftsubsecnumwidth}{4.0em}
+
+          \renewcommand{\cftsecfont}{\small}
+          \renewcommand{\cftsubsecfont}{\small}
+          \renewcommand{\cftsecpagefont}{\small}
+          \renewcommand{\cftsubsecpagefont}{\small}
+
+          \setlength{\cftbeforefigskip}{2pt}
+          \setlength{\cftbeforetabskip}{2pt}
+
+          % ---- Paragraphs / lists (textbook feel) ----
+          \setlength{\parindent}{1.5em}
+          \setlength{\parskip}{0pt}
+          \setlist[itemize]{topsep=4pt,itemsep=2pt,parsep=0pt}
+          \setlist[enumerate]{topsep=4pt,itemsep=2pt,parsep=0pt}
+
+          % ---- Headings (article: sections/subsections only) ----
+          \titleformat{\section}{\normalfont\bfseries\scshape\large}{\thesection}{0.7em}{}
+          \titleformat{\subsection}{\normalfont\bfseries\scshape}{\thesubsection}{0.7em}{}
+          \titleformat{\subsubsection}{\normalfont\bfseries}{\thesubsubsection}{0.7em}{}
+
+          \titlespacing*{\section}{0pt}{12pt}{6pt}
+          \titlespacing*{\subsection}{0pt}{10pt}{5pt}
+          \titlespacing*{\subsubsection}{0pt}{8pt}{4pt}
+
+          % ---- Two-sided header/footer (article) ----
+          \pagestyle{fancy}
+          \fancyhf{}
+          \fancyhead[LE]{\small\scshape\nouppercase{\rightmark}}
+          \fancyhead[RO]{\small\scshape\nouppercase{\rightmark}}
+          \fancyfoot[CE,CO]{\thepage}
+          \renewcommand{\headrulewidth}{0.2pt}
+          \renewcommand{\footrulewidth}{0pt}
+          \renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+
+          % ---- Captions ----
+          \captionsetup{font=small,labelfont=bf}
+
+          % ---- Proof/QED ----
+          \renewcommand{\qedsymbol}{\(\square\)}
+
+          % ---- Theorem-like environments (numbered by section) ----
+          \theoremstyle{plain}
+          \newtheorem{theorem}{Theorem}[section]
+          \newtheorem{proposition}[theorem]{Proposition}
+          \newtheorem{lemma}[theorem]{Lemma}
+          \newtheorem{corollary}[theorem]{Corollary}
+
+          \theoremstyle{definition}
+          \newtheorem{definition}[theorem]{Definition}
+          \newtheorem{example}[theorem]{Example}
+          \newtheorem{exercise}{Exercise}[section]
+
+
+          \theoremstyle{remark}
+          \newtheorem{remark}[theorem]{Remark}
+
+          % Assumptions: A1.1, A1.2, ... (by section)
+          \newtheorem{assumption}{Assumption}[section]
+          \renewcommand{\theassumption}{A\thesection.\arabic{assumption}}
+
+          % ---- Boxed blocks (Notation / Regularity Conditions) ----
+          \usepackage[most]{tcolorbox}
+          \tcbset{
+            before skip=8pt,
+            after skip=8pt,
+            boxrule=0.4pt,
+            sharp corners,
+            left=6pt,right=6pt,top=6pt,bottom=6pt
+          }
+          \newtcolorbox{notationbox}[1][]{title=\textsc{Notation},#1}
+          \newtcolorbox{regcondbox}[1][]{title=\textsc{Regularity Conditions},#1}
+
+          % ==========================================================
+          % LIST OF RESULTS (Theorems/Lemmas/Assumptions/...)
+          % ==========================================================
+          \usepackage{thmtools}
+          \AtEndPreamble{%
+            \usepackage[nameinlink,noabbrev]{cleveref}
+            \crefname{theorem}{Theorem}{Theorems}
+            \crefname{proposition}{Proposition}{Propositions}
+            \crefname{lemma}{Lemma}{Lemmas}
+            \crefname{corollary}{Corollary}{Corollaries}
+            \crefname{definition}{Definition}{Definitions}
+            \crefname{assumption}{Assumption}{Assumptions}
+            \crefname{example}{Example}{Examples}
+            \crefname{remark}{Remark}{Remarks}
+            \crefname{exercise}{Exercise}{Exercises}
+            \Crefname{theorem}{Theorem}{Theorems}
+            \Crefname{proposition}{Proposition}{Propositions}
+            \Crefname{lemma}{Lemma}{Lemmas}
+            \Crefname{corollary}{Corollary}{Corollaries}
+            \Crefname{definition}{Definition}{Definitions}
+            \Crefname{assumption}{Assumption}{Assumptions}
+            \Crefname{example}{Example}{Examples}
+            \Crefname{remark}{Remark}{Remarks}
+            \Crefname{exercise}{Exercise}{Exercises}
+          }
+          \renewcommand{\listtheoremname}{List of Results}
+
+          \newcommand{\printlistofresults}{%
+            \clearpage
+            \listoftheorems[ignoreall,show={theorem,proposition,lemma,corollary,definition,assumption,example,remark}]%
+          }
+          \let\oldtableofcontents\tableofcontents
+          \renewcommand{\tableofcontents}{%
+            \oldtableofcontents
+            \printlistofresults
+          }
+
+          % Display math spacing (slightly tighter)
+          \setlength{\abovedisplayskip}{10pt}
+          \setlength{\belowdisplayskip}{10pt}
+          \setlength{\abovedisplayshortskip}{6pt}
+          \setlength{\belowdisplayshortskip}{6pt}
+
+---
+
+# Introduction
+
+This handout provides lecture notes on the Classical Linear Regression Model (CLRM) for the MA Econometrics course. The notes cover key concepts, assumptions, and results of the CLRM, along with relevant mathematical formulations and examples. The structure of the notes is designed to facilitate understanding of the theoretical underpinnings and practical applications of the CLRM in econometric analysis.
+
+The notes cover the following topics:
+
+- Overview of CLRM
+- Assumptions of CLRM
+- Estimation methods
+  - Ordinary Least Squares (OLS) estimation
+  - Method of Moments (MoM) estimation
+  - Maximum Likelihood Estimation (MLE)
+- Properties of the OLS estimator
+- Estimation of variance of the error term
+- Hypothesis testing
+- Model diagnostics
+- Applications in econometrics and economics
+- Further reading
+
+
+## Overview of the Classical Linear Regression Model (CLRM)
+
+Consider the following linear regression model (with an intercept, where $x_{i1}=1$ for all $i$):
+\begin{equation}
+y_i = \beta_1 + \beta_2 x_{i2} + \cdots + \beta_k x_{ik} + \varepsilon_i
+= \sum_{j=1}^k \beta_j x_{ij} + \varepsilon_i, \quad i = 1,2,\ldots,N.
+\end{equation}
+where $x_{ij}$ are regressors, $\beta_j$ are unknown population or true parameters to be estimated, and $\varepsilon_i$ are error terms.
+
+The regression model can also be expressed in a compact form as
+\begin{equation}
+y_i = \symbf{x}_i' \symbf{\beta} + \varepsilon_i, \quad i=1,2,\ldots,N,
+\end{equation}
+where $\symbf{x}_i = (1, x_{i2}, \ldots, x_{ik})'$ is a $k \times 1$ vector of regressors for observation $i$, and
+$\symbf{\beta} = (\beta_1, \beta_2, \ldots, \beta_k)'$ is a $k \times 1$ vector of unknown parameters.
+
+Stacking the $N$ observations yields the matrix form
+\begin{equation}
+\symbf{y} = \symbf{X}\symbf{\beta} + \symbf{\varepsilon},
+\end{equation}
+where:
+
+- $\symbf{y}$ is an $N \times 1$ vector of the dependent variable.
+- $\symbf{X}$ is an $N \times k$ matrix of regressors.
+- $\symbf{\beta}$ is a $k \times 1$ vector of unknown parameters.
+- $\symbf{\varepsilon}$ is an $N \times 1$ vector of error terms.
+
+$$
+\symbf{y} =
+\begin{bmatrix}
+y_1\\
+y_2\\
+\vdots\\
+y_N
+\end{bmatrix},
+\qquad
+\symbf{X} =
+\begin{bmatrix}
+1 & x_{12} & x_{13} & \cdots & x_{1k}\\
+1 & x_{22} & x_{23} & \cdots & x_{2k}\\
+\vdots & \vdots & \vdots & \ddots & \vdots\\
+1 & x_{N2} & x_{N3} & \cdots & x_{Nk}
+\end{bmatrix},
+\qquad
+\symbf{\varepsilon} =
+\begin{bmatrix}
+\varepsilon_1\\
+\varepsilon_2\\
+\vdots\\
+\varepsilon_N
+\end{bmatrix}.
+$$
+
+
+## Assumptions of the CLRM
+
+\begin{assumption}\label{assump:clrm}
+(Linearity in parameters) The relationship between the dependent variable and regressors is linear in \(\symbf{\beta}\):
+\begin{equation}
+\symbf{y} = \symbf{X}\symbf{\beta} + \symbf{\varepsilon}.
+\end{equation}
+\end{assumption}
+
+This assumption ensures that the model is linear in parameters, allowing for the application of linear estimation techniques. The regressors $\symbf{X}$ can be non-linear functions of the original variables, but the parameters $\symbf{\beta}$ must enter the model linearly.
+
+\begin{assumption}\label{assump:Non-singularity}
+(Non-singularity / no perfect multicollinearity) The regressor matrix \(\symbf{X}\) has full column rank:
+\begin{equation}
+\operatorname{rank}(\symbf{X}) = k.
+\end{equation}
+\end{assumption}
+
+This assumption ensures that there is no perfect linear relationship among the regressors, allowing for the unique estimation of the parameters $\symbf{\beta}$
+
+\begin{assumption}\label{assump:exogeneity}
+(Exogeneity) The conditional expectation of the error term given the regressors is zero:
+\begin{equation}
+\mathbb{E}[\symbf{\varepsilon}\mid \symbf{X}] = \symbf{0}.
+\end{equation}
+\end{assumption}
+
+This assumption implies that the regressors/explanatory variables are uncorrelated with the error term, ensuring that the OLS estimator is unbiased and consistent.
+
+\begin{assumption}\label{assump:spherical errors}
+(Spherical errors) The errors are homoscedastic and uncorrelated:
+\begin{equation}
+\operatorname{Var}(\symbf{\varepsilon}\mid \symbf{X}) = \sigma^2 \symbf{I}_N.
+\end{equation}
+\end{assumption}
+
+This assumption states that the variance of the error terms is constant across observations (homoscedasticity) and that the error terms are uncorrelated with each other. This assumption is crucial for the efficiency of the OLS estimator.
+
+\begin{assumption}\label{assump:normality}
+(Normality) The errors are normally distributed:
+\begin{equation}
+\symbf{\varepsilon}\mid \symbf{X} \sim \mathcal{N}(\symbf{0}, \sigma^2 \symbf{I}_N).
+\end{equation}
+\end{assumption}
+
+This assumption is often made for inference purposes, as it allows for the derivation of exact finite-sample distributions of the OLS estimator and test statistics. It justifies the use of t-tests and F-tests in hypothesis testing. It is not required for the consistency or unbiasedness of the OLS estimator.
+
+
+# Estimation Methods
+
+## Ordinary Least Squares (OLS) Estimation
+
+The OLS estimator of $\symbf{\beta}$ minimizes the residual sum of squares (RSS):
+\begin{equation}
+\betahat = \arg\min_{\symbf{\beta}}
+\sum_{i=1}^N \bigl(y_i - \symbf{x}_i' \symbf{\beta}\bigr)^2.
+\end{equation}
+
+### Derivation of the OLS Estimator
+
+Define the RSS objective:
+$$
+S(\symbf{\beta})=\sum_{i=1}^N \bigl(y_i-\symbf{x}_i'\symbf{\beta}\bigr)^2.
+$$
+
+ Matrix notation
+
+Let
+$$
+\symbf{y}=
+\begin{pmatrix}
+y_1\\ \vdots\\ y_N
+\end{pmatrix}\in\mathbb{R}^{N\times 1},
+\qquad
+\symbf{X}=
+\begin{pmatrix}
+\symbf{x}_1'\\ \vdots\\ \symbf{x}_N'
+\end{pmatrix}\in\mathbb{R}^{N\times k}.
+$$
+
+In matrix notation, the residual sum of squares (RSS) can be expressed as
+
+\begin{equation}
+S(\symbf{\beta})=(\symbf{y}-\symbf{X}\symbf{\beta})'(\symbf{y}-\symbf{X}\symbf{\beta}).
+\end{equation}
+
+ Expand the objective
+
+\begin{align}
+S(\symbf{\beta})
+&= \symbf{y}'\symbf{y} - \symbf{y}'\symbf{X}\symbf{\beta}
+    - (\symbf{X}\symbf{\beta})'\symbf{y}
+    + (\symbf{X}\symbf{\beta})'(\symbf{X}\symbf{\beta}) \nonumber\\
+&= \symbf{y}'\symbf{y} - \symbf{y}'\symbf{X}\symbf{\beta}
+    - \symbf{\beta}'\symbf{X}'\symbf{y}
+    + \symbf{\beta}'\symbf{X}'\symbf{X}\symbf{\beta}.
+\end{align}
+
+
+Since $\symbf{y}'\symbf{X}\symbf{\beta}$ is a scalar,
+$\symbf{y}'\symbf{X}\symbf{\beta} = \symbf{y}'\symbf{X}\symbf{\beta}' = \symbf{\beta}'\symbf{X}'\symbf{y}$  Hence,
+
+\begin{equation}
+S(\symbf{\beta})
+= \symbf{y}'\symbf{y} - 2\symbf{\beta}'\symbf{X}'\symbf{y}
+  + \symbf{\beta}'\symbf{X}'\symbf{X}\symbf{\beta}.
+\end{equation}
+
+
+First-order condition (normal equations)
+
+Since $\symbf{X}'\symbf{X}$ is symmetric,
+\begin{equation}
+\frac{\partial S(\symbf{\beta})}{\partial \symbf{\beta}}
+= -2\symbf{X}'\symbf{y} + 2\symbf{X}'\symbf{X}\symbf{\beta}.
+\end{equation}
+
+Setting the gradient to zero yields the normal equations:
+\begin{equation}
+\symbf{X}'\symbf{X}\symbf{\beta}=\symbf{X}'\symbf{y}.
+\end{equation}
+
+
+Closed-form solution
+
+If $\operatorname{rank}(\symbf{X})=k$, then $\symbf{X}'\symbf{X}$ is invertible and the unique minimizer is
+\begin{equation}
+\boxed{
+\betahat = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{y}.
+}
+\end{equation}
+
+
+Second-order condition
+
+The Hessian matrix is
+\begin{equation}
+\frac{\partial^2 S(\symbf{\beta})}{\partial \symbf{\beta}\,\partial \symbf{\beta}'}
+= 2\symbf{X}'\symbf{X},
+\end{equation}
+
+which is positive semidefinite (and positive definite when $\operatorname{rank}(\symbf{X})=k$). Therefore, $\betahat$ minimizes $S(\symbf{\beta})$.
+
+
+Orthogonality interpretation
+
+Let $\hat{\symbf{e}}=\symbf{y}-\symbf{X}\betahat$. From the normal equations,
+\begin{equation}
+\symbf{X}'\hat{\symbf{e}}=\symbf{0},
+\end{equation}
+so the OLS residuals are orthogonal to each column of $\symbf{X}$.
+
+
+\begin{exercise}
+Show that the OLS residuals $\hat{\symbf{e}}$ are orthogonal to the regressors in $\symbf{X}$.
+\end{exercise}
+
+\begin{exercise}
+Show that $\symbf{y}'\symbf{X}\symbf{\beta}' = \symbf{\beta}'\symbf{X}'\symbf{y}$.
+\end{exercise}
+
+\begin{exercise}
+Show that the OLS estimator follows a multivariate normal distribution under \Cref{assump:normality}.
+\end{exercise}
+

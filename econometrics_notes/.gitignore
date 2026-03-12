@@ -1,0 +1,13 @@
+.DS_Store
+.vscode/
+
+# Quarto and LaTeX render artifacts
+*.pdf
+*.html
+*.docx
+*.tex
+*.aux
+*.log
+*.loe
+*_cache/
+*_files/

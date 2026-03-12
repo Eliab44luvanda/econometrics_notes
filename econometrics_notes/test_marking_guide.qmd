@@ -1,0 +1,129 @@
+
+---
+title: "Econometrics Test II - Marking Guide" 
+subtitle: "EC Statistical Inference and Econometrics"
+date: 2026-02-28
+
+
+format:
+  pdf:
+    pdf-engine: xelatex
+    documentclass: article
+    papersize: a4
+    fontsize: 11pt
+    geometry:
+      - top=25mm
+      - bottom=25mm
+      - left=25mm
+      - right=25mm
+    mainfont: "Palatino"
+    mathfont: "Palatino"
+    number-sections: false
+    toc: false
+    colorlinks: true
+    linkcolor: black
+    urlcolor: black
+    citecolor: black
+    include-in-header:
+      text: |
+        \usepackage{setspace}
+        \setstretch{1.10}
+        \usepackage{enumitem}
+        \setlist[itemize]{noitemsep,topsep=2pt}
+        \setlist[enumerate]{noitemsep,topsep=2pt}
+---
+
+
+
+# Instructions
+
+Time allowed: **1 hour**. This test contains **three questions**.  
+**Answer any TWO**. Provide complete solutions with clear explanations.
+
+---
+
+# Questions
+
+## **Question 1: The OLS estimator and its variance-covariance matrix** (Total: **10 marks**)
+
+
+Consider the classical linear regression model:
+$$
+\symbf{y} = \symbf{X}\symbf{\beta} + \symbf{\varepsilon},
+$$
+where $\symbf{y}$ is $N \times 1$, $\symbf{X}$ is $N \times k$, $\symbf{\beta}$ is $k \times 1$, and $\symbf{\varepsilon}$ is $N \times 1$.
+
+1. **[5 marks]** Derive the **OLS estimator** $\hat{\beta}$.
+   
+  **Solution:** The OLS estimator $\hat{\beta}$ is derived by minimizing the sum of squared residuals:
+$$
+\hat{\beta} = \arg\min_{\beta} (\symbf{y} - \symbf{X}\beta)'(\symbf{y} - \symbf{X}\beta).
+$$
+To find the minimum, we take the derivative with respect to $\beta$ and set it to zero:
+$$-2\symbf{X}'(\symbf{y} - \symbf{X}\beta) = 0.$$
+Rearranging gives:
+$$\symbf{X}'\symbf{X}\beta = \symbf{X}'\symbf{y}.$$
+Assuming $\symbf{X}'\symbf{X}$ is invertible, we can solve for $\beta$:
+$$\hat{\beta} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{y}.$$    
+
+2. **[5 marks]** Derive the **variance-covariance matrix** of $\hat{\beta}$ under the classical assumptions.
+
+**Solution:** Under the classical assumptions, we have $\symbf{\varepsilon} \sim N(0, \sigma^2 I)$, where $I$ is the identity matrix. The variance-covariance matrix of $\hat{\beta}$ can be derived as follows:
+First, we express $\hat{\beta}$ in terms of $\symbf{\varepsilon}$:
+$$\hat{\beta} = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'(\symbf{X}\symbf{\beta} + \symbf{\varepsilon}) = \beta + (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{\varepsilon}.$$
+The variance-covariance matrix of $\hat{\beta}$ is then:
+$$\text{Var}(\hat{\beta}) = \text{Var}((\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{\varepsilon}) = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\text{Var}(\symbf{\varepsilon})\symbf{X}(\symbf{X}'\symbf{X})^{-1}.$$
+Since $\text{Var}(\symbf{\varepsilon}) = \sigma^2 I$, we have:
+$$\text{Var}(\hat{\beta}) = \sigma^2 (\symbf{X}'\symbf{X})^{-1}.$$
+
+## **Question 2: Unbiasedness and consistency of OLS estimator** (Total: **10 marks**)
+
+
+Given the model in Question 1:
+
+1. **[5 marks]** Show that $\hat{\beta}$ is **unbiased** under the classical assumptions.
+
+**Solution:** To show that $\hat{\beta}$ is unbiased, we use the conditional expectation of the error term given $\symbf{X}$:
+$$E[\hat{\beta}\mid \symbf{X}] = E\left[(\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{y}\mid \symbf{X}\right] = E\left[(\symbf{X}'\symbf{X})^{-1}\symbf{X}'(\symbf{X}\symbf{\beta} + \symbf{\varepsilon})\mid \symbf{X}\right].$$
+This can be simplified to:
+$$E[\hat{\beta}\mid \symbf{X}] = (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{X}\symbf{\beta} + (\symbf{X}'\symbf{X})^{-1}\symbf{X}'E[\symbf{\varepsilon}\mid \symbf{X}].$$
+Under the classical assumptions, $E[\symbf{\varepsilon}\mid \symbf{X}] = 0$, so:
+$$E[\hat{\beta}\mid \symbf{X}] = \symbf{\beta}.$$
+Thus, $\hat{\beta}$ is an unbiased estimator of $\beta$ conditional on $\symbf{X}$, and therefore also unconditionally.
+
+The alternative way to show unbiasedness is to start with the expression that the OLS estimator can be written as $\hat{\beta} = \beta + (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{\varepsilon}$, and then take the conditional expectation of $\hat{\beta}$ given $\symbf{X}$:
+$$E[\hat{\beta}\mid \symbf{X}] = E\left[\beta + (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{\varepsilon}\mid \symbf{X}\right] = \beta + (\symbf{X}'\symbf{X})^{-1}\symbf{X}'E[\symbf{\varepsilon}\mid \symbf{X}].$$  
+Since $E[\symbf{\varepsilon}\mid \symbf{X}] = 0$, we have:
+$$E[\hat{\beta}\mid \symbf{X}] = \beta.$$
+Thus, $\hat{\beta}$ is an unbiased estimator of $\beta$ conditional on $\symbf{X}$, and therefore also unconditionally.
+
+   
+2. **[5 marks]** If a regressor in $\symbf{X}$ is correlated with $\symbf{\varepsilon}$, is $\hat{\beta}$ still unbiased? **Explain.**
+
+**Solution:** If a regressor in $\symbf{X}$ is correlated with $\symbf{\varepsilon}$, then the assumption of exogeneity is violated. In this case, the expected value of $\hat{\beta}$ would not equal $\beta$, and thus $\hat{\beta}$ would be a biased estimator. This is because the correlation between the regressor and the error term would introduce systematic bias into the estimation process, leading to an expected value of $\hat{\beta}$ that deviates from the true parameter $\beta$.
+
+
+## **Question 3: Normality of the OLS estimator** (Total: **10 marks**)
+
+1. **[5 marks]** Assuming the model in Question 1 and normal errors, show that $\hat{\beta}$ is **normally distributed**. State its mean and variance.
+
+**Solution:** Under the classical assumptions with normal errors, we have $\symbf{\varepsilon} \sim N(0, \sigma^2 I)$. Since $\hat{\beta} = \beta + (\symbf{X}'\symbf{X})^{-1}\symbf{X}'\symbf{\varepsilon}$ is a linear combination of the normally distributed errors, it follows that $\hat{\beta}$ is also normally distributed:
+$$\hat{\beta} \sim N\left(\beta, \sigma^2 (\symbf{X}'\symbf{X})^{-1}\right).$$
+Thus, the mean of $\hat{\beta}$ is $\beta$ and the variance-covariance matrix is $\sigma^2 (\symbf{X}'\symbf{X})^{-1}$.
+
+
+2. **[5 marks]** Why is the **normality assumption** important for hypothesis tests and confidence intervals for $\hat{\beta}$?
+
+**Solution:** The normality assumption is important for hypothesis tests and confidence intervals for $\hat{\beta}$ because it allows us to use the properties of the normal distribution to make inferences about the parameters. Specifically, if $\hat{\beta}$ is normally distributed, we can construct confidence intervals and perform hypothesis tests using the standard normal distribution or the t-distribution (when the variance is estimated). This is crucial for determining the statistical significance of the estimated coefficients and for making valid inferences about the population parameters. Without the normality assumption, the distribution of $\hat{\beta}$ may not be well-defined, and standard inference procedures may not be valid.
+   
+---
+
+
+---
+
+**End of Test**
+
+*Version: 2026-02-28*
+
+*Version: 2026-02-28*
+
