@@ -26,6 +26,14 @@ execute:
   message: false
 ---
 
+```{=latex}
+\clearpage
+\listoftables
+\clearpage
+\listoffigures
+\clearpage
+```
+
 # Introduction
 
 This note presents a Monte Carlo experiment designed to illustrate a central result of regression analysis: when the disturbance term is spherical, the sampling distribution of the ordinary least squares estimator tends to be more concentrated than when the disturbance term exhibits heteroscedasticity or serial correlation.
