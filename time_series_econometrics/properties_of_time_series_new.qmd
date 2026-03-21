@@ -1,0 +1,271 @@
+---
+title: "**Time Series Econometrics**"
+subtitle: "**Properties of Stationary and Integrated Time Series**"
+author: "**Eliab Luvanda**"
+date: today
+lang: en
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    mainfont: Palatino
+    documentclass: article
+    classoption:
+      - twoside
+    fontsize: 11pt
+    papersize: a4
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    colorlinks: true
+    lof: true
+
+
+geometry:
+  - inner=1.3in
+  - outer=1.0in
+  - top=1.1in
+  - bottom=1.1in
+  - headsep=0.3in
+header-includes:
+  - \usepackage{amsmath, amssymb, amsthm, mathtools}
+  - \usepackage{bm}
+  - \usepackage{bbm}
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{graphicx}
+  - \usepackage{setspace}
+  - \onehalfspacing
+  - |
+    \theoremstyle{plain}
+    \newtheorem{theorem}{Theorem}[section]
+    \newtheorem{lemma}[theorem]{Lemma}
+    \newtheorem{proposition}[theorem]{Proposition}
+    \newtheorem{corollary}[theorem]{Corollary}
+  - |
+    \theoremstyle{definition}
+    \newtheorem{definition}[theorem]{Definition}
+    \newtheorem{example}[theorem]{Example}
+    \newtheorem{exercise}[theorem]{Exercise}
+  - |
+    \theoremstyle{remark}
+    \newtheorem{remark}[theorem]{Remark}
+  - \renewcommand{\qedsymbol}{$\blacksquare$}
+  - |
+    \newcommand{\E}{\mathbb{E}}
+    \newcommand{\Var}{\mathrm{Var}}
+    \newcommand{\Cov}{\mathrm{Cov}}
+    \newcommand{\plim}{\mathrm{plim}}
+    \newcommand{\R}{\mathbb{R}}
+    \newcommand{\1}{\mathbbm{1}}
+  - \usepackage{titlesec}
+  - |
+    \titleformat{\section}
+      {\normalfont\large\bfseries}{\thesection}{1em}{}
+  - |
+    \titleformat{\subsection}
+      {\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
+  - \usepackage{fancyhdr}
+  - |
+    \pagestyle{fancy}
+    \fancyhf{}
+    \fancyhead[LE,RO]{\thepage}
+    \fancyhead[LO]{Stationary and Integrated Processes}
+    \fancyhead[RE]{Stationary and Integrated Processes}
+  - \usepackage{hyperref}
+  - |
+    \hypersetup{
+      colorlinks=true,
+      linkcolor=blue,
+      citecolor=blue,
+      urlcolor=blue
+    }
+---
+## Introduction
+
+Time series econometrics constitutes a specialized subfield within econometrics dedicated to the analysis of data observed sequentially over time. It utilizes advanced statistical methodologies to examine time series data with the objective of identifying and interpreting underlying patterns, trends, and dynamic relationships. This handout provides a comprehensive overview of the principal concepts and methodological approaches employed in time series econometrics, and it includes practical examples and code snippets to illustrate key ideas.
+
+Time series data warrant particular consideration because they often exhibit distinctive characteristics such as trends, seasonality, and autocorrelation. These features introduce additional complexity to the analysis and require specialized methods for reliable modeling and forecasting. Serial correlation among observations violates the assumption of independence that underlies many standard statistical procedures; consequently, practitioners must adopt tools and inferential techniques that account for temporal dependence.
+
+Autocorrelation implies that an observation at time t is systematically related to its past values. If ignored, this dependence can produce biased parameter estimates and invalid inference. The problem becomes more severe in the presence of non-stationarity, where moments such as the mean and variance evolve over time. Non-stationary series can lead to spurious regressions, in which unrelated series appear statistically associated because of shared trending behavior rather than any meaningful economic link.
+
+The temporal dependence inherent in many time series challenges the conditions of classical limit theorems. In particular, autocorrelation and heteroskedasticity may affect the sampling distributions of estimators and test statistics, so that asymptotic approximations must be used with care. This course of notes emphasizes both theoretical foundations (e.g., properties of stationary and integrated processes, unit-root theory, and cointegration) and practical implementation (tests, estimation, and model selection) to equip readers with tools for rigorous empirical work.
+
+## Key Concepts
+### Stationarity
+A time series is said to be stationary if its statistical properties, such as mean and variance, do not change over time. Stationarity is crucial for many time series models, as non-stationary data can lead to misleading results. A common test for stationarity is the Augmented Dickey-Fuller (ADF) test, which tests the null hypothesis that a unit root is present in the time series. The ADF test can be performed using statistical software like R or Python.
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| caption: "Simulated Stationary Time Series"
+#| fig.cap: "A simulated stationary time series"
+#| fig.width: 4
+#| fig.height: 3
+library(ggplot2)
+set.seed(123)
+n <- 100
+library(ggplot2)  # Load required library
+library(ggpubr)  # Load ggpubr for theme_classic2
+
+# Function to generate a stationary time series
+# y_t = c + \phi *y_{t-1} + \epsilon_t
+ar1_time_series <- function(n, c, phi) {
+  # Generate white noise
+  epsilon <- rnorm(n, mean = 0, sd = 1)
+  
+  # Initialize the time series
+  y <- numeric(n)
+  y[1] <- c + epsilon[1]  # Initial value
+  
+  # Generate the time series
+  for (t in 2:n) {
+    y[t] <- c + phi * y[t - 1] + epsilon[t]
+  }  # Added missing closing brace
+  
+  return(y)
+}  # Fixed brace placement
+
+# Define n before using it
+n <- 200  # Add this line
+c <- 0.2  # Constant term
+phi <- 0.6  # Autoregressive coefficient
+
+# Generate an AR(1) time series
+data <- data.frame(
+  time = 1:n,
+  time_series = ar1_time_series(n, c, phi)
+)
+
+# Plot the time series using ggplot2
+ggplot(data, aes(x = time, y = time_series)) +
+  geom_line(color = "navy") +
+  labs(
+    x = "Time",
+    y = "Value"
+  ) +
+  theme_classic2() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+\begin{definition}
+A time series is stationary if its mean, variance, and autocovariance do not change over time.
+\end{definition}
+
+\begin{example}
+Consider a time series \( Y_t \) defined as follows:
+\[Y_t = \mu + \epsilon_t \]
+where \( \mu \) is a constant and \( \epsilon_t \) is white noise. This time series is stationary because its mean is constant (\( \mu \)), its variance is constant, and its autocovariance does not depend on time.
+\end{example}
+
+### Unit Roots
+A unit root is a characteristic of a time series that indicates non-stationarity. A time series has a unit root if it can be represented as an autoregressive process with a root equal to one. The presence of a unit root implies that shocks to the time series have permanent effects, making it non-stationary.
+
+\begin{definition}
+A time series has a unit root if it can be represented as an autoregressive process with a root equal to one.
+\end{definition}
+
+\begin{remark}
+The presence of a unit root in a time series indicates that the series is non-stationary and that shocks to the series have permanent effects.
+\end{remark}
+
+## Example: Visualizing Weak Stationarity
+
+The figure below illustrates a simulated weakly stationary AR(1) process, which is a common example of a stationary time series. The plot demonstrates the constancy of the mean (indicated by the red dashed line) and the stable variance over time, visually confirming the properties of weak stationarity.
+
+- Constancy of mean
+- Stable variance
+
+
+```{r, fig.cap="A simulated stationary AR(1) process is illustrated. The mean (red dashed line) is shown to be constant, and the variance remains stable over time. This stability is further depicted by fluctuations being contained within a nearly uniform band", fig.width=5, fig.height=3}
+# Simulate a stationary AR(1) process
+set.seed(123)
+n <- 500
+phi <- 0.7
+mu <- 5
+sigma <- 1
+x <- numeric(n)
+x[1] <- rnorm(1, mean = mu, sd = sigma / sqrt(1 - phi^2))
+for (t in 2:n) {
+  x[t] <- mu + phi * (x[t-1] - mu) + rnorm(1, 0, sigma)
+}
+library(ggplot2)
+
+mean_x <- mean(x)
+sd_x <- sd(x)
+upper_band <- mean_x + 2 * sd_x
+lower_band <- mean_x - 2 * sd_x
+
+ggplot(data.frame(Time = 1:n, Value = x), aes(Time, Value)) +
+  geom_line(color = 'steelblue', linewidth = 1) +
+  geom_hline(yintercept = mean_x, linetype = 'dashed', color = 'red', linewidth = 1) +
+  geom_hline(yintercept = upper_band, linetype = 'dotted', color = 'darkgreen', linewidth = 0.8) +
+  geom_hline(yintercept = lower_band, linetype = 'dotted', color = 'darkgreen', linewidth = 0.8) +
+  labs(y = expression(X(t)), x = 'Time') +
+  theme_classic(base_size = 14) +
+  theme(
+    axis.title.x = element_text(size = 10),
+    axis.title.y = element_text(size = 10),
+    axis.text.x = element_text(size = 8),
+    axis.text.y = element_text(size = 8)
+  ) +
+  scale_x_continuous(breaks = seq(0, n, by = 50)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 8))
+```
+
+
+\begin{remark}
+The concept of weak stationarity is often contrasted with strong stationarity (or strict stationarity), which requires that the entire joint distribution of the process be invariant under time shifts, not just the first two moments. While strong stationarity is a more stringent condition, weak stationarity is often sufficient for many practical applications in econometrics and time series analysis, particularly when the focus is on linear models and second-order properties.
+\end{remark}
+
+## Strong Stationarity
+
+
+A strong (or strictly) stationary stochastic process is defined as a process whose complete probabilistic structure remains invariant under temporal shifts. In other words, for any displacement of the time index—whether forward or backward—the joint distribution of any finite collection of observations remains unchanged. This property implies that the statistical behavior of the process is entirely independent of the specific time at which it is observed. In contrast to weak stationarity, which requires only the constancy of the mean, variance, and autocovariance structure over time, strong stationarity imposes the more stringent condition that all finite-dimensional distributions are invariant with respect to time shifts.
+
+In other words, the process is characterized not merely by stability in its first two moments, but by invariance in its entire distributional structure, thereby ensuring that its stochastic behavior remains fully time-invariant. This stronger condition establishes a rigorous theoretical framework for modeling processes in which the complete probability distribution is preserved over time, and thus constitutes a fundamental concept in probability theory and stochastic modeling.
+
+\begin{definition}[strong stationarity]
+Let $ (\Omega, \mathcal{F}, \mathbb{P}) $ be a probability space, and let $ \{X_t : t \in T\} $ be a stochastic process indexed by $ T \subseteq \mathbb{R} $. The process $ \{X_t\} $ is said to be strongly stationary (or strictly stationary) if, for every integer $ n \geq 1 $, for every choice of time points $ t_1, t_2, \ldots, t_n \in T $, and for every shift $ h \in \mathbb{R} $ such that $ t_i + h \in T $, we have
+$ (X_{t_1}, X_{t_2}, \ldots, X_{t_n}) \overset{d}{=} (X_{t_1+h}, X_{t_2+h}, \ldots, X_{t_n+h}), $
+where $ \overset{d}{=} $ denotes equality in distribution.
+\end{definition}
+
+
+**Key Points**
+
+• Entire distribution invariance: Not just the mean, variance, or covariance, but the full joint distribution of any finite collection of random variables is unchanged under time shifts.
+
+• Stronger than weak stationarity: Weak stationarity only requires invariance of first and second moments, while strong stationarity requires invariance of all finite-dimensional distributions.
+
+• Implication: Every strong stationary process is weakly stationary (if moments exist), but not every weakly stationary process is strongly stationary.
+
+The underlying rationale of strong stationarity is that a stochastic process exhibits identical behavior regardless of the temporal point at which observation begins. Rather than merely requiring the stability of moments such as the mean, variance, or covariance, strong stationarity necessitates that the complete joint distribution of any set of observations remains invariant under temporal shifts.
+
+Intuitively, this implies that the randomness governing the process is entirely invariant with respect to time. Specifically, if one observes the process at time points $t_1, t_2, \ldots, t_n$ and subsequently shifts this collection of observations forward by an arbitrary increment $h$, the resulting joint probability distribution remains unchanged. This definition therefore characterizes the strongest form of temporal consistency, ensuring that the process is not merely stable in terms of its moments, but is fundamentally identical in its full distributional structure under any temporal translation.
+
+\begin{example}
+A simple example of a strongly stationary process is i.i.d. white noise. Suppose $\{X_t\}$ is a sequence of independent and identically distributed random variables, each with distribution $F$. Because the variables are identically distributed, the joint distribution of any finite collection $ (X_{t_1}, X_{t_2}, \ldots, X_{t_n}) $ is the same as that of $ (X_{t_1+h}, X_{t_2+h}, \ldots, X_{t_n+h}) $ for any time shift $h$. Independence ensures that shifting the time indices does not change the joint law, and identical distribution ensures that each variable has the same marginal distribution. Thus, i.i.d. white noise is strictly stationary. 
+\end{example}
+
+\begin{example}
+ Another simple example is a Bernoulli process, where each $X_t$ is an independent Bernoulli random variable with the same success probability $p$. Again, the joint distribution is invariant under time shifts, making it a strongly stationary process. 
+\end{example}
+
+These examples highlight the intuition: when randomness is identically distributed across time and unaffected by shifts, the process satisfies strong stationarity.
+
+A classic example of a process that is weakly stationary but not strongly stationary is a Gaussian process with time-invariant mean and covariance compared to a non-Gaussian process with the same covariance structure. To make it concrete, consider the following:
+\begin{example}
+Let $\{X_t\}$ be a sequence of random variables defined as
+$$X_t = Z_t \cdot Y,$$
+ 
+where $\{Z_t\}$ is i.i.d. white noise with mean zero and variance one, and $Y$ is an independent random variable taking values $\pm 1$ with equal probability.
+Why weakly stationary?
+The mean of  $X_t$ is zero for all $t$, the variance is constant, and the covariance between $X_s$ and $X_t$ depends only on the lag because the underlying $\{Z_t\}$ is i.i.d. Thus, the process satisfies weak stationarity.
+Why not strongly stationary?
+The joint distribution of $X_{t_1}, X_{t_2}, \ldots, X_{t_n}$ depends on the random sign $Y$. For example, the distribution of $(X_1, X_2)$ is not the same as that of $(-X_1, -X_2)$, even though their means and covariances are identical. This shows that the finite-dimensional distributions are not invariant under time shifts, so the process fails strong stationarity.
+\end{example}
+
+In short: weak stationarity only cares about mean, variance, and covariance stability, while strong stationarity requires full distributional invariance. This example illustrates how a process can meet the weaker conditions without satisfying the stronger ones.

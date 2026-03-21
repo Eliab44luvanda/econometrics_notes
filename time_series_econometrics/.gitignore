@@ -1,0 +1,31 @@
+# IntelliJ, macOS, R, and Quarto ignores
+.DS_Store
+.Rhistory
+.RData
+.Rproj.user/
+.Rhistory
+.Rapp.history
+.Renviron
+*.aux
+*.log
+*.out
+*.toc
+*.tex
+*.pdf
+*.knit.md
+*.utf8
+# Quarto cache and render files
+.quarto/**
+_site/
+_rendered/
+
+# Python
+__pycache__/
+*.pyc
+
+# Editor backups
+*~
+
+# Ignore generated figures and data (uncomment if you want to keep them tracked)
+# figs/
+# data/

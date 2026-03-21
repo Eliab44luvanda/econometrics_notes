@@ -1,0 +1,304 @@
+---
+title: "Time Series Econometrics"
+author: "Eliab Luvanda"
+date: "`r Sys.Date()`"
+format:
+  pdf:
+    number-sections: true # Enable numbered sections
+   # toc: true # Generate the table of contents
+    keep_tex: true # Keep the intermediate TeX files for further customizations
+    includes:
+      in_header: header.tex # Include a custom LaTeX header if needed
+    documentclass: article # Specify the document class
+    fontfamily: "mathpazo" # Uses the Palatino font and suitable mathematical fonts 
+    mainfont: "Palatino"
+    sansfont: "Helvetica"
+    monofont: "Courier"
+    geometry: margin=1in # Define document margins
+    linestretch: 1.0 # Line spacing
+    classoption: "fleqn" # Left-align equations
+header-includes: 
+  - \usepackage{amsmath} # Advanced math
+  - \usepackage{amsfonts} # Math fonts
+  - \usepackage{amssymb} # Symbols
+  - \usepackage{amsthm} # Theorems
+  - \usepackage{mathtools} # Additional math tools
+  - \usepackage{algorithm} # Algorithms
+  - \usepackage{algorithmic} # Algorithmic environment
+  - \usepackage{graphicx} # Add any graphics
+  - \newtheorem{theorem}{Theorem}[section]
+  - \newtheorem{assump}{Assumption}[section]
+  - \newtheorem{lemma}[theorem]{Lemma}
+  - \newtheorem{proposition}[theorem]{Proposition}
+  - \newtheorem{remark}[theorem]{Remark}
+  - \newtheorem{property}[theorem]{Property}
+  - \newtheorem{corollary}[theorem]{Corollary}
+  - \newtheorem{definition}[theorem]{Definition}
+  - \newtheorem{example}[theorem]{Example}
+abstract: |
+  This handout provides a comprehensive overview of time series econometrics, covering key concepts such as stationarity, unit roots, and cointegration. It also discusses various models used in time series analysis, including ARIMA models, GARCH models, and VAR models. The document includes practical examples and code snippets for implementation in R and Python, making it a valuable resource for students and practitioners in the field of econometrics. 
+---
+
+# Introduction
+
+Time series econometrics constitutes a specialized subfield within econometrics dedicated to the analysis of data observed sequentially over time. It utilizes advanced statistical methodologies to examine time series data with the objective of identifying and interpreting underlying patterns, trends, and dynamic relationships. This handout presents a comprehensive overview of the principal concepts and methodological approaches employed in time series econometrics.
+
+Time series data warrants particular consideration due to its propensity to display distinctive characteristics, including trends, seasonality, and autocorrelation. These attributes introduce additional complexity to the analytical process and require the application of specialized methodologies for accurate modeling and forecasting of future values. The presence of serial correlation among observations violates the assumption of independence, which constitutes a foundational premise in numerous statistical models. According to the law of large numbers, the sample mean of a collection of independent and identically distributed random variables converges to the expected value as the sample size increases. However, the inherent dependencies within time series data challenge this assumption, thereby necessitating alternative approaches to statistical inference and model estimation.
+
+However, in the context of time series data, observations frequently exhibit autocorrelation, such that the value at a given time point is systematically related to values at preceding time points. This characteristic contravenes the assumption of independence among observations, potentially resulting in biased parameter estimates and invalid inferential conclusions if not appropriately accounted for. The issue is further exacerbated in the presence of non-stationary data, wherein the temporal dependence among observations is substantially influenced by time-varying properties. Non-stationarity may consequently yield spurious regression outcomes, whereby two unrelated time series appear to be statistically associated due to shared temporal trends rather than any substantive relationship.
+
+The pronounced temporal dependence inherent in time series data violates the assumptions underlying the central limit theorem, which posits that the sampling distribution of an estimator converges to normality as the sample size becomes large. In the context of time series, the existence of autocorrelation among observations can induce deviations from normality in the distribution of the estimator, thereby compromising the validity and reliability of statistical inference.
+
+# Key Concepts
+## Stationarity
+A time series is said to be stationary if its statistical properties, such as mean and variance, do not change over time. Stationarity is crucial for many time series models, as non-stationary data can lead to misleading results. A common test for stationarity is the Augmented Dickey-Fuller (ADF) test, which tests the null hypothesis that a unit root is present in the time series. The ADF test can be performed using statistical software like R or Python. 
+
+
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| caption: "Simulated Stationary Time Series"
+#| fig.cap: "A simulated stationary time series"
+#| fig.width: 4
+#| fig.height: 3
+library(ggplot2)
+set.seed(123)
+n <- 100
+library(ggplot2)  # Load required library
+library(ggpubr)  # Load ggpubr for theme_classic2
+
+# Function to generate a stationary time series
+# y_t = c + \phi *y_{t-1} + \epsilon_t
+ar1_time_series <- function(n, c, phi) {
+  # Generate white noise
+  epsilon <- rnorm(n, mean = 0, sd = 1)
+  
+  # Initialize the time series
+  y <- numeric(n)
+  y[1] <- c + epsilon[1]  # Initial value
+  
+  # Generate the time series
+  for (t in 2:n) {
+    y[t] <- c + phi * y[t - 1] + epsilon[t]
+  }  # Added missing closing brace
+  
+  return(y)
+}  # Fixed brace placement
+
+# Define n before using it
+n <- 200  # Add this line
+c <- 0.2  # Constant term
+phi <- 0.6  # Autoregressive coefficient
+
+# Generate an AR(1) time series
+data <- data.frame(
+  time = 1:n,
+  time_series = ar1_time_series(n, c, phi)
+)
+
+# Plot the time series using ggplot2
+ggplot(data, aes(x = time, y = time_series)) +
+  geom_line(color = "navy") +
+  labs(
+    x = "Time",
+    y = "Value"
+  ) +
+  theme_classic2() +
+  theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+\begin{definition}
+A time series is stationary if its mean, variance, and autocovariance do not change over time.
+\end{definition}
+
+\begin{example}
+Consider a time series \( Y_t \) defined as follows:
+\[Y_t = \mu + \epsilon_t \]
+where \( \mu \) is a constant and \( \epsilon_t \) is white noise. This time series is stationary because its mean is constant (\( \mu \)), its variance is constant, and its autocovariance does not depend on time.
+\end{example}
+
+\begin{example}
+Consider a time series \( Y_t \) defined as follows:
+\[Y_t = \mu + \phi Y_{t-1} + \epsilon_t \]
+where \( \mu \) is a constant, \( \phi \) is a parameter, and \( \epsilon_t \) is white noise. This time series is stationary if \( |\phi| < 1 \). If \( |\phi| \geq 1 \), the time series is non-stationary.
+\end{example}
+
+\begin{example}
+Consider a time series \( Y_t \) defined as follows:
+\[Y_t = \mu + \phi Y_{t-1} + \epsilon_t + \delta t\]
+where \( \mu \) is a constant, \( \phi \) is a parameter, \( \epsilon_t \) is white noise, and \( \delta t \) is a deterministic trend. This time series is non-stationary because it has a deterministic trend (\( \delta t \)).
+\end{example}
+
+# Unit Roots
+A unit root is a characteristic of a time series that indicates non-stationarity. A time series has a unit root if it can be represented as an autoregressive process with a root equal to one. The presence of a unit root implies that shocks to the time series have permanent effects, making it non-stationary.
+
+\begin{definition}
+A time series has a unit root if it can be represented as an autoregressive process with a root equal to one.
+\end{definition}
+
+\begin{remark}
+The presence of a unit root in a time series indicates that the series is non-stationary and that shocks to the series have permanent effects.
+\end{remark}
+
+
+
+The following figure illustrates a simulated non-stationary time series with a unit root. The time series is generated using the formula:
+
+$$Y_t = c + Y_{t-1} + \epsilon_t$$
+
+where $c$ is a constant, $Y_{t-1}$ is the previous value of the time series, and $\epsilon_t$ is white noise. The plot shows the evolution of the time series over time, demonstrating its non-stationary nature.
+
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| caption: "Simulated Non-Stationary Time Series with Unit Root"
+#| fig.cap: "A simulated non-stationary time series with a unit root"
+#| fig.width: 4
+#| fig.height: 3
+##| eval: false
+#| fig.align: "center"
+#| out.width: "100%"
+
+library(ggplot2)
+set.seed(123)
+n <- 100
+# Function to generate a non-stationary time series with a unit root
+unit_root_time_series <- function(n, c) {
+  # Generate white noise
+  epsilon <- rnorm(n, mean = 0, sd = 1)
+  
+  # Initialize the time series
+  y <- numeric(n)
+  y[1] <- c + epsilon[1]  # Initial value
+  
+  # Generate the time series
+  for (t in 2:n) {
+    y[t] <- c + y[t - 1] + epsilon[t]
+  }
+  
+  return(y)
+}
+
+# Define n before using it
+n <- 200  # Add this line
+c <- 0.2  # Constant term
+# Generate a non-stationary time series with a unit root
+data <- data.frame(
+  time = 1:n,
+  time_series = unit_root_time_series(n, c)
+)
+# Plot the time series using ggplot2
+ggplot(data, aes(x = time, y = time_series)) +
+  geom_line(color = "navy") +
+  labs(
+    x = "Time",
+    y = "Value"
+  ) +
+  theme_classic2() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+## Combined Short-Run and Long-Run Coefficients from ARDL Model
+
+```{r}
+#| echo: false
+library(knitr)
+
+# Create the data frame
+coeff_table <- data.frame(
+  Term = c("(Intercept)", "primary", "ppetp", "pmger", "pfger", "let",
+           "(Intercept)", "primary", "ppetp", "pmger", "pfger", "let"),
+  Type = c(rep("Long-run", 6), rep("Short-run", 6)),
+  Estimate = c(-6.1061, -0.0613, -0.3849, -1.0667, 1.3666, -0.1120,
+               -4.6465, -0.0467, -0.2929, -0.8117, 1.0399, 1.9338),
+  Std_Error = c(6.4852, 0.1042, 0.1026, 0.2913, 0.3561, 0.1675,
+                5.1686, 0.0782, 0.0752, 0.1828, 0.2231, 0.5979),
+  t_value = c(-0.942, -0.589, -3.752, -3.662, 3.838, -0.668,
+              -0.899, -0.596, -3.895, -4.442, 4.661, 3.234),
+  p_value = c(0.3529, 0.5599, 0.0006, 0.0008, 0.0005, 0.5084,
+              0.3748, 0.5547, 0.0004, 0.0001, 0.0000, 0.0027)
+)
+
+# Add significance stars
+coeff_table$Significance <- cut(coeff_table$p_value,
+  breaks = c(-Inf, 0.01, 0.05, 0.1, Inf),
+  labels = c("***", "**", "*", ""),
+  right = FALSE
+)
+
+# Display the table
+kable(coeff_table, digits = c(0, 0, 4, 4, 3, 4, 0),
+      col.names = c("Term", "Type", "Estimate", "Std. Error", "t-value", "p-value", "Significance"),
+      align = "lcccccc",
+      caption = "Combined Short-Run and Long-Run Coefficients from ARDL Model")
+```
+
+## Cointegration
+Cointegration refers to a statistical property of a collection of time series variables that indicates a long-term equilibrium relationship among them, despite being individually non-stationary. When two or more non-stationary time series are cointegrated, it implies that they share a common stochastic trend, allowing for the possibility of meaningful long-term relationships even in the presence of short-term fluctuations.
+
+\begin{definition}
+Two or more time series are said to be cointegrated if they are individually non-stationary but a linear combination of them is stationary.
+\end{definition}
+
+\begin{remark}
+Cointegration is a crucial concept in time series econometrics, as it allows for the modeling of long-term relationships between non-stationary variables. It is often used in the context of error correction models (ECMs), which capture both short-term dynamics and long-term equilibrium relationships.
+\end{remark}
+
+The following figure illustrates a simulated cointegrated time series. The time series is generated using the formula:
+$$Y_t = c + \phi Y_{t-1} + \epsilon_t$$
+
+
+where $c$ is a constant, $Y_{t-1}$ is the previous value of the time series, and $\epsilon_t$ is white noise. The plot shows the evolution of the time series over time, demonstrating its cointegrated nature.
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| caption: "Simulated Cointegrated Time Series"
+#| fig.cap: "A simulated cointegrated time series"
+library(ggplot2)
+set.seed(123)
+n <- 100
+
+# Function to generate a cointegrated time series
+cointegrated_time_series <- function(n, c, phi) {
+  # Generate white noise
+  epsilon <- rnorm(n, mean = 0, sd = 1)
+  
+  # Initialize the time series
+  y <- numeric(n)
+  y[1] <- c + epsilon[1]  # Initial value
+  
+  # Generate the time series
+  for (t in 2:n) {
+    y[t] <- c + phi * y[t - 1] + epsilon[t]
+  }
+  
+  return(y)
+}
+
+# Define n before using it
+n <- 200  # Add this line
+c <- 0.2  # Constant term
+phi <- 0.6  # Autoregressive coefficient
+# Generate a cointegrated time series
+data <- data.frame(
+  time = 1:n,
+  time_series = cointegrated_time_series(n, c, phi)
+)
+# Plot the time series using ggplot2
+ggplot(data, aes(x = time, y = time_series)) +
+  geom_line(color = "navy") +
+  labs(
+    x = "Time",
+    y = "Value"
+  ) +
+  theme_classic2() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
