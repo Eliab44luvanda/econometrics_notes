@@ -176,6 +176,8 @@ The presence of a unit root in a time series indicates that the series is non-st
 
 ## Example: Visualizing Weak Stationarity
 
+<!-- -->
+
 The figure below illustrates a simulated weakly stationary AR(1) process, which is a common example of a stationary time series. The plot demonstrates the constancy of the mean (indicated by the red dashed line) and the stable variance over time, visually confirming the properties of weak stationarity.
 
 - Constancy of mean
@@ -254,15 +256,7 @@ Intuitively, this implies that the randomness governing the process is entirely 
 A simple example of a strongly stationary process is i.i.d. white noise. Suppose $\{X_t\}$ is a sequence of independent and identically distributed random variables, each with distribution $F$. Because the variables are identically distributed, the joint distribution of any finite collection $ (X_{t_1}, X_{t_2}, \ldots, X_{t_n}) $ is the same as that of $ (X_{t_1+h}, X_{t_2+h}, \ldots, X_{t_n+h}) $ for any time shift $h$. Independence ensures that shifting the time indices does not change the joint law, and identical distribution ensures that each variable has the same marginal distribution. Thus, i.i.d. white noise is strictly stationary. 
 \end{example}
 
-#```{r}
-#| echo: true
-#| include: true
-#| warning: false
-#| message: false
-#| caption: "Gaussian white noise: strong stationarity example"
-#| fig.cap: "Gaussian white noise (i.i.d. N(0,1)) — an example of a strongly stationary stochastic process"
-#| fig.width: 5
-#| fig.height: 3
+```{r white_noise, echo=FALSE, include=TRUE, warning=FALSE, message=FALSE, fig.cap="Gaussian white noise (i.i.d. N(0,1)) — an example of a strongly stationary stochastic process", fig.width=5, fig.height=3}
 set.seed(42)
 n <- 200
 wn <- rnorm(n, mean = 0, sd = 1)
