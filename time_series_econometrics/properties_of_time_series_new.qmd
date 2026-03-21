@@ -208,7 +208,7 @@ ggplot(data.frame(Time = 1:n, Value = x), aes(Time, Value)) +
   geom_hline(yintercept = upper_band, linetype = 'dotted', color = 'darkgreen', linewidth = 0.8) +
   geom_hline(yintercept = lower_band, linetype = 'dotted', color = 'darkgreen', linewidth = 0.8) +
   labs(y = expression(X(t)), x = 'Time') +
-  theme_classic(base_size = 14) +
+  theme_bw(base_size = 14) +
   theme(
     axis.title.x = element_text(size = 10),
     axis.title.y = element_text(size = 10),
@@ -253,6 +253,26 @@ Intuitively, this implies that the randomness governing the process is entirely 
 \begin{example}
 A simple example of a strongly stationary process is i.i.d. white noise. Suppose $\{X_t\}$ is a sequence of independent and identically distributed random variables, each with distribution $F$. Because the variables are identically distributed, the joint distribution of any finite collection $ (X_{t_1}, X_{t_2}, \ldots, X_{t_n}) $ is the same as that of $ (X_{t_1+h}, X_{t_2+h}, \ldots, X_{t_n+h}) $ for any time shift $h$. Independence ensures that shifting the time indices does not change the joint law, and identical distribution ensures that each variable has the same marginal distribution. Thus, i.i.d. white noise is strictly stationary. 
 \end{example}
+
+```{r}
+#| echo: false
+#| include: true
+#| warning: false
+#| message: false
+#| caption: "Gaussian white noise: strong stationarity example"
+#| fig.cap: "Gaussian white noise (i.i.d. N(0,1)) — an example of a strongly stationary stochastic process"
+#| fig.width: 5
+#| fig.height: 3
+set.seed(42)
+n <- 200
+wn <- rnorm(n, mean = 0, sd = 1)
+library(ggplot2)
+ggplot(data.frame(Time = 1:n, Value = wn), aes(x = Time, y = Value)) +
+  geom_line(color = 'black') +
+  labs(x = 'Time', y = expression(epsilon[t]), title = 'Gaussian White Noise (i.i.d. N(0,1))') +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
 
 \begin{example}
  Another simple example is a Bernoulli process, where each $X_t$ is an independent Bernoulli random variable with the same success probability $p$. Again, the joint distribution is invariant under time shifts, making it a strongly stationary process. 
