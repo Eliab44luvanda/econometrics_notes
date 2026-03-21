@@ -132,6 +132,25 @@ Consider a time series \( Y_t \) defined as follows:
 where \( \mu \) is a constant, \( \phi \) is a parameter, \( \epsilon_t \) is white noise, and \( \delta t \) is a deterministic trend. This time series is non-stationary because it has a deterministic trend (\( \delta t \)).
 \end{example}
 
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| caption: "Gaussian white noise: example of a strongly stationary process"
+#| fig.cap: "Gaussian white noise (i.i.d. N(0,1)) — an example of a strongly stationary stochastic process"
+#| fig.width: 5
+#| fig.height: 3
+set.seed(42)
+n <- 200
+wn <- rnorm(n, mean = 0, sd = 1)
+library(ggplot2)
+ggplot(data.frame(Time = 1:n, Value = wn), aes(x = Time, y = Value)) +
+  geom_line(color = 'black') +
+  labs(x = 'Time', y = expression(epsilon[t]), title = 'Gaussian White Noise (i.i.d. N(0,1))') +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
 # Unit Roots
 A unit root is a characteristic of a time series that indicates non-stationarity. A time series has a unit root if it can be represented as an autoregressive process with a root equal to one. The presence of a unit root implies that shocks to the time series have permanent effects, making it non-stationary.
 
