@@ -133,7 +133,8 @@ where \( \mu \) is a constant, \( \phi \) is a parameter, \( \epsilon_t \) is wh
 \end{example}
 
 ```{r}
-#| echo: false
+#| echo: true
+#| include: true
 #| warning: false
 #| message: false
 #| caption: "Gaussian white noise: example of a strongly stationary process"
