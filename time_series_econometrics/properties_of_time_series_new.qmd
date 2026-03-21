@@ -20,6 +20,11 @@ format:
     colorlinks: true
     lof: true
 
+execute:
+  echo: false
+  warning: false
+  message: false
+
 
 geometry:
   - inner=1.3in
@@ -83,20 +88,18 @@ header-includes:
 ---
 ## Introduction
 
-Time series econometrics constitutes a specialized subfield within econometrics dedicated to the analysis of data observed sequentially over time. It utilizes advanced statistical methodologies to examine time series data with the objective of identifying and interpreting underlying patterns, trends, and dynamic relationships. This handout provides a comprehensive overview of the principal concepts and methodological approaches employed in time series econometrics, and it includes practical examples and code snippets to illustrate key ideas.
 
-Time series data warrant particular consideration because they often exhibit distinctive characteristics such as trends, seasonality, and autocorrelation. These features introduce additional complexity to the analysis and require specialized methods for reliable modeling and forecasting. Serial correlation among observations violates the assumption of independence that underlies many standard statistical procedures; consequently, practitioners must adopt tools and inferential techniques that account for temporal dependence.
+Time series econometrics is a branch of econometrics that focuses on the analysis of data that is collected over time. Time series econometrics is distinct from conventional econometrics in that it explicitly accounts for the temporal dependence and dynamic structure of the data. For this reason, time series econometrics is often regarded as a specialized subfield of econometrics, with its own unique set of tools and techniques for analyzing time series data. The reason for this distinction is that time series data often exhibit properties such as autocorrelation, non-stationarity, and seasonality, which renders the application of the standard laws of large numbers and the central limit theorem  inapplicable without appropriate modifications. As a result, time series econometrics has developed a rich theoretical framework and a wide array of methodologies to address these challenges, making it an essential area of study for economists and statisticians working with temporal data.
 
-Autocorrelation implies that an observation at time t is systematically related to its past values. If ignored, this dependence can produce biased parameter estimates and invalid inference. The problem becomes more severe in the presence of non-stationarity, where moments such as the mean and variance evolve over time. Non-stationary series can lead to spurious regressions, in which unrelated series appear statistically associated because of shared trending behavior rather than any meaningful economic link.
 
-The temporal dependence inherent in many time series challenges the conditions of classical limit theorems. In particular, autocorrelation and heteroskedasticity may affect the sampling distributions of estimators and test statistics, so that asymptotic approximations must be used with care. This course of notes emphasizes both theoretical foundations (e.g., properties of stationary and integrated processes, unit-root theory, and cointegration) and practical implementation (tests, estimation, and model selection) to equip readers with tools for rigorous empirical work.
+The rationale for this distinction lies in the fact that time series data frequently display characteristics such as autocorrelation, non-stationarity, and seasonality. These inherent features preclude the direct application of the classical Law of Large Numbers and the Central Limit Theorem, unless appropriate methodological adjustments are implemented to account for such dependencies and structural patterns.  Consequently, time series econometrics has evolved into a highly sophisticated discipline characterized by a robust theoretical foundation and an extensive repertoire of methodological approaches designed to address these complexities, thereby establishing itself as an indispensable field of inquiry for researchers engaged in the analysis of temporal data.
 
-## Key Concepts
-### Stationarity
-A time series is said to be stationary if its statistical properties, such as mean and variance, do not change over time. Stationarity is crucial for many time series models, as non-stationary data can lead to misleading results. A common test for stationarity is the Augmented Dickey-Fuller (ADF) test, which tests the null hypothesis that a unit root is present in the time series. The ADF test can be performed using statistical software like R or Python.
+
+
 
 ```{r}
 #| echo: false
+#| include: false
 #| warning: false
 #| message: false
 #| caption: "Simulated Stationary Time Series"
@@ -181,6 +184,7 @@ The figure below illustrates a simulated weakly stationary AR(1) process, which 
 
 ```{r, fig.cap="A simulated stationary AR(1) process is illustrated. The mean (red dashed line) is shown to be constant, and the variance remains stable over time. This stability is further depicted by fluctuations being contained within a nearly uniform band", fig.width=5, fig.height=3}
 # Simulate a stationary AR(1) process
+#| echo: false
 set.seed(123)
 n <- 500
 phi <- 0.7
