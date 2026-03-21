@@ -178,13 +178,13 @@ where \( \mu \) is a constant and \( \epsilon_t \) is white noise. This time ser
 Alternatively, a stochastic process can be defined as follows:
 
 \begin{definition}
-[ X : \Omega \times T \to \mathbb{R}, \quad X(\omega, \tau)
- ]
+A stochastic process can equivalently be viewed as a function
+$$X: \Omega \times T \to \mathbb{R},\qquad (\omega,\tau) \mapsto X(\omega,\tau),$$
 where:
 
-• For each [ \tau \in T ], [ X(\cdot, \tau) ] is measurable with respect to [ \mathcal{F} ].
+- For each $\tau \in T$, the mapping $X(\cdot,\tau):\Omega\to\mathbb{R}$ is measurable with respect to $\mathcal{F}$.
 
-• For each [ \omega \in \Omega ], the mapping [ X(\omega, \cdot) ] is a trajectory (or sample path) of the process.
+- For each $\omega\in\Omega$, the mapping $X(\omega,\cdot):T\to\mathbb{R}$ is a trajectory (sample path) of the process.
 \end{definition}
 
 ### Unit Roots
