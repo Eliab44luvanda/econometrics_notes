@@ -254,8 +254,8 @@ Intuitively, this implies that the randomness governing the process is entirely 
 A simple example of a strongly stationary process is i.i.d. white noise. Suppose $\{X_t\}$ is a sequence of independent and identically distributed random variables, each with distribution $F$. Because the variables are identically distributed, the joint distribution of any finite collection $ (X_{t_1}, X_{t_2}, \ldots, X_{t_n}) $ is the same as that of $ (X_{t_1+h}, X_{t_2+h}, \ldots, X_{t_n+h}) $ for any time shift $h$. Independence ensures that shifting the time indices does not change the joint law, and identical distribution ensures that each variable has the same marginal distribution. Thus, i.i.d. white noise is strictly stationary. 
 \end{example}
 
-```{r}
-#| echo: false
+#```{r}
+#| echo: true
 #| include: true
 #| warning: false
 #| message: false

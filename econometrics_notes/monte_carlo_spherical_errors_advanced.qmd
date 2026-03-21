@@ -1,6 +1,6 @@
 ---
 title: "Monte Carlo Simulation of Spherical and Non-Spherical Errors"
-subtitle: "Advanced Econometrics Teaching Version"
+subtitle: "Econometrics Note: Efficiency of OLS under Different Error Structures"
 author: "Eliab Luvanda"
 date: today
 format:
@@ -337,7 +337,89 @@ That is the correct theoretical foundation for interpreting the Monte Carlo resu
 
 # Setup
 
-The Monte Carlo calculations in this section are executed with hidden R chunks so that the main text can focus on the results. The full R implementation is reported in Appendix A.1, and equivalent Python and Julia scripts are reported in Appendix A.2 and Appendix A.3.
+The simulation design in this section follows the equations introduced in Section 1 so that each Monte Carlo output has a direct theoretical interpretation.
+
+## Data-Generating Equations
+
+For each replication, data are generated from the linear model
+
+$$
+y_i = \beta_0 + \beta_1 x_i + u_i,
+$$
+
+with regressor draws
+
+$$
+x_i \sim \mathcal{N}(0,1).
+$$
+
+The disturbance process is simulated under three alternative covariance structures:
+
+1. Spherical errors:
+
+$$
+u_i \sim \mathcal{N}(0,\sigma^2).
+$$
+
+2. Heteroscedastic errors:
+
+$$
+u_i \sim \mathcal{N}(0,\sigma_i^2), \qquad \sigma_i^2 = \sigma^2(1 + \gamma x_i^2).
+$$
+
+3. Heteroscedastic plus AR(1) serial dependence:
+
+$$
+u_t = \rho u_{t-1} + \varepsilon_t, \qquad \varepsilon_t \sim \mathcal{N}(0,\sigma_t^2),
+$$
+
+with
+
+$$
+\sigma_t^2 = \sigma^2(1 + \gamma x_t^2).
+$$
+
+This setup isolates the effect of non-sphericity by keeping the structural model for $y$ unchanged and varying only the covariance structure of $u$.
+
+## Simulation Parameters and Their Roles
+
+The simulation constants are:
+
+- $R = 2000$: number of Monte Carlo replications per scenario. This is large enough to stabilize estimated densities, variances, and RMSE values.
+- $n \in \{50, 100, 500\}$: sample sizes used to compare small, moderate, and larger-sample behavior.
+- $\beta_0 = 1$: intercept in the true data-generating process.
+- $\beta_1 = 2$: true slope parameter used as the benchmark for bias and RMSE calculations.
+- $\sigma = 1$: baseline disturbance scale in the spherical case.
+- $\gamma = 2$: strength of heteroscedasticity; larger $|x_i|$ implies larger disturbance variance.
+- $\rho = 0.7$: persistence parameter in the AR(1) disturbance process, representing strong positive serial correlation.
+
+Interpretation of these choices:
+
+- $\gamma = 2$ creates a visibly non-constant variance pattern, making efficiency differences between OLS and GLS empirically clear in finite samples.
+- $\rho = 0.7$ induces persistent serial dependence, so off-diagonal covariance terms in $\Omega$ materially affect OLS precision.
+- Using multiple $n$ values shows both asymptotic concentration and the practical magnitude of finite-sample efficiency losses.
+
+## Simulation Workflow
+
+For each combination of sample size and error structure, the simulation runs the following algorithm:
+
+1. Draw regressors $x_i$ and disturbances $u_i$ according to the selected case.
+2. Construct outcomes $y_i = \beta_0 + \beta_1 x_i + u_i$.
+3. Estimate OLS and record $\hat{\beta}_{1,\mathrm{OLS}}$.
+4. Compute two OLS standard errors:
+  - conventional (spherical-assumption) standard error,
+  - HC1 robust standard error.
+5. Estimate GLS (or weighted GLS approximation in non-spherical cases) and record $\hat{\beta}_{1,\mathrm{GLS}}$.
+6. Repeat for $R=2000$ replications.
+7. Aggregate across replications to compute mean, bias, variance, SD, RMSE, and the efficiency ratio
+
+$$
+	ext{Efficiency Ratio} = \frac{\operatorname{Var}(\hat{\beta}_{1,\mathrm{OLS}})}{\operatorname{Var}(\hat{\beta}_{1,\mathrm{GLS}})}.
+$$
+
+A ratio above 1 indicates the magnitude of OLS efficiency loss relative to GLS under non-spherical errors.
+
+The Monte Carlo calculations below are executed with hidden R chunks so that the main text can focus on interpretation. The full R implementation is reported in Appendix A.1, and equivalent Python and Julia scripts are reported in Appendix A.2 and Appendix A.3.
 
 ```{r}
 #| label: setup-simulation
