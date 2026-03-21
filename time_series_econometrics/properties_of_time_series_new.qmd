@@ -94,7 +94,19 @@ Time series econometrics is a branch of econometrics that focuses on the analysi
 
 The rationale for this distinction lies in the fact that time series data frequently display characteristics such as autocorrelation, non-stationarity, and seasonality. These inherent features preclude the direct application of the classical Law of Large Numbers and the Central Limit Theorem, unless appropriate methodological adjustments are implemented to account for such dependencies and structural patterns.  Consequently, time series econometrics has evolved into a highly sophisticated discipline characterized by a robust theoretical foundation and an extensive repertoire of methodological approaches designed to address these complexities, thereby establishing itself as an indispensable field of inquiry for researchers engaged in the analysis of temporal data.
 
+The distinction between stationary time series and integrated time series is fundamental in time series econometrics. Understanding the properties of these types of time series is crucial for selecting appropriate modeling techniques and for making valid inferences about the underlying data-generating processes. The underlying concept central to the comprehension of the properties of stationary and integrated time series is the notion of stochastic processes. Building on the foundational principles of probability theory, sta stochastic process can be defined:
 
+\begin{definition}
+Let $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space, and let $T$ be an index set (often representing time, e.g. $T = \mathbb{N}$ for discrete time or $T = \mathbb{R}_{+}$ for continuous time).
+
+A stochastic process is a family of random variables
+$$\{X(\tau, \omega) : \tau \in T, \; \omega \in \Omega\}$$
+
+such that for each fixed $\tau \in T$, the mapping
+$$X(\tau, \cdot) : \Omega \to \mathbb{R}$$
+
+is a random variable on $(\Omega, \mathcal{F}, \mathbb{P})$.
+\end{definition}
 
 
 ```{r}
@@ -163,6 +175,18 @@ Consider a time series \( Y_t \) defined as follows:
 where \( \mu \) is a constant and \( \epsilon_t \) is white noise. This time series is stationary because its mean is constant (\( \mu \)), its variance is constant, and its autocovariance does not depend on time.
 \end{example}
 
+Alternatively, a stochastic process can be defined as follows:
+
+\begin{definition}
+[ X : \Omega \times T \to \mathbb{R}, \quad X(\omega, \tau)
+ ]
+where:
+
+• For each [ \tau \in T ], [ X(\cdot, \tau) ] is measurable with respect to [ \mathcal{F} ].
+
+• For each [ \omega \in \Omega ], the mapping [ X(\omega, \cdot) ] is a trajectory (or sample path) of the process.
+\end{definition}
+
 ### Unit Roots
 A unit root is a characteristic of a time series that indicates non-stationarity. A time series has a unit root if it can be represented as an autoregressive process with a root equal to one. The presence of a unit root implies that shocks to the time series have permanent effects, making it non-stationary.
 
@@ -189,7 +213,7 @@ The figure below illustrates a simulated weakly stationary AR(1) process, which 
 #| echo: false
 set.seed(123)
 n <- 500
-phi <- 0.7
+phi <- 0.8
 mu <- 5
 sigma <- 1
 x <- numeric(n)
@@ -205,7 +229,7 @@ upper_band <- mean_x + 2 * sd_x
 lower_band <- mean_x - 2 * sd_x
 
 ggplot(data.frame(Time = 1:n, Value = x), aes(Time, Value)) +
-  geom_line(color = 'steelblue', linewidth = 1) +
+  geom_line(color = 'steelblue', linewidth = 0.6) +
   geom_hline(yintercept = mean_x, linetype = 'dashed', color = 'red', linewidth = 1) +
   geom_hline(yintercept = upper_band, linetype = 'dotted', color = 'darkgreen', linewidth = 0.8) +
   geom_hline(yintercept = lower_band, linetype = 'dotted', color = 'darkgreen', linewidth = 0.8) +
@@ -274,7 +298,7 @@ ggplot(data.frame(Time = 1:n, Value = wn), aes(x = Time, y = Value)) +
   geom_hline(yintercept = upper, linetype = 'dotted', color = 'darkgreen', linewidth = 0.5) +
   geom_hline(yintercept = lower, linetype = 'dotted', color = 'darkgreen', linewidth = 0.5) +
   labs(x = 'Time', y = expression(epsilon[t])) +
-  scale_x_continuous(breaks = seq(0, n, by = 25)) +
+  scale_x_continuous(breaks = seq(0, n, by = 50)) +
   scale_y_continuous(breaks = seq(floor(min(wn)), ceiling(max(wn)), by = 1)) +
   theme_bw() +
   theme(plot.title = element_text(hjust = 0.5))
