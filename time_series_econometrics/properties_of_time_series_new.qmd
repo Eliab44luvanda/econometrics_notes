@@ -4,6 +4,16 @@ subtitle: "**Properties of Stationary and Integrated Time Series**"
 author: "**Eliab Luvanda**"
 date: today
 lang: en
+bibliography: references.bib
+abstract: |
+  This handout reviews properties of stationary and integrated time
+  series, covering definitions of stationarity, examples, and visual
+  illustrations. It is intended as a concise reference for students and
+  researchers in time series econometrics.
+keywords:
+  - time series
+  - stationarity
+  - econometrics
 
 format:
   pdf:
@@ -64,15 +74,7 @@ header-includes:
     \newcommand{\R}{\mathbb{R}}
     \newcommand{\1}{\mathbbm{1}}
   - |
-    % Make \mathcal robust when accidentally used outside math mode
-    \let\oldmathcal\mathcal
-    \DeclareRobustCommand{\mathcal}[1]{\ifmmode\oldmathcal{#1}\else\(\oldmathcal{#1}\)\fi}
-  - |
-    \let\oldmathbb\mathbb
-    \DeclareRobustCommand{\mathbb}[1]{\ifmmode\oldmathbb{#1}\else\(\oldmathbb{#1}\)\fi}
-  - |
-    \let\oldmathbbm\mathbbm
-    \DeclareRobustCommand{\mathbbm}[1]{\ifmmode\oldmathbbm{#1}\else\(\oldmathbbm{#1}\)\fi}
+  
   - \usepackage{titlesec}
   - |
     \titleformat{\section}
@@ -143,7 +145,7 @@ where:
 
 Figure 1 illustrates the concept of a stochastic process through the simulation of multiple sample paths of a simple random walk, a canonical example within stochastic process theory. Each trajectory corresponds to a distinct realization of the process, associated with a particular outcome $\omega \in \Omega$. The figure depicts the temporal evolution of the process values across these realizations, thereby exemplifying the intrinsic randomness and variability that are fundamental characteristics of stochastic processes.
 
-```{r, fig.cap="Multiple simple random-walk sample paths (5) representing different $\\omega \\in \\Omega$", fig.width=6, fig.height=3, echo=FALSE}
+```{r, fig.cap="Multiple simple random-walk sample paths (5)", fig.width=6, fig.height=3, echo=FALSE}
 # Simulate and plot 5 simple random walks (T = 500)
 set.seed(2026)
 T <- 500
@@ -186,7 +188,10 @@ ggplot(df_paths, aes(x = Time, y = Value, color = Omega, group = Omega)) +
 
 A stochastic process may be most appropriately understood as a mathematical formalization of the concept of “random evolution over time.” Its definition is grounded in a probability space $(\Omega, \mathcal{F}, \mathbb{P})$, which characterizes the set of all possible outcomes and provides the underlying measure-theoretic structure for randomness. For each time point $\tau$ in the index set $T$, the process assigns a random variable $X(\tau, \cdot)$. Consequently, at every instant in time, there exists a well-defined random quantity associated with the process.
 
-Conversely, fixing an outcome $\omega$ yields a deterministic function $X(\omega, \cdot)$, referred to as a *sample path*, which describes how the process evolves for that specific realization of randomness. This dual perspective—viewing the process as a collection of random variables indexed by time and, alternatively, as deterministic trajectories indexed by outcomes—is central to the definition. It ensures that the process is formulated with probabilistic rigor while remaining intuitively interpretable as a family of random paths evolving over time.
+See the formal definition above; Figure 1 shows sample paths (realizations) for different outcomes $\\omega \\in \\Omega$.
+
+Conversely, fixing an outcome $\\omega$ yields a deterministic function $X(\\omega, \\cdot)$, called a *sample path*, which describes the process for that realization. This dual perspective (random variables indexed by time vs.
+deterministic trajectories indexed by outcomes) is central to the theory.
 
 ```{r}
 #| echo: false
@@ -255,7 +260,7 @@ The figure below illustrates a simulated weakly stationary AR(1) process, which 
 - Stable variance
 
 
-```{r, fig.cap="A simulated stationary AR(1) process is illustrated. The mean (red dashed line) is shown to be constant, and the variance remains stable over time. This stability is further depicted by fluctuations being contained within a nearly uniform band", fig.width=5, fig.height=3}
+```{r, fig.cap="Simulated stationary AR(1) process (mean dashed)", fig.width=5, fig.height=3}
 # Simulate a stationary AR(1) process
 #| echo: false
 set.seed(123)
@@ -323,10 +328,10 @@ The underlying rationale of strong stationarity is that a stochastic process exh
 Intuitively, this implies that the randomness governing the process is entirely invariant with respect to time. Specifically, if one observes the process at time points $t_1, t_2, \ldots, t_n$ and subsequently shifts this collection of observations forward by an arbitrary increment $h$, the resulting joint probability distribution remains unchanged. This definition therefore characterizes the strongest form of temporal consistency, ensuring that the process is not merely stable in terms of its moments, but is fundamentally identical in its full distributional structure under any temporal translation.
 
 \begin{example}
-A simple example of a strongly stationary process is i.i.d. white noise. Suppose $\{X_t\}$ is a sequence of independent and identically distributed random variables, each with distribution $F$. Because the variables are identically distributed, the joint distribution of any finite collection $ (X_{t_1}, X_{t_2}, \ldots, X_{t_n}) $ is the same as that of $ (X_{t_1+h}, X_{t_2+h}, \ldots, X_{t_n+h}) $ for any time shift $h$. Independence ensures that shifting the time indices does not change the joint law, and identical distribution ensures that each variable has the same marginal distribution. Thus, i.i.d. white noise is strictly stationary. 
+An everyday example is i.i.d. white noise: independence plus identical marginals imply that every finite-dimensional joint distribution is invariant under time shifts, so the process is strictly stationary.
 \end{example}
 
-```{r white_noise, echo=FALSE, include=TRUE, warning=FALSE, message=FALSE, fig.cap="Gaussian white noise (i.i.d. N(0,1)). Constant mean (0) shown as red dashed line; fluctuations are stable and mostly within the ±2 SD bounds (green dotted lines), illustrating constant variance and distributional invariance across time.", fig.width=5, fig.height=3}
+```{r white_noise, echo=FALSE, include=TRUE, warning=FALSE, message=FALSE, fig.cap="Gaussian white noise (i.i.d. N(0,1))", fig.width=5, fig.height=3}
 set.seed(42)
 n <- 500
 wn <- rnorm(n, mean = 0, sd = 1)
@@ -351,21 +356,14 @@ ggplot(data.frame(Time = 1:n, Value = wn), aes(x = Time, y = Value)) +
 ```
 
 \begin{example}
- Another simple example is a Bernoulli process, where each $X_t$ is an independent Bernoulli random variable with the same success probability $p$. Again, the joint distribution is invariant under time shifts, making it a strongly stationary process. 
+The Bernoulli process (i.i.d. Bernoulli($p$)) is likewise strictly stationary.
 \end{example}
 
 These examples highlight the intuition: when randomness is identically distributed across time and unaffected by shifts, the process satisfies strong stationarity.
 
 A classic example of a process that is weakly stationary but not strongly stationary is a Gaussian process with time-invariant mean and covariance compared to a non-Gaussian process with the same covariance structure. To make it concrete, consider the following:
 \begin{example}
-Let $\{X_t\}$ be a sequence of random variables defined as
-$$X_t = Z_t \cdot Y,$$
- 
-where $\{Z_t\}$ is i.i.d. white noise with mean zero and variance one, and $Y$ is an independent random variable taking values $\pm 1$ with equal probability.
-Why weakly stationary?
-The mean of  $X_t$ is zero for all $t$, the variance is constant, and the covariance between $X_s$ and $X_t$ depends only on the lag because the underlying $\{Z_t\}$ is i.i.d. Thus, the process satisfies weak stationarity.
-Why not strongly stationary?
-The joint distribution of $X_{t_1}, X_{t_2}, \ldots, X_{t_n}$ depends on the random sign $Y$. For example, the distribution of $(X_1, X_2)$ is not the same as that of $(-X_1, -X_2)$, even though their means and covariances are identical. This shows that the finite-dimensional distributions are not invariant under time shifts, so the process fails strong stationarity.
+Define $X_t=Z_tY$ with $Z_t$ i.i.d. mean-zero noise and $Y\in\{\pm1\}$ independent of the $Z_t$. The process has constant mean and lag-dependent covariance (weak stationarity), but finite-dimensional distributions depend on the random sign $Y$, so it is not strictly stationary.
 \end{example}
 
 In short: weak stationarity only cares about mean, variance, and covariance stability, while strong stationarity requires full distributional invariance. This example illustrates how a process can meet the weaker conditions without satisfying the stronger ones.
