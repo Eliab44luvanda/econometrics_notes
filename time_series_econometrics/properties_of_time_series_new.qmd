@@ -108,6 +108,49 @@ $$X(\tau, \cdot) : \Omega \to \mathbb{R}$$
 is a random variable on $(\Omega, \mathcal{F}, \mathbb{P})$.
 \end{definition}
 
+Figure 1 illustrates the concept of a stochastic process through the simulation of multiple sample paths of a simple random walk, a canonical example within stochastic process theory. Each trajectory corresponds to a distinct realization of the process, associated with a particular outcome $\omega \in \Omega$. The figure depicts the temporal evolution of the process values across these realizations, thereby exemplifying the intrinsic randomness and variability that are fundamental characteristics of stochastic processes.
+
+```{r, fig.cap="Multiple simple random-walk sample paths (5) representing different $\\omega \\in \\Omega$", fig.width=6, fig.height=3, echo=FALSE}
+# Simulate and plot 5 simple random walks (T = 500)
+set.seed(2026)
+T <- 500
+n_paths <- 5
+
+# Generate iid normal increments and form cumulative sums (simple random walks)
+increments <- matrix(rnorm(T * n_paths, mean = 0, sd = 1), ncol = n_paths)
+paths <- apply(increments, 2, cumsum)
+
+# Prepare long dataframe for ggplot
+df_paths <- data.frame(
+  Time = rep(1:T, times = n_paths),
+  Value = as.vector(paths),
+  Omega = factor(rep(1:n_paths, each = T))
+)
+
+library(ggplot2)
+
+# Use showtext to ensure the glyphs (e.g. ω) are available in R graphics
+if (!requireNamespace("showtext", quietly = TRUE)) {
+  install.packages("showtext", repos = "https://cloud.r-project.org")
+}
+library(showtext)
+# Register Google font 'Noto Sans' (covers Greek letters) and enable showtext
+try({
+  font_add_google("Noto Sans", "notosans")
+}, silent = TRUE)
+showtext_auto()
+
+ggplot(df_paths, aes(x = Time, y = Value, color = Omega, group = Omega)) +
+  geom_line(size = 0.6) +
+  labs(x = 'Time', y = expression(X[t](omega)), color = expression(omega)) +
+  theme_bw() +
+  theme(text = element_text(family = "notosans"),
+        legend.position = 'right',
+        plot.title = element_text(hjust = 0.5)) +
+    scale_color_discrete(labels = parse(text = paste0("omega[", 1:n_paths, "]"))) +
+    scale_x_continuous(breaks = seq(1, T, by = 50))
+```
+
 
 ```{r}
 #| echo: false
@@ -187,16 +230,15 @@ where:
 - For each $\omega\in\Omega$, the mapping $X(\omega,\cdot):T\to\mathbb{R}$ is a trajectory (sample path) of the process.
 \end{definition}
 
-### Unit Roots
-A unit root is a characteristic of a time series that indicates non-stationarity. A time series has a unit root if it can be represented as an autoregressive process with a root equal to one. The presence of a unit root implies that shocks to the time series have permanent effects, making it non-stationary.
 
-\begin{definition}
-A time series has a unit root if it can be represented as an autoregressive process with a root equal to one.
-\end{definition}
 
-\begin{remark}
-The presence of a unit root in a time series indicates that the series is non-stationary and that shocks to the series have permanent effects.
-\end{remark}
+🔑 Key Perspectives
+
+• Random variable view: For each $\tau \in T$, $X(\tau)$ is a random variable.
+
+• Sample path view: For each $\omega \in \Omega$, $X(\omega, \cdot)$ is a deterministic function of time.
+
+• Distributional view: The finite-dimensional distributions $X(\tau_1), \ldots, X(\tau_n)$ for $\tau_1, \ldots, \tau_n \in T$ characterize the process.
 
 ## Example: Visualizing Weak Stationarity
 
@@ -229,7 +271,7 @@ upper_band <- mean_x + 2 * sd_x
 lower_band <- mean_x - 2 * sd_x
 
 ggplot(data.frame(Time = 1:n, Value = x), aes(Time, Value)) +
-  geom_line(color = 'steelblue', linewidth = 0.6) +
+  geom_line(color = 'black', linewidth = 0.6) +
   geom_hline(yintercept = mean_x, linetype = 'dashed', color = 'red', linewidth = 1) +
   geom_hline(yintercept = upper_band, linetype = 'dotted', color = 'darkgreen', linewidth = 0.8) +
   geom_hline(yintercept = lower_band, linetype = 'dotted', color = 'darkgreen', linewidth = 0.8) +
