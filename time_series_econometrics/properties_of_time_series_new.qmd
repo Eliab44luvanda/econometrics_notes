@@ -63,6 +63,16 @@ header-includes:
     \newcommand{\plim}{\mathrm{plim}}
     \newcommand{\R}{\mathbb{R}}
     \newcommand{\1}{\mathbbm{1}}
+  - |
+    % Make \mathcal robust when accidentally used outside math mode
+    \let\oldmathcal\mathcal
+    \DeclareRobustCommand{\mathcal}[1]{\ifmmode\oldmathcal{#1}\else\(\oldmathcal{#1}\)\fi}
+  - |
+    \let\oldmathbb\mathbb
+    \DeclareRobustCommand{\mathbb}[1]{\ifmmode\oldmathbb{#1}\else\(\oldmathbb{#1}\)\fi}
+  - |
+    \let\oldmathbbm\mathbbm
+    \DeclareRobustCommand{\mathbbm}[1]{\ifmmode\oldmathbbm{#1}\else\(\oldmathbbm{#1}\)\fi}
   - \usepackage{titlesec}
   - |
     \titleformat{\section}
@@ -89,12 +99,11 @@ header-includes:
 ## Introduction
 
 
-Time series econometrics is a branch of econometrics that focuses on the analysis of data that is collected over time. Time series econometrics is distinct from conventional econometrics in that it explicitly accounts for the temporal dependence and dynamic structure of the data. For this reason, time series econometrics is often regarded as a specialized subfield of econometrics, with its own unique set of tools and techniques for analyzing time series data. The reason for this distinction is that time series data often exhibit properties such as autocorrelation, non-stationarity, and seasonality, which renders the application of the standard laws of large numbers and the central limit theorem  inapplicable without appropriate modifications. As a result, time series econometrics has developed a rich theoretical framework and a wide array of methodologies to address these challenges, making it an essential area of study for economists and statisticians working with temporal data.
+Time series econometrics is a branch of econometrics that focuses on the analysis of data collected over time. It is distinct from conventional econometrics because it explicitly accounts for temporal dependence and the dynamic structure of data. Time series data often exhibit properties such as autocorrelation, non‑stationarity, and seasonality, which can render the standard laws of large numbers and the central limit theorem inapplicable without appropriate modifications. As a result, time series econometrics has developed a rich theoretical framework and a wide array of methodologies to address these challenges, making it an essential area of study for economists and statisticians working with temporal data.
 
+This distinction arises because time series data frequently display features such as autocorrelation, non‑stationarity, and seasonality.
 
-The rationale for this distinction lies in the fact that time series data frequently display characteristics such as autocorrelation, non-stationarity, and seasonality. These inherent features preclude the direct application of the classical Law of Large Numbers and the Central Limit Theorem, unless appropriate methodological adjustments are implemented to account for such dependencies and structural patterns.  Consequently, time series econometrics has evolved into a highly sophisticated discipline characterized by a robust theoretical foundation and an extensive repertoire of methodological approaches designed to address these complexities, thereby establishing itself as an indispensable field of inquiry for researchers engaged in the analysis of temporal data.
-
-The distinction between stationary time series and integrated time series is fundamental in time series econometrics. Understanding the properties of these types of time series is crucial for selecting appropriate modeling techniques and for making valid inferences about the underlying data-generating processes. The underlying concept central to the comprehension of the properties of stationary and integrated time series is the notion of stochastic processes. Building on the foundational principles of probability theory, sta stochastic process can be defined:
+The distinction between stationary time series and integrated time series is fundamental in time series econometrics. Understanding the properties of these types of series is crucial for selecting appropriate modeling techniques and for making valid inferences about the underlying data-generating processes. The underlying concept central to understanding stationary and integrated time series is the notion of a stochastic process. Building on foundational principles of probability theory, a stochastic process can be defined as follows:
 
 \begin{definition}
 Let $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space, and let $T$ be an index set (often representing time, e.g. $T = \mathbb{N}$ for discrete time or $T = \mathbb{R}_{+}$ for continuous time).
@@ -107,6 +116,30 @@ $$X(\tau, \cdot) : \Omega \to \mathbb{R}$$
 
 is a random variable on $(\Omega, \mathcal{F}, \mathbb{P})$.
 \end{definition}
+
+
+Alternatively, a stochastic process can be defined as follows:
+
+\begin{definition}
+A stochastic process can equivalently be viewed as a function
+$$X: \Omega \times T \to \mathbb{R},\qquad (\omega,\tau) \mapsto X(\omega,\tau),$$
+where:
+
+- For each $\tau \in T$, the mapping $X(\cdot,\tau):\Omega\to\mathbb{R}$ is measurable with respect to $\mathcal{F}$.
+
+- For each $\omega\in\Omega$, the mapping $X(\omega,\cdot):T\to\mathbb{R}$ is a trajectory (sample path) of the process.
+\end{definition}
+
+
+
+ **Key Perspectives**
+
+• Random variable view: For each $\tau \in T$, $X(\tau)$ is a random variable.
+
+• Sample path view: For each $\omega \in \Omega$, $X(\omega, \cdot)$ is a deterministic function of time.
+
+• Distributional view: The finite-dimensional distributions $X(\tau_1), \ldots, X(\tau_n)$ for $\tau_1, \ldots, \tau_n \in T$ characterize the process.
+
 
 Figure 1 illustrates the concept of a stochastic process through the simulation of multiple sample paths of a simple random walk, a canonical example within stochastic process theory. Each trajectory corresponds to a distinct realization of the process, associated with a particular outcome $\omega \in \Omega$. The figure depicts the temporal evolution of the process values across these realizations, thereby exemplifying the intrinsic randomness and variability that are fundamental characteristics of stochastic processes.
 
@@ -151,6 +184,9 @@ ggplot(df_paths, aes(x = Time, y = Value, color = Omega, group = Omega)) +
     scale_x_continuous(breaks = seq(1, T, by = 50))
 ```
 
+A stochastic process may be most appropriately understood as a mathematical formalization of the concept of “random evolution over time.” Its definition is grounded in a probability space $(\Omega, \mathcal{F}, \mathbb{P})$, which characterizes the set of all possible outcomes and provides the underlying measure-theoretic structure for randomness. For each time point $\tau$ in the index set $T$, the process assigns a random variable $X(\tau, \cdot)$. Consequently, at every instant in time, there exists a well-defined random quantity associated with the process.
+
+Conversely, fixing an outcome $\omega$ yields a deterministic function $X(\omega, \cdot)$, referred to as a *sample path*, which describes how the process evolves for that specific realization of randomness. This dual perspective—viewing the process as a collection of random variables indexed by time and, alternatively, as deterministic trajectories indexed by outcomes—is central to the definition. It ensures that the process is formulated with probabilistic rigor while remaining intuitively interpretable as a family of random paths evolving over time.
 
 ```{r}
 #| echo: false
@@ -208,37 +244,6 @@ ggplot(data, aes(x = time, y = time_series)) +
 
 ```
 
-\begin{definition}
-A time series is stationary if its mean, variance, and autocovariance do not change over time.
-\end{definition}
-
-\begin{example}
-Consider a time series \( Y_t \) defined as follows:
-\[Y_t = \mu + \epsilon_t \]
-where \( \mu \) is a constant and \( \epsilon_t \) is white noise. This time series is stationary because its mean is constant (\( \mu \)), its variance is constant, and its autocovariance does not depend on time.
-\end{example}
-
-Alternatively, a stochastic process can be defined as follows:
-
-\begin{definition}
-A stochastic process can equivalently be viewed as a function
-$$X: \Omega \times T \to \mathbb{R},\qquad (\omega,\tau) \mapsto X(\omega,\tau),$$
-where:
-
-- For each $\tau \in T$, the mapping $X(\cdot,\tau):\Omega\to\mathbb{R}$ is measurable with respect to $\mathcal{F}$.
-
-- For each $\omega\in\Omega$, the mapping $X(\omega,\cdot):T\to\mathbb{R}$ is a trajectory (sample path) of the process.
-\end{definition}
-
-
-
-🔑 Key Perspectives
-
-• Random variable view: For each $\tau \in T$, $X(\tau)$ is a random variable.
-
-• Sample path view: For each $\omega \in \Omega$, $X(\omega, \cdot)$ is a deterministic function of time.
-
-• Distributional view: The finite-dimensional distributions $X(\tau_1), \ldots, X(\tau_n)$ for $\tau_1, \ldots, \tau_n \in T$ characterize the process.
 
 ## Example: Visualizing Weak Stationarity
 
@@ -294,10 +299,9 @@ The concept of weak stationarity is often contrasted with strong stationarity (o
 
 ## Strong Stationarity
 
+A strong (or strictly) stationary stochastic process is defined as a process whose complete probabilistic structure remains invariant under temporal shifts. For any displacement of the time index—whether forward or backward—the joint distribution of any finite collection of observations remains unchanged. This property implies that the statistical behavior of the process is independent of the specific time at which it is observed. In contrast to weak stationarity, which requires only the constancy of the mean, variance, and autocovariance structure over time, strong stationarity imposes the more stringent condition that all finite-dimensional distributions are invariant with respect to time shifts.
 
-A strong (or strictly) stationary stochastic process is defined as a process whose complete probabilistic structure remains invariant under temporal shifts. In other words, for any displacement of the time index—whether forward or backward—the joint distribution of any finite collection of observations remains unchanged. This property implies that the statistical behavior of the process is entirely independent of the specific time at which it is observed. In contrast to weak stationarity, which requires only the constancy of the mean, variance, and autocovariance structure over time, strong stationarity imposes the more stringent condition that all finite-dimensional distributions are invariant with respect to time shifts.
-
-In other words, the process is characterized not merely by stability in its first two moments, but by invariance in its entire distributional structure, thereby ensuring that its stochastic behavior remains fully time-invariant. This stronger condition establishes a rigorous theoretical framework for modeling processes in which the complete probability distribution is preserved over time, and thus constitutes a fundamental concept in probability theory and stochastic modeling.
+Thus, the process is characterized not merely by stability in its first two moments, but by invariance in its entire distributional structure, ensuring that its stochastic behavior remains fully time-invariant. This stronger condition establishes a rigorous theoretical framework for modeling processes in which the complete probability distribution is preserved over time, and thus constitutes a fundamental concept in probability theory and stochastic modeling.
 
 \begin{definition}[strong stationarity]
 Let $ (\Omega, \mathcal{F}, \mathbb{P}) $ be a probability space, and let $ \{X_t : t \in T\} $ be a stochastic process indexed by $ T \subseteq \mathbb{R} $. The process $ \{X_t\} $ is said to be strongly stationary (or strictly stationary) if, for every integer $ n \geq 1 $, for every choice of time points $ t_1, t_2, \ldots, t_n \in T $, and for every shift $ h \in \mathbb{R} $ such that $ t_i + h \in T $, we have
