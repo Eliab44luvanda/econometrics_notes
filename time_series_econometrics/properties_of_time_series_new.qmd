@@ -8,8 +8,9 @@ bibliography: references.bib
 abstract: |
   This handout reviews properties of stationary and integrated time
   series, covering definitions of stationarity, examples, and visual
-  illustrations. It is intended as a concise reference for students and
+  illustrations. This handout provides a concise reference for students and
   researchers in time series econometrics.
+
 keywords:
   - time series
   - stationarity
@@ -100,12 +101,9 @@ header-includes:
 ---
 ## Introduction
 
+Time series econometrics analyzes sequences of observations indexed by time and explicitly models temporal dependence. Time series commonly show autocorrelation, nonstationarity, and seasonality. As a result, standard i.i.d. assumptions often fail, requiring specialized methods. This handout summarizes core definitions and properties of stationary and integrated processes, and gives concise examples and illustrations.
 
-Time series econometrics is a branch of econometrics that focuses on the analysis of data collected over time. It is distinct from conventional econometrics because it explicitly accounts for temporal dependence and the dynamic structure of data. Time series data often exhibit properties such as autocorrelation, non‑stationarity, and seasonality, which can render the standard laws of large numbers and the central limit theorem inapplicable without appropriate modifications. As a result, time series econometrics has developed a rich theoretical framework and a wide array of methodologies to address these challenges, making it an essential area of study for economists and statisticians working with temporal data.
-
-This distinction arises because time series data frequently display features such as autocorrelation, non‑stationarity, and seasonality.
-
-The distinction between stationary time series and integrated time series is fundamental in time series econometrics. Understanding the properties of these types of series is crucial for selecting appropriate modeling techniques and for making valid inferences about the underlying data-generating processes. The underlying concept central to understanding stationary and integrated time series is the notion of a stochastic process. Building on foundational principles of probability theory, a stochastic process can be defined as follows:
+Distinguishing stationary from integrated series is essential for choosing models and making valid inferences. Central to these ideas is the notion of a stochastic process, defined below.
 
 \begin{definition}
 Let $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space, and let $T$ be an index set (often representing time, e.g. $T = \mathbb{N}$ for discrete time or $T = \mathbb{R}_{+}$ for continuous time).
@@ -120,10 +118,10 @@ is a random variable on $(\Omega, \mathcal{F}, \mathbb{P})$.
 \end{definition}
 
 
-Alternatively, a stochastic process can be defined as follows:
+Alternatively, we define a stochastic process as follows:
 
 \begin{definition}
-A stochastic process can equivalently be viewed as a function
+One can equivalently view a stochastic process as a function
 $$X: \Omega \times T \to \mathbb{R},\qquad (\omega,\tau) \mapsto X(\omega,\tau),$$
 where:
 
@@ -186,12 +184,8 @@ ggplot(df_paths, aes(x = Time, y = Value, color = Omega, group = Omega)) +
     scale_x_continuous(breaks = seq(1, T, by = 50))
 ```
 
-A stochastic process may be most appropriately understood as a mathematical formalization of the concept of “random evolution over time.” Its definition is grounded in a probability space $(\Omega, \mathcal{F}, \mathbb{P})$, which characterizes the set of all possible outcomes and provides the underlying measure-theoretic structure for randomness. For each time point $\tau$ in the index set $T$, the process assigns a random variable $X(\tau, \cdot)$. Consequently, at every instant in time, there exists a well-defined random quantity associated with the process.
 
-See the formal definition above; Figure 1 shows sample paths (realizations) for different outcomes $\\omega \\in \\Omega$.
-
-Conversely, fixing an outcome $\\omega$ yields a deterministic function $X(\\omega, \\cdot)$, called a *sample path*, which describes the process for that realization. This dual perspective (random variables indexed by time vs.
-deterministic trajectories indexed by outcomes) is central to the theory.
+A stochastic process formalizes "random evolution over time": given a probability space $(\Omega,\mathcal{F},\mathbb{P})$, the process assigns a random variable to each time point and, for a fixed outcome $\omega$, a deterministic sample path. Figure 1 illustrates multiple sample paths (realizations) of a simple random walk.
 
 ```{r}
 #| echo: false
@@ -205,7 +199,6 @@ deterministic trajectories indexed by outcomes) is central to the theory.
 library(ggplot2)
 set.seed(123)
 n <- 100
-library(ggplot2)  # Load required library
 library(ggpubr)  # Load ggpubr for theme_classic2
 
 # Function to generate a stationary time series
@@ -299,14 +292,12 @@ ggplot(data.frame(Time = 1:n, Value = x), aes(Time, Value)) +
 
 
 \begin{remark}
-The concept of weak stationarity is often contrasted with strong stationarity (or strict stationarity), which requires that the entire joint distribution of the process be invariant under time shifts, not just the first two moments. While strong stationarity is a more stringent condition, weak stationarity is often sufficient for many practical applications in econometrics and time series analysis, particularly when the focus is on linear models and second-order properties.
+Weak stationarity requires only constant mean and autocovariance, whereas strong stationarity requires full distributional invariance under time shifts. Although strict stationarity is a stronger condition, weak stationarity is often sufficient in practice, especially for linear models and analyses focused on second-order properties.
 \end{remark}
 
 ## Strong Stationarity
 
-A strong (or strictly) stationary stochastic process is defined as a process whose complete probabilistic structure remains invariant under temporal shifts. For any displacement of the time index—whether forward or backward—the joint distribution of any finite collection of observations remains unchanged. This property implies that the statistical behavior of the process is independent of the specific time at which it is observed. In contrast to weak stationarity, which requires only the constancy of the mean, variance, and autocovariance structure over time, strong stationarity imposes the more stringent condition that all finite-dimensional distributions are invariant with respect to time shifts.
-
-Thus, the process is characterized not merely by stability in its first two moments, but by invariance in its entire distributional structure, ensuring that its stochastic behavior remains fully time-invariant. This stronger condition establishes a rigorous theoretical framework for modeling processes in which the complete probability distribution is preserved over time, and thus constitutes a fundamental concept in probability theory and stochastic modeling.
+A strongly (strictly) stationary process has the same finite-dimensional distributions under any time shift. This is a stronger requirement than weak stationarity, which only constrains the first two moments; strict stationarity demands full distributional invariance.
 
 \begin{definition}[strong stationarity]
 Let $ (\Omega, \mathcal{F}, \mathbb{P}) $ be a probability space, and let $ \{X_t : t \in T\} $ be a stochastic process indexed by $ T \subseteq \mathbb{R} $. The process $ \{X_t\} $ is said to be strongly stationary (or strictly stationary) if, for every integer $ n \geq 1 $, for every choice of time points $ t_1, t_2, \ldots, t_n \in T $, and for every shift $ h \in \mathbb{R} $ such that $ t_i + h \in T $, we have
@@ -317,15 +308,14 @@ where $ \overset{d}{=} $ denotes equality in distribution.
 
 **Key Points**
 
-• Entire distribution invariance: Not just the mean, variance, or covariance, but the full joint distribution of any finite collection of random variables is unchanged under time shifts.
+• Entire distribution invariance: Not just the mean, variance, or covariance, but the full joint distribution of any finite collection of random variables remains the same under time shifts.
 
 • Stronger than weak stationarity: Weak stationarity only requires invariance of first and second moments, while strong stationarity requires invariance of all finite-dimensional distributions.
 
 • Implication: Every strong stationary process is weakly stationary (if moments exist), but not every weakly stationary process is strongly stationary.
 
-The underlying rationale of strong stationarity is that a stochastic process exhibits identical behavior regardless of the temporal point at which observation begins. Rather than merely requiring the stability of moments such as the mean, variance, or covariance, strong stationarity necessitates that the complete joint distribution of any set of observations remains invariant under temporal shifts.
 
-Intuitively, this implies that the randomness governing the process is entirely invariant with respect to time. Specifically, if one observes the process at time points $t_1, t_2, \ldots, t_n$ and subsequently shifts this collection of observations forward by an arbitrary increment $h$, the resulting joint probability distribution remains unchanged. This definition therefore characterizes the strongest form of temporal consistency, ensuring that the process is not merely stable in terms of its moments, but is fundamentally identical in its full distributional structure under any temporal translation.
+Intuitively: strict stationarity means time shifts do not change the joint distribution of observations.
 
 \begin{example}
 An everyday example is i.i.d. white noise: independence plus identical marginals imply that every finite-dimensional joint distribution is invariant under time shifts, so the process is strictly stationary.
@@ -359,7 +349,7 @@ ggplot(data.frame(Time = 1:n, Value = wn), aes(x = Time, y = Value)) +
 The Bernoulli process (i.i.d. Bernoulli($p$)) is likewise strictly stationary.
 \end{example}
 
-These examples highlight the intuition: when randomness is identically distributed across time and unaffected by shifts, the process satisfies strong stationarity.
+These examples illustrate that identical marginal distributions and independence across time imply strict stationarity.
 
 A classic example of a process that is weakly stationary but not strongly stationary is a Gaussian process with time-invariant mean and covariance compared to a non-Gaussian process with the same covariance structure. To make it concrete, consider the following:
 \begin{example}
