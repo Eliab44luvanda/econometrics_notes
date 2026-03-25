@@ -7,9 +7,9 @@ lang: en
 bibliography: references.bib
 abstract: |
   This handout reviews properties of stationary and integrated time
-  series, covering definitions of stationarity, examples, and visual
-  illustrations. This handout provides a concise reference for students and
-  researchers in time series econometrics.
+  series, covering definitions, examples, and visual illustrations. It
+  provides a concise reference for students and researchers in
+  time-series econometrics.
 
 keywords:
   - time series
@@ -101,12 +101,12 @@ header-includes:
 ---
 ## Introduction
 
-Time series econometrics analyzes sequences of observations indexed by time and explicitly models temporal dependence. Time series commonly show autocorrelation, nonstationarity, and seasonality. As a result, standard i.i.d. assumptions often fail, requiring specialized methods. This handout summarizes core definitions and properties of stationary and integrated processes, and gives concise examples and illustrations.
+Time-series econometrics analyzes sequences of observations indexed by time and explicitly models temporal dependence. Time-series data commonly exhibit autocorrelation, non-stationarity, and seasonality. As a result, the standard i.i.d. assumptions often fail and require specialized methods. This handout summarizes core definitions and properties of stationary and integrated processes, and gives concise examples and illustrations.
 
 Distinguishing stationary from integrated series is essential for choosing models and making valid inferences. Central to these ideas is the notion of a stochastic process, defined below.
 
 \begin{definition}
-Let $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space, and let $T$ be an index set (often representing time, e.g. $T = \mathbb{N}$ for discrete time or $T = \mathbb{R}_{+}$ for continuous time).
+Let $(\Omega,\mathcal{F},\mathbb{P})$ be a probability space, and let $T$ be an index set (often representing time, e.g. $T = \mathbb{N}$ for discrete time or $T = \mathbb{R}_{+}$ for continuous time).
 
 A stochastic process is a family of random variables
 $$\{X(\tau, \omega) : \tau \in T, \; \omega \in \Omega\}$$
@@ -185,7 +185,7 @@ ggplot(df_paths, aes(x = Time, y = Value, color = Omega, group = Omega)) +
 ```
 
 
-A stochastic process formalizes "random evolution over time": given a probability space $(\Omega,\mathcal{F},\mathbb{P})$, the process assigns a random variable to each time point and, for a fixed outcome $\omega$, a deterministic sample path. Figure 1 illustrates multiple sample paths (realizations) of a simple random walk.
+A stochastic process formalizes "random evolution over time": given a probability space $(\Omega,\mathcal{F},\mathbb{P})$, the process assigns a random variable to each time point and, for a fixed outcome $\omega$, a deterministic sample path. Figure 1 illustrates multiple sample paths (realizations) of a simple random walk. Each trajectory corresponds to a distinct realization. The figure depicts the temporal evolution of the process values across these realizations. It exemplifies the intrinsic randomness and variability that are fundamental characteristics of stochastic processes.
 
 ```{r}
 #| echo: false
@@ -315,7 +315,7 @@ where $ \overset{d}{=} $ denotes equality in distribution.
 • Implication: Every strong stationary process is weakly stationary (if moments exist), but not every weakly stationary process is strongly stationary.
 
 
-Intuitively: strict stationarity means time shifts do not change the joint distribution of observations.
+Intuitively, strict stationarity means that time shifts do not change the joint distribution of observations.
 
 \begin{example}
 An everyday example is i.i.d. white noise: independence plus identical marginals imply that every finite-dimensional joint distribution is invariant under time shifts, so the process is strictly stationary.
