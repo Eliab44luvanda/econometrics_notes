@@ -100,7 +100,7 @@ header-includes:
     }
 ---
 
-## Introduction
+# Introduction
 
 Time-series econometrics analyzes sequences of observations indexed by time and explicitly models temporal dependence. Time-series data commonly exhibit autocorrelation, non-stationarity, and seasonality. As a result, the standard i.i.d. assumptions often fail and require specialized methods. This handout summarizes core definitions and properties of stationary and integrated processes, and gives concise examples and illustrations.
 
@@ -237,7 +237,7 @@ ggplot(data, aes(x = time, y = time_series)) +
 
 ```
 
-## Weak Stationarity
+# Weak Stationarity
 
 \begin{definition}[Weak (second-order) stationarity]
 Let $\{X_t : t \in T\}$ be a stochastic process with finite second moments. The process is said to be weakly stationary (or second-order stationary) if:
@@ -301,7 +301,7 @@ The figure shows a simulated AR(1) series with coefficient $\phi = 0.8$ and unco
 Weak stationarity requires only constant mean and autocovariance, whereas strong stationarity requires full distributional invariance under time shifts. Although strict stationarity is a stronger condition, weak stationarity is often sufficient in practice, especially for linear models and analyses focused on second-order properties.
 \end{remark}
 
-## Strong Stationarity
+# Strong Stationarity
 
 A strongly (strictly) stationary process has the same finite-dimensional distributions under any time shift. This is a stronger requirement than weak stationarity, which only constrains the first two moments; strict stationarity demands full distributional invariance.
 
