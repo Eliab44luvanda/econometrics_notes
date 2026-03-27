@@ -395,3 +395,10 @@ Table: Summary comparison of weak (second‑order) and strong (strict) stationar
 |Practical use| Sufficient for spectral analysis and linear forecasting. | Stronger theoretical guarantees; rarely required in practice. |
 |Vulnerabilities| Can hide nonstationary higher moments or non‑Gaussian features. | More robust but harder to verify. |
 
+# Non-stationary Stationary Processes
+
+<!-- Julia simulation omitted; using pre-generated image -->
+
+::: {#fig-ols fig-cap="OLS $\hat{\phi}$ distributions for stationary AR(1) and random walk processes"}
+![](ols_estimator_distributions.png)
+:::
