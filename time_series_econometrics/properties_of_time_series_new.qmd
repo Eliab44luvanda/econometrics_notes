@@ -430,6 +430,7 @@ $$\varepsilon_t \sim \mathcal{WN}(0,\sigma^2),$$
 In time-series analysis, the most cautious assumption is typically the second-order definition mentioned earlier, unless the author clearly specifies that the process is i.i.d. or Gaussian. This difference is important because being uncorrelated is a less restrictive condition than being independent. For instance, a process may display zero autocovariances at every nonzero lag—thereby meeting the criteria for weak white noise—yet still show higher-order dependencies that contradict the i.i.d. assumption. Consequently, in time-series analysis, it is essential to specify which definition of white noise is being used, since this choice affects the behavior of estimators and the reliability of statistical inference.
 
 
+
 ### Moving Average (MA) Processes
 
 
@@ -445,7 +446,7 @@ In time-series analysis, the most cautious assumption is typically the second-or
 <!-- Julia simulation omitted; using pre-generated image -->
 
 ::: {#fig-ols fig-cap="OLS $\hat{\phi}$ distributions for stationary AR(1) and random walk processes"}
-![](ols_estimator_distributions.png)
+![](properties_of_time_series_new_files/ols_estimator_distributions.pdf){width=90%}
 :::
 
 ```{r sim_summary, echo=FALSE, results='asis'}

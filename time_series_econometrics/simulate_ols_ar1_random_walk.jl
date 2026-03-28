@@ -15,8 +15,7 @@ Parse command-line arguments of the form `--key=value`.
 function parse_args(args)
     options = Dict(
         "phi" => "0.7",
-        "n" => "20
-        00",
+        "n" => "2000",
         "reps" => "2000000",
         "burnin" => "200",
         "seed" => "12345",
@@ -177,11 +176,15 @@ function add_histogram_density_plot!(plt, estimates, title_text, true_value, bin
         color = :steelblue,
         linecolor = :white,
         linewidth = 0.5,
-        label = "Histogram",
+        label = false,
         legend = :topleft,
         title = title_text,
         xlabel = L"\hat{\phi}",
         ylabel = "Density",
+        titlefont = font(12),
+        guidefont = font(11),
+        tickfont = font(10),
+        legendfont = font(9),
     )
 
     density!(
@@ -214,22 +217,22 @@ function add_histogram_density_plot!(plt, estimates, title_text, true_value, bin
     )
 end
 
-function save_plots(path, ar1_phi, rw_phi, phi, bins)
-    default(fontfamily = "sans-serif")
+function save_plots(path, ar1_phi, rw_phi, phi, bins, n, reps)
+    default(fontfamily = "serif")
 
     p1 = plot()
-        title1 = @sprintf("Stationary AR(1): φ̂ = %.1f", phi)
+        title1 = @sprintf("Stationary AR(1): φ̂ = %.1f (n=%d, reps=%d)", phi, n, reps)
         add_histogram_density_plot!(p1, ar1_phi, title1, phi, bins)
 
     p2 = plot()
-        title2 = @sprintf("Random Walk: φ̂ = %.1f", 1.0)
+        title2 = @sprintf("Random Walk: φ̂ = %.1f (n=%d, reps=%d)", 1.0, n, reps)
         add_histogram_density_plot!(p2, rw_phi, title2, 1.0, bins)
 
     combined = plot(
         p1, p2;
         layout = (1, 2),
-        size = (1200, 450),
-            plot_title = "",
+        size = (1400, 520),
+        plot_title = "",
         margin = 6Plots.mm,
     )
 
@@ -300,7 +303,7 @@ function main()
     summarize_estimates("Random Walk", rw_alpha, rw_phi, 1.0)
 
     maybe_write_csv(opts.csv, ar1_alpha, ar1_phi, rw_alpha, rw_phi)
-    save_plots(opts.plot, ar1_phi, rw_phi, opts.phi, opts.bins)
+    save_plots(opts.plot, ar1_phi, rw_phi, opts.phi, opts.bins, opts.n, opts.reps)
 end
 
 main()
