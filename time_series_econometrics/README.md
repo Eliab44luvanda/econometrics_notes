@@ -25,3 +25,26 @@ font_add_google('Noto Sans', 'notosans')
 ```
 
 Then re-run your Quarto render. This avoids interactive package/font downloads during automated rendering.
+
+## Preheat LaTeX font DB (optional but recommended)
+
+On first LaTeX runs LuaTeX may spend several minutes generating a font database (luaotfload). To avoid that delay and reduce intermittent hangs during interactive renders, this repo includes a small helper that pre-generates the font DB in an isolated HOME before rendering.
+
+- Preheat manually:
+
+```sh
+./scripts/preheat_fontdb.sh
+```
+
+- The atomic renderer will call the preheat helper automatically when present. Use the atomic render wrapper to produce validated PDFs safely:
+
+```sh
+./scripts/atomic_render.sh properties_of_time_series_new.qmd
+# or via Makefile
+make pdf
+```
+
+Notes:
+- The preheat script requires LuaTeX (`luaotfload-tool`) available from your TeX distribution (macOS: TeX Live via `/Library/TeX/texbin`).
+- The preheat step is non-fatal: if it fails the renderer continues and still attempts to produce a PDF.
+

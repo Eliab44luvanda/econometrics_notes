@@ -393,9 +393,54 @@ Table: Summary comparison of weak (second‑order) and strong (strict) stationar
 |Typical examples| ARMA processes with finite variance. | IID processes; time‑homogeneous Markov processes. |
 |Detectability / tests| Tests focus on mean/covariance (ADF, KPSS, sample ACF). | Hard to test directly; compares finite‑dimensional distributions. |
 |Practical use| Sufficient for spectral analysis and linear forecasting. | Stronger theoretical guarantees; rarely required in practice. |
-|Vulnerabilities| Can hide nonstationary higher moments or non‑Gaussian features. | More robust but harder to verify. |
+|Vulnerabilities| Can hide nonstationary higher moments or non‑Gaussian features. | More robust but harder to verify. 
+
+## Example Stationary Processes
+
+### White Noise Process
+
+
+**Definition (White noise).** Let $(\Omega,\mathcal{F},\mathbb{P})$ be a probability space, and let $\{\varepsilon_t\}_{t\in\mathbb{Z}}$ be a real-valued stochastic process with finite second moments. The process is a white noise process with variance $\sigma^2$ if, for every $t,s\in\mathbb{Z}$,
+$$\mathbb{E}[\varepsilon_t]=0,\qquad \mathbb{E}[\varepsilon_t^2]=\sigma^2<\infty,\qquad \mathrm{Cov}(\varepsilon_t,\varepsilon_s)=0\ \text{for } t\neq s.$$ 
+
+Equivalently, its autocovariance function is
+$$\gamma(h)=\mathrm{Cov}(\varepsilon_t,\varepsilon_{t-h})=\begin{cases}\sigma^2,&h=0,\\0,&h\neq0.\end{cases}$$
+
+This is the weak, wide-sense, or second-order notion of white noise: the process is centered, has constant finite variance, and is uncorrelated across distinct times. If the $\varepsilon_t$ are also independent and identically distributed (i.i.d.) with mean zero and variance $\sigma^2$, then the process is a strong (strictly) stationary white noise process, because all finite-dimensional distributions are invariant under time shifts. The Gaussian white noise process is a special case where $\varepsilon_t \sim \mathcal{N}(0,\sigma^2)$ i.i.d., which is also both weakly and strongly stationary.
+
+**Key Points**
+
+Two stronger notions are often separated from that basic definition:
+
+-	i.i.d. white noise / strong white noise: $\varepsilon_t$  are independent and identically distributed with mean
+zero and variance $\sigma^2$.
+
+-	Gaussian white noise: in addition, the process is jointly Gaussian; in that case, zero covariance already implies independence.
+
+So, when one says:
+
+$$\varepsilon_t \sim \text{i.i.d. } \mathcal{N}(0,\sigma^2),$$
+
+It means that the process is a Gaussian white noise process, which is both weakly and strongly stationary. The i.i.d. assumption ensures strong stationarity, while the Gaussianity implies that the process is fully characterized by its mean and covariance structure.
+
+And, when one says:
+
+$$\varepsilon_t \sim \mathcal{WN}(0,\sigma^2),$$
+
+In time-series analysis, the most cautious assumption is typically the second-order definition mentioned earlier, unless the author clearly specifies that the process is i.i.d. or Gaussian. This difference is important because being uncorrelated is a less restrictive condition than being independent. For instance, a process may display zero autocovariances at every nonzero lag—thereby meeting the criteria for weak white noise—yet still show higher-order dependencies that contradict the i.i.d. assumption. Consequently, in time-series analysis, it is essential to specify which definition of white noise is being used, since this choice affects the behavior of estimators and the reliability of statistical inference.
+
+
+### Moving Average (MA) Processes
+
+
+### Autoregressive (AR) Processes
+
 
 # Non-stationary Stationary Processes
+
+## Trend Stationary Processes
+
+## Difference Stationary or Integrated Processes (Unit Root Processes)
 
 <!-- Julia simulation omitted; using pre-generated image -->
 
