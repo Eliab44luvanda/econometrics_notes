@@ -1,0 +1,152 @@
+.gitignore: conservative global ignore for home-root repo
+# Purpose: keep personal home files, generated artefacts and large folders out of the repo
+
+# macOS
+.DS_Store
+._*
+/.Spotlight-V100/
+/.TemporaryItems/
+/.Trashes/
+
+# Common large user folders (conservative)
+Applications/
+Desktop/
+Documents/
+Downloads/
+Downloads.old/
+Library/
+Movies/
+Music/
+Pictures/
+Public/
+OneDrive/
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+env/
+venv/
+.venv/
+.env
+.pyenv/
+pip-wheel-metadata/
+*.egg-info/
+.eggs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Conda / virtual envs
+.conda/
+anaconda3/
+miniconda3/
+micromamba/
+
+# Node
+node_modules/
+
+# Caches and config
+.cache/
+.config/
+.local/
+npm-debug.log*
+yarn-error.log*
+
+# Backup, temp, history
+*.bak
+*.tmp
+*.swp
+*~
+*.log
+.bash_history
+.zsh_history
+.python_history
+
+# R and RStudio
+.Rhistory
+.RData
+.Rapp.history
+.Renviron
+.Renviron.bak
+.Rprofile
+.Rprofile.bak
+.Rproj.user/
+
+# Julia
+.julia/
+.juliaup/
+
+# LaTeX build artefacts
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Beamer intermediate files
+beamer/*.aux
+beamer/*.fdb_latexmk
+beamer/*.fls
+beamer/*.log
+beamer/*.nav
+beamer/*.snm
+beamer/*.toc
+beamer/*.out
+beamer/*.synctex.gz
+
+# Quarto / local render backups and temporary files in the course repo
+time_series_econometrics/*.pdf.bak*
+time_series_econometrics/*.pdf.prev*
+time_series_econometrics/*.pdf.qpdf.bak*
+time_series_econometrics/.tmp_*
+time_series_econometrics/*.txt
+time_series_econometrics/scripts/
+time_series_econometrics/test_*.png
+
+# Untitled/temporary notebooks and files
+Untitled*.ipynb
+
+# Common large tool and environment dirs to keep out of repo root
+anaconda_projects/
+PycharmProjects/
+Zotero/
+ai_assisted_programming/
+api_keys/
+
+# Misc
+.DS_Store
+Thumbs.db
+
+# Backup and misc
+*.bak
+*.tmp
+*.swp
+*~
+*.log
+
+# Local dotfiles and private configs (optional)
+.gitconfig
+.claude.json
+.claude.json.backup
+.env.*
+
+# Aggressive root-level ignore: ignore all untracked root items, but allow selected project folders
+/*
+!/.gitignore
+!/time_series_econometrics/
+!/econometrics_notes/
+!/beamer/
+!/README.md
+
+# Keep this file tracked (explicit)
+!.gitignore
