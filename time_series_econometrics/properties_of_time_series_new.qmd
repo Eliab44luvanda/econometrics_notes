@@ -447,3 +447,61 @@ In time-series analysis, the most cautious assumption is typically the second-or
 ::: {#fig-ols fig-cap="OLS $\hat{\phi}$ distributions for stationary AR(1) and random walk processes"}
 ![](ols_estimator_distributions.png)
 :::
+
+```{r sim_summary, echo=FALSE, results='asis'}
+if (file.exists("sim_run_1e6.log")) {
+  lines <- readLines("sim_run_1e6.log")
+
+  get_first <- function(pattern) {
+    l <- grep(pattern, lines, value = TRUE)
+    if (length(l) == 0) return(NA)
+    sub(".*:\\s*", "", l[1])
+  }
+
+  sample_n <- as.integer(get_first("Sample size"))
+  reps <- as.integer(get_first("Replications"))
+  burnin <- as.integer(get_first("Burn-in"))
+
+  get_nth_num <- function(pattern, n) {
+    idx <- grep(pattern, lines)
+    if (length(idx) < n) return(NA)
+    as.numeric(sub(".*:\\s*", "", lines[idx[n]]))
+  }
+
+  mean_phi_ar1 <- get_nth_num("Mean\\(phi_hat\\)", 1)
+  std_phi_ar1  <- get_nth_num("Std\\(phi_hat\\)", 1)
+  bias_phi_ar1 <- get_nth_num("Bias\\(phi_hat\\)", 1)
+
+  mean_phi_rw <- get_nth_num("Mean\\(phi_hat\\)", 2)
+  std_phi_rw  <- get_nth_num("Std\\(phi_hat\\)", 2)
+  bias_phi_rw <- get_nth_num("Bias\\(phi_hat\\)", 2)
+
+  true_phi_vals <- as.numeric(sub(".*:\\s*", "", grep("True phi", lines, value = TRUE)))
+
+  df <- data.frame(
+    Process = c("Stationary AR(1)", "Random Walk"),
+    True_phi = true_phi_vals,
+    Mean_phi_hat = c(mean_phi_ar1, mean_phi_rw),
+    Std_phi_hat  = c(std_phi_ar1,  std_phi_rw),
+    Bias_phi_hat = c(bias_phi_ar1, bias_phi_rw)
+  )
+
+  library(knitr)
+  # Use kableExtra for LaTeX/booktabs styling and scale table to fit page
+  if (!requireNamespace("kableExtra", quietly = TRUE)) {
+    cat("\\nPackage 'kableExtra' not installed; printing basic table.\\n")
+    names(df) <- c("Process","True $\\phi$", "Mean of $\\hat{\\phi}$", "Std of $\\hat{\\phi}$", "Bias of $\\hat{\\phi}$")
+    print(kable(df, caption = paste0("Monte Carlo summary (n=", sample_n, ", reps=", format(reps, big.mark=','), ", burn-in=", burnin, ")"), digits = 4, format = "pandoc", escape = FALSE))
+  } else {
+    library(kableExtra)
+    col_names <- c("Process", "$\\phi$", "Mean of $\\hat{\\phi}$", "Std of $\\hat{\\phi}$", "Bias of $\\hat{\\phi}$")
+    tbl <- knitr::kable(df, format = "latex", booktabs = TRUE, digits = 4,
+                 caption = paste0("Monte Carlo summary (n=", sample_n, ", reps=", format(reps, big.mark=','), ", burn-in=", burnin, ")"),
+                 align = c("l","r","r","r","r"), col.names = col_names, escape = FALSE)
+    tbl <- kable_styling(tbl, latex_options = c("hold_position", "scale_down"))
+    cat(tbl)
+  }
+} else {
+  cat("**Simulation log not found:** sim_run_1e6.log\\n")
+}
+```

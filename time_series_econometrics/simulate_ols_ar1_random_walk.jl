@@ -15,7 +15,8 @@ Parse command-line arguments of the form `--key=value`.
 function parse_args(args)
     options = Dict(
         "phi" => "0.7",
-        "n" => "2000",
+        "n" => "20
+        00",
         "reps" => "1000000",
         "burnin" => "200",
         "seed" => "12345",
