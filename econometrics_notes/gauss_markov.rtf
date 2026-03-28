@@ -1,0 +1,128 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww31900\viewh16520\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \
+\\section\{The Gauss--Markov Theorem\}\
+\
+Consider the classical linear regression model\
+$$\
+\\mathbf y = \\mathbf X \\boldsymbol\\beta + \\boldsymbol\\varepsilon,\
+$$\
+where $\\mathbf X \\in \\mathbb R^\{n\\times k\}$ has full column rank and the disturbance\
+vector $\\boldsymbol\\varepsilon$ satisfies the classical error assumptions.\
+\
+\\begin\{theorem\}[Gauss--Markov]\
+Under the classical linear regression assumptions, the ordinary least squares (OLS)\
+estimator\
+$$\
+\\hat\{\\boldsymbol\\beta\}\
+=\
+(\\mathbf X'\\mathbf X)^\{-1\}\\mathbf X'\\mathbf y\
+$$\
+is the \\emph\{Best Linear Unbiased Estimator\} (BLUE) of $\\boldsymbol\\beta$.\
+That is, among all linear unbiased estimators of $\\boldsymbol\\beta$,\
+$\\hat\{\\boldsymbol\\beta\}$ has the minimum variance--covariance matrix.\
+\\end\{theorem\}\
+\
+\\subsection*\{Definition: Linear Unbiased Estimator\}\
+\
+An estimator $\\tilde\{\\boldsymbol\\beta\}$ is said to be:\
+\\begin\{itemize\}\
+\\item \\textbf\{Linear\} if it can be written as $\\tilde\{\\boldsymbol\\beta\} = \\mathbf A \\mathbf y$\
+for some nonrandom $k\\times n$ matrix $\\mathbf A$.\
+\\item \\textbf\{Unbiased\} if $\\mathbb E(\\tilde\{\\boldsymbol\\beta\}\\mid \\mathbf X)=\\boldsymbol\\beta$.\
+\\end\{itemize\}\
+\
+\\begin\{proof\}\
+Let $\\tilde\{\\boldsymbol\\beta\} = \\mathbf A \\mathbf y$ be any linear unbiased estimator of\
+$\\boldsymbol\\beta$. Substituting $\\mathbf y = \\mathbf X\\boldsymbol\\beta + \\boldsymbol\\varepsilon$,\
+$$\
+\\tilde\{\\boldsymbol\\beta\}\
+=\
+\\mathbf A \\mathbf X \\boldsymbol\\beta + \\mathbf A \\boldsymbol\\varepsilon.\
+$$\
+\
+Unbiasedness requires\
+$$\
+\\mathbb E(\\tilde\{\\boldsymbol\\beta\}\\mid \\mathbf X)\
+=\
+\\mathbf A \\mathbf X \\boldsymbol\\beta\
+=\
+\\boldsymbol\\beta\
+\\quad \\Rightarrow \\quad\
+\\mathbf A \\mathbf X = \\mathbf I_k.\
+$$\
+\
+The variance of $\\tilde\{\\boldsymbol\\beta\}$ is\
+$$\
+\\Var(\\tilde\{\\boldsymbol\\beta\}\\mid \\mathbf X)\
+=\
+\\mathbf A \\Var(\\boldsymbol\\varepsilon\\mid \\mathbf X)\\mathbf A'\
+=\
+\\sigma^2 \\mathbf A \\mathbf A',\
+$$\
+where the last equality follows from $\\Var(\\boldsymbol\\varepsilon\\mid \\mathbf X)=\\sigma^2\\mathbf I_n$.\
+\
+Now write\
+$$\
+\\mathbf A\
+=\
+(\\mathbf X'\\mathbf X)^\{-1\}\\mathbf X' + \\mathbf C,\
+$$\
+for some $k\\times n$ matrix $\\mathbf C$ satisfying $\\mathbf C\\mathbf X = \\mathbf 0$.\
+(This decomposition follows from the unbiasedness constraint.)\
+\
+Then\
+$$\
+\\Var(\\tilde\{\\boldsymbol\\beta\}\\mid \\mathbf X)\
+=\
+\\sigma^2\
+\\left[\
+(\\mathbf X'\\mathbf X)^\{-1\}\
++\
+\\mathbf C\\mathbf C'\
+\\right].\
+$$\
+\
+Since $\\mathbf C\\mathbf C'$ is positive semidefinite,\
+$$\
+\\Var(\\tilde\{\\boldsymbol\\beta\}\\mid \\mathbf X)\
+-\
+\\Var(\\hat\{\\boldsymbol\\beta\}\\mid \\mathbf X)\
+=\
+\\sigma^2 \\mathbf C\\mathbf C'\
+\\quad \\text\{is positive semidefinite\}.\
+$$\
+\
+Hence,\
+$$\
+\\Var(\\tilde\{\\boldsymbol\\beta\}\\mid \\mathbf X)\
+\\succeq\
+\\Var(\\hat\{\\boldsymbol\\beta\}\\mid \\mathbf X),\
+$$\
+with equality if and only if $\\mathbf C=\\mathbf 0$, which implies\
+$\\tilde\{\\boldsymbol\\beta\}=\\hat\{\\boldsymbol\\beta\}$.\
+Therefore, OLS is the unique linear unbiased estimator with minimum variance.\
+\\end\{proof\}\
+\
+\\begin\{remark\}[Meaning of ``Best'']\
+``Best'' refers to the ordering of variance--covariance matrices in the\
+positive semidefinite sense, not to mean squared error or finite-sample efficiency\
+under nonlinearity or bias.\
+\\end\{remark\}\
+\
+\\begin\{remark\}[Role of Normality]\
+Normality of the error term is \\emph\{not\} required for the Gauss--Markov theorem.\
+Normality is only needed for exact finite-sample $t$ and $F$ inference.\
+\\end\{remark\}\
+\
+\\begin\{remark\}[When OLS Is No Longer BLUE]\
+If $\\Var(\\boldsymbol\\varepsilon\\mid \\mathbf X)\\neq \\sigma^2\\mathbf I_n$,\
+OLS remains unbiased under exogeneity but is no longer efficient.\
+In such cases, generalized least squares (GLS) yields a more efficient estimator.\
+\\end\{remark\}\
+}

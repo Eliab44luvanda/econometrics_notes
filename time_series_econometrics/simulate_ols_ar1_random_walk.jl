@@ -16,7 +16,7 @@ function parse_args(args)
     options = Dict(
         "phi" => "0.7",
         "n" => "2000",
-        "reps" => "200000",
+        "reps" => "1000000",
         "burnin" => "200",
         "seed" => "12345",
         "csv" => "",
