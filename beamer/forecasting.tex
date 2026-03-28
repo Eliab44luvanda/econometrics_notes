@@ -1,0 +1,303 @@
+
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathpazo}
+\usepackage[scaled=0.92]{helvet}
+\usepackage{courier}
+\usetheme{Madrid}
+\usecolortheme{default}
+\usefonttheme{serif}
+
+
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{ragged2e}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{microtype}
+
+% Davidson-style academic palette and spacing
+\definecolor{DavidsonBlue}{HTML}{1F4E79}
+\definecolor{DavidsonBlueDark}{HTML}{173A5E}
+\definecolor{SoftGray}{HTML}{F4F6F8}
+\definecolor{AccentGold}{HTML}{B8860B}
+\definecolor{TextGray}{HTML}{333333}
+
+\setbeamercolor{title}{fg=white,bg=DavidsonBlue}
+\setbeamercolor{frametitle}{fg=white,bg=DavidsonBlue}
+\setbeamercolor{structure}{fg=DavidsonBlueDark}
+\setbeamercolor{normal text}{fg=TextGray,bg=white}
+\setbeamercolor{block title}{fg=white,bg=DavidsonBlueDark}
+\setbeamercolor{block body}{fg=TextGray,bg=SoftGray}
+\setbeamercolor{item projected}{fg=white,bg=DavidsonBlue}
+\setbeamercolor{footline}{fg=white,bg=DavidsonBlueDark}
+\setbeamercolor{author in head/foot}{fg=white,bg=DavidsonBlueDark}
+\setbeamercolor{title in head/foot}{fg=white,bg=DavidsonBlueDark}
+\setbeamercolor{date in head/foot}{fg=white,bg=DavidsonBlueDark}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{items}[circle]
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+\setbeamerfont{title}{series=\bfseries,size=\Large}
+\setbeamerfont{subtitle}{size=\large}
+\setbeamerfont{frametitle}{series=\bfseries,size=\large}
+\setbeamerfont{author}{size=\normalsize}
+\setbeamerfont{date}{size=\small}
+
+\setbeamertemplate{frametitle}{%
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\paperwidth,ht=3.1ex,dp=1.1ex,leftskip=0.45cm,rightskip=0.2cm]{frametitle}
+    \usebeamerfont{frametitle}\insertframetitle
+  \end{beamercolorbox}%
+}
+
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.73\paperwidth,ht=2.6ex,dp=1.1ex,leftskip=0.35cm]{author in head/foot}%
+      \usebeamerfont{author in head/foot}Supply-Side Teacher Forecasting Framework
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.19\paperwidth,ht=2.6ex,dp=1.1ex,center]{title in head/foot}%
+      Tanzania
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.08\paperwidth,ht=2.6ex,dp=1.1ex,rightskip=0.25cm]{date in head/foot}%
+      \hfill\insertframenumber/\inserttotalframenumber
+    \end{beamercolorbox}%
+  }
+}
+
+\newcommand{\highlight}[1]{\textcolor{DavidsonBlueDark}{\textbf{#1}}}
+\newcommand{\gold}[1]{\textcolor{AccentGold}{\textbf{#1}}}
+
+\title{Supply-Side Teacher Forecasting Framework}
+\subtitle{Primary and Secondary Education in Tanzania}
+\author{Prepared for MOEST and PO-RALG}
+\date{March 2026}
+
+\begin{document}
+
+% Title slide
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[DavidsonBlue] (current page.south west) rectangle (current page.north east);
+    \fill[white, opacity=0.06] ([xshift=-1cm,yshift=-0.5cm]current page.north east) circle (2.5cm);
+    \fill[white, opacity=0.05] ([xshift=1.5cm,yshift=0.8cm]current page.south west) circle (3cm);
+  \end{tikzpicture}
+  \vspace{0.9cm}
+  {\usebeamerfont{title}\color{white}\inserttitle\par}
+  \vspace{0.2cm}
+  {\usebeamerfont{subtitle}\color{white!92}\insertsubtitle\par}
+  \vspace{0.7cm}
+  {\color{white}\large Prepared for: \par}
+  \vspace{0.15cm}
+  {\color{white!92}\normalsize Ministry of Education, Science and Technology (MOEST)\\
+  President's Office - Regional Administration and Local Government (PO-RALG)\par}
+  \vfill
+  {\color{white!85}\small A technical framework for workforce planning, budgeting, and teacher deployment.\par}
+  \vspace{0.35cm}
+  {\color{white!80}\small \insertdate\par}
+\end{frame}
+
+\begin{frame}{Strategic Context}
+\begin{columns}[T,onlytextwidth]
+\column{0.58\textwidth}
+\begin{itemize}
+  \item Tanzania has expanded access to basic and secondary education through fee-free education, curriculum reforms, and school expansion.
+  \item These gains have increased \highlight{demand for teachers}, especially across growing enrolment areas.
+  \item Persistent constraints include fiscal pressures, uneven deployment, limited training capacity in some subjects, and attrition.
+  \item Acute shortages remain visible in \gold{STEM}, languages, special needs education, and remote localities.
+\end{itemize}
+\column{0.38\textwidth}
+\begin{block}{Why forecasting?}
+\justifying
+A regular forecasting system enables MOEST and PO-RALG to shift from reactive staffing decisions to \highlight{proactive workforce planning}.
+\end{block}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Purpose and Scope}
+\begin{block}{Purpose}
+\justifying
+To provide a \highlight{clear, repeatable, and transparent} process for forecasting the supply of primary and secondary teachers in Tanzania.
+\end{block}
+\vspace{0.15cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.52\textwidth}
+\textbf{What the framework supports}
+\begin{itemize}
+  \item Recruitment planning
+  \item Budgeting and wage-bill discussions
+  \item Teacher deployment and post allocation
+  \item Scholarship and training decisions
+\end{itemize}
+\column{0.46\textwidth}
+\textbf{What it covers}
+\begin{itemize}
+  \item Current stock of teachers
+  \item New graduates and re-entrants
+  \item Retirements, mortality, and attrition
+  \item Disaggregation by level, subject, gender, and region
+\end{itemize}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Institutional Arrangements and Governance}
+\begin{itemize}
+  \item \highlight{MOEST}: policy direction, national standards, technical oversight, and use of forecasts for teacher education and sector planning.
+  \item \highlight{PO-RALG}: deployment, LGA coordination, stock and attrition data, and local interpretation of forecast results.
+  \item \highlight{Teacher education institutions, TCU, NACTVET}: intake, completion, and subject specialization data.
+  \item \highlight{Ministry of Finance, NBS, development partners}: wage-bill implications, demographic projections, and technical support.
+\end{itemize}
+\vspace{0.25cm}
+\begin{block}{Recommended coordination mechanism}
+A joint \highlight{Teacher Workforce Planning Technical Working Group} should review data, validate assumptions, agree scenarios, and sign off forecast outputs.
+\end{block}
+\end{frame}
+
+\begin{frame}{Forecasting Methodology}
+\begin{columns}[T,onlytextwidth]
+\column{0.56\textwidth}
+\textbf{Core approach}
+\begin{itemize}
+  \item Stock-and-flow model as the main forecasting backbone
+  \item Trend-based and ratio-based projections where detailed data are incomplete
+  \item Scenario analysis to test plausible alternative futures
+  \item Structured expert judgment to refine assumptions
+\end{itemize}
+\column{0.40\textwidth}
+\begin{block}{Why this approach?}
+\justifying
+It is \highlight{transparent}, uses relatively low data requirements, supports \highlight{data-driven decisions}, and can be institutionalized while maintaining attention to \highlight{equity, gender, and inclusion}.
+\end{block}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Core Stock-Flow Identity}
+\begin{block}{Dynamic accounting relationship}
+\[
+\mathrm{Stock}_{t+1} = \mathrm{Stock}_{t} + \mathrm{Inflows}_{t} - \mathrm{Outflows}_{t}
+\]
+\end{block}
+\vspace{0.15cm}
+\begin{columns}[T,onlytextwidth]
+\column{0.32\textwidth}
+\textbf{Stock}
+\begin{itemize}
+  \item Teachers in post
+  \item Actively available to teach
+\end{itemize}
+\column{0.32\textwidth}
+\textbf{Inflows}
+\begin{itemize}
+  \item New graduates recruited
+  \item Re-entries
+  \item Transfers in
+\end{itemize}
+\column{0.32\textwidth}
+\textbf{Outflows}
+\begin{itemize}
+  \item Retirements
+  \item Mortality
+  \item Attrition and exits
+\end{itemize}
+\end{columns}
+\vspace{0.2cm}
+\begin{block}{Interpretation}
+The model updates the teacher workforce \highlight{year by year}, making it suitable for annual planning and budgeting cycles.
+\end{block}
+\end{frame}
+
+\begin{frame}{Inflows and Outflows}
+\begin{columns}[T,onlytextwidth]
+\column{0.49\textwidth}
+\begin{block}{Inflows}
+\[
+H_t = \mathrm{Intake}_{t-k}\cdot c \cdot \delta
+\]
+\begin{itemize}
+  \item Training intake drives future graduate supply
+  \item $c$: completion rate
+  \item $\delta$: recruitment or absorption rate
+  \item Re-entries add a smaller but relevant source of supply
+\end{itemize}
+\end{block}
+\column{0.49\textwidth}
+\begin{block}{Outflows}
+\[
+\mathrm{Outflow}_t = \mathrm{Ret}_t + \mathrm{Mort}_t + \mathrm{Attr}_t
+\]
+\begin{itemize}
+  \item Retirement is relatively predictable
+  \item Mortality is usually small but non-negligible
+  \item Attrition is the \gold{most policy-sensitive} component
+\end{itemize}
+\end{block}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Scenarios and Validation}
+\begin{columns}[T,onlytextwidth]
+\column{0.47\textwidth}
+\textbf{Scenario design}
+\begin{itemize}
+  \item Baseline: continuation of current trends
+  \item Optimistic: stronger training capacity and retention
+  \item Pessimistic: fiscal tightening or higher attrition
+\end{itemize}
+\column{0.49\textwidth}
+\textbf{Validation}
+\begin{itemize}
+  \item Back-testing with historical data
+  \item Mean Absolute Error (MAE)
+  \item Root Mean Square Error (RMSE)
+  \item Mean Absolute Percentage Error (MAPE)
+\end{itemize}
+\end{columns}
+\vspace{0.2cm}
+\begin{block}{Planning value}
+Scenario analysis supports \highlight{risk-aware teacher workforce planning} rather than dependence on a single point forecast.
+\end{block}
+\end{frame}
+
+\begin{frame}{Implementation Roadmap}
+\begin{enumerate}
+  \item \highlight{Phase 1: Pilot and prepare}
+  \begin{itemize}
+    \item Map data sources, assess quality, integrate historical data
+    \item Pilot a basic stock-flow model for selected regions or subjects
+  \end{itemize}
+  \item \highlight{Phase 2: Scale up}
+  \begin{itemize}
+    \item Extend to all regions and subject groups
+    \item Align forecasting cycle with budgeting and recruitment decisions
+  \end{itemize}
+  \item \highlight{Phase 3: Consolidate and enhance}
+  \begin{itemize}
+    \item Introduce more advanced statistical modules where data permit
+    \item Integrate supply and demand forecasting for fuller workforce planning
+  \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}{Conclusion and Policy Message}
+\begin{block}{Core message}
+\justifying
+A practical supply-side forecasting framework allows Tanzania's education system to move from \highlight{reactive staffing responses} toward \highlight{strategic teacher workforce management}.
+\end{block}
+\vspace{0.15cm}
+\begin{itemize}
+  \item It strengthens recruitment planning, deployment, and budgeting.
+  \item It makes assumptions explicit and testable.
+  \item It improves attention to equity, gender balance, and underserved areas.
+  \item It can begin with existing tools and evolve as data quality improves.
+\end{itemize}
+\vspace{0.2cm}
+\centering
+\Large\gold{Every learner should have access to a qualified teacher.}
+\end{frame}
+
+\end{document}

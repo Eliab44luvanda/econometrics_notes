@@ -1,0 +1,120 @@
+---
+title: "Forecasting Teacher Supply in Tanzania"
+author: "Your Name"
+date: "March 2026"
+format: 
+  beamer-pdf:
+    theme: Madrid
+    fontsize: 17pt
+---
+
+# Overview & Motivation
+
+- Supply-side teacher forecasting framework for Tanzania  
+- Supports MOEST and PO-RALG in workforce planning  
+- Motivated by:  
+  - Rapid expansion of education access (fee-free, curriculum reforms)  
+  - Persistent supply challenges: STEM shortages, uneven distribution, attrition  
+- Central idea: forecast systematically, not reactively  
+
+---
+
+# Core Concept: Teacher Supply
+
+- Teacher supply = Current stock + Inflows − Outflows  
+- Influenced by:  
+  - Individual decisions (career choice, mobility)  
+  - Government policies (training, recruitment, compensation)  
+
+---
+
+# Purpose of the Framework
+
+- Transparent and repeatable forecasting system  
+- Supports planning, budgeting, recruitment decisions  
+- Produces disaggregated forecasts (subject, gender, region, level)  
+- Aligns teacher supply with education demand  
+
+---
+
+# Guiding Principles
+
+- Policy relevance (aligned with ESDP, national strategies)  
+- Institutionalization (routine, not ad hoc)  
+- Data-driven decision-making  
+- Simplicity with scalability  
+- Equity and inclusion (gender, rural, special needs)  
+
+---
+
+# Institutional Framework
+
+- Coordination among:  
+  - MOEST → policy & technical leadership  
+  - PO-RALG → deployment & local implementation  
+  - Training institutions & TCU → supply pipeline  
+  - NBS & Ministry of Finance → demographics & budgeting  
+- Technical working group proposed for coordination  
+
+---
+
+# Forecasting Methodology
+
+- **Stock-and-Flow Model**  
+  \[
+  Stock_{t+1} = Stock_t + Inflows_t - Outflows_t
+  \]  
+- Advantages:  
+  - Requires minimal data  
+  - Transparent and easy to implement  
+  - Can be updated regularly  
+
+---
+
+# Model Components & Supporting Methods
+
+**Inflows**  
+- New graduates entering teaching  
+- Re-entry of former teachers  
+
+**Outflows**  
+- Retirement (predictable)  
+- Mortality  
+- Attrition (resignation, migration, career change)  
+
+**Supporting Methods**  
+- Trend-based projections  
+- Scenario analysis (baseline, optimistic, pessimistic)  
+- Validation: back-testing, accuracy metrics (MAE, RMSE, MAPE)  
+
+---
+
+# Data Constraints & Implementation Strategy
+
+- Tanzania lacks longitudinal, high-quality microdata  
+- Administrative systems (EMIS, HR, payroll) useful but incomplete  
+- Three-phase roadmap:  
+  1. Pilot – data integration & initial model  
+  2. Scale-up – national implementation  
+  3. Enhancement – advanced methods  
+
+---
+
+# Cross-Cutting Priorities
+
+- Gender balance  
+- Regional equity (urban vs rural)  
+- Special needs education  
+- Data governance & quality assurance  
+
+---
+
+# Final Insight
+
+- Framework shifts planning from:  
+  - ❌ Reactive → responding to shortages  
+  - ✅ Proactive → anticipating future supply  
+- Teacher forecasting is a strategic policy tool  
+- Ensures every learner has access to a qualified, well-distributed, motivated teacher  
+
+
