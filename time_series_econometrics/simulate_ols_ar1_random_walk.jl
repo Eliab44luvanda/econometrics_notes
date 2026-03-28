@@ -178,6 +178,7 @@ function add_histogram_density_plot!(plt, estimates, title_text, true_value, bin
         linecolor = :white,
         linewidth = 0.5,
         label = "Histogram",
+        legend = :topleft,
         title = title_text,
         xlabel = L"\hat{\phi}",
         ylabel = "Density",
@@ -217,11 +218,11 @@ function save_plots(path, ar1_phi, rw_phi, phi, bins)
     default(fontfamily = "sans-serif")
 
     p1 = plot()
-           title1 = "Stationary AR(1): φ̂ = $(round(phi, digits=2))"
+        title1 = @sprintf("Stationary AR(1): φ̂ = %.1f", phi)
         add_histogram_density_plot!(p1, ar1_phi, title1, phi, bins)
 
     p2 = plot()
-           title2 = "Random Walk: φ̂ = $(round(1.0, digits=2))"
+        title2 = @sprintf("Random Walk: φ̂ = %.1f", 1.0)
         add_histogram_density_plot!(p2, rw_phi, title2, 1.0, bins)
 
     combined = plot(
