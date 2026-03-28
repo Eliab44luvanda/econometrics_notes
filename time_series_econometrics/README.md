@@ -48,3 +48,40 @@ Notes:
 - The preheat script requires LuaTeX (`luaotfload-tool`) available from your TeX distribution (macOS: TeX Live via `/Library/TeX/texbin`).
 - The preheat step is non-fatal: if it fails the renderer continues and still attempts to produce a PDF.
 
+## Julia
+
+This repository also contains a small Julia Monte Carlo utility that simulates the OLS estimator
+for two data-generating processes (stationary AR(1) and a random walk).
+
+Required (non-stdlib) Julia packages:
+
+- Distributions
+- StatsPlots
+- LaTeXStrings
+
+Install the packages non-interactively from a shell:
+
+```sh
+julia -e 'import Pkg; Pkg.add(["Distributions","StatsPlots","LaTeXStrings"])'
+```
+
+Run the simulation (script available at the repository root and under `scripts/`):
+
+```sh
+# example
+julia simulate_ols_ar1_random_walk.jl --phi=0.7 --n=200 --reps=10000 --burnin=200 --seed=12345 --plot=ols_estimator_distributions.png
+
+# or the copy in the scripts/ folder
+julia scripts/simulate_ols_ar1_random_walk.jl --help
+```
+
+Outputs:
+
+- A combined histogram and kernel-density image (default: `ols_estimator_distributions.png`).
+- Optional CSV with replication-level results using `--csv=path`.
+
+See the script header for full option details; the script supports `--phi`, `--n`, `--reps`,
+`--burnin`, `--seed`, `--csv`, `--plot`, and `--bins`.
+
+Recommended Julia: 1.6+ (or the current stable release).
+
