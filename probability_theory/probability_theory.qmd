@@ -4,6 +4,9 @@ subtitle: "Lecture Notes for Econometrics."
 author: "Eliab Luvanda"
 date: today
 date-format: "MMMM D, YYYY"
+bibliography: references.bib
+reference-section-title: "References"
+nocite: "@*"
 
 format:
   pdf:
@@ -301,4 +304,11 @@ ggplot(df, aes(x = n, y = mean)) +
   theme_classic() +
   labs(x = "Sample size", y = "Mean")
 ```
+
+\newpage
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
 
