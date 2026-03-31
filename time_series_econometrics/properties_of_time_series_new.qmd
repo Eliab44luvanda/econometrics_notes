@@ -433,6 +433,41 @@ In time-series analysis, the most cautious assumption is typically the second-or
 
 ### Moving Average (MA) Processes
 
+**Definition (MA(q) process)**. Let $(\Omega,\mathcal{F},\mathbb{P})$ be a probability space, and let $\{\varepsilon_t\}_{t\in\mathbb{Z}}$ be a white noise process with variance $\sigma^2$. A stochastic process $\{X_t\}_{t\in\mathbb{Z}}$ is a moving average process of order $q$ (MA($q$)) if it can be represented as 
+
+$$
+X_t=\mu+\sum_{j=0}^{q}\theta_j\varepsilon_{t-j}.
+$$
+
+Equivalently, in lag-operator notation,
+$$
+X_t=\mu+\theta(B)\varepsilon_t,
+\qquad
+\theta(B)=\theta_0+\theta_1B+\cdots+\theta_qB^q.
+$$
+
+This is the conventional formal definition employed in time-series analysis.
+
+The term “moving average” indicates that the variable $X_t$ is constructed as a finite linear combination of the present and previous shocks $\varepsilon_t,\varepsilon_{t-1},\dots,\varepsilon_{t-q}$. The source of randomness lies in the white-noise innovations, while the parameters $\theta_j$ control the extent to which each shock influences the process over time.
+
+According to this definition, an $\mathrm{MA}(q)$ process is inherently weakly stationary, and its autocovariance function satisfies
+
+$$
+\gamma(h)=0 \qquad \text{for } |h|>q,
+$$
+Thus, correlations disappear for lags greater than $q$. More precisely,
+$$
+\gamma(h)=\sigma^2\sum_{j=0}^{q-|h|}\theta_j\theta_{j+|h|}
+\qquad \text{for } |h|\le q,
+$$
+adopting the convention that $\theta_0 = 1$.
+
+One frequently encountered special instance is the $\mathrm{MA}(1)$ process:
+$$
+X_t=\mu+\varepsilon_t+\theta_1\varepsilon_{t-1}.
+$$
+
+
 
 ### Autoregressive (AR) Processes
 

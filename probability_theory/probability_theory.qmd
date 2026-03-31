@@ -1,0 +1,304 @@
+---
+title: "Measure-Theoretic Probability Theory"
+subtitle: "Lecture Notes for Econometrics."
+author: "Eliab Luvanda"
+date: today
+date-format: "MMMM D, YYYY"
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: scrartcl
+    classoption:
+      - DIV=11
+      - numbers=noendperiod
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    colorlinks: true
+    geometry:
+      - inner=1.25in
+      - outer=1.00in
+      - top=1.05in
+      - bottom=1.10in
+    include-in-header:
+      text: |
+        \usepackage{fontspec}
+        \setmainfont{TeX Gyre Pagella}
+        \setsansfont{TeX Gyre Pagella}
+
+        \addtokomafont{disposition}{\rmfamily}
+        \setkomafont{title}{\normalfont\rmfamily\bfseries\LARGE}
+        \setkomafont{subtitle}{\normalfont\rmfamily\Large}
+        \setkomafont{section}{\normalfont\rmfamily\bfseries\Large}
+        \setkomafont{subsection}{\normalfont\rmfamily\bfseries\large}
+
+        \usepackage{amsmath, amssymb, amsthm, mathtools}
+        \usepackage{bm}
+        \newcommand{\E}{\mathbb{E}}
+        \newcommand{\Prob}{\mathbb{P}}
+
+        \numberwithin{equation}{section}
+
+        % Davidson-style theorem heads: "Definition 3.1 ..." on one line
+        \newtheoremstyle{davidson}
+          {6pt}{6pt}
+          {\normalfont}
+          {0pt}
+          {\bfseries}
+          {.}
+          {0.6em}
+          {}
+
+        \theoremstyle{davidson}
+        \newtheorem{theorem}{Theorem}[section]
+        \newtheorem{lemma}[theorem]{Lemma}
+        \newtheorem{proposition}[theorem]{Proposition}
+        \newtheorem{corollary}[theorem]{Corollary}
+        \newtheorem{definition}[theorem]{Definition}
+        \newtheorem{assumption}[theorem]{Assumption}
+        \newtheorem{example}[theorem]{Example}
+        \newtheorem{exercise}[theorem]{Exercise}
+        \newtheorem{remarkenv}[theorem]{Remark}
+        \renewcommand{\qedsymbol}{$\blacksquare$}
+
+crossref:
+  eq-prefix: ""
+  sec-prefix: "Section"
+---
+
+# 1. Introduction
+
+## 1.1 Probability and Uncertainty
+
+\begin{definition}
+Probability is a numerical measure that quantifies uncertainty associated with events.
+\end{definition}
+
+In economics, uncertainty is central to decision-making, from consumption choices to financial markets and policy design.
+
+## 1.2 Approaches to Probability
+
+### Classical
+Based on equally likely outcomes.
+
+### Frequentist
+Probability as long-run relative frequency.
+
+### Subjective
+Probability as degree of belief.
+
+### Axiomatic (Measure-Theoretic)
+Probability is defined as a measure on a measurable space.
+
+\begin{remarkenv}
+The axiomatic approach provides the mathematical foundation for modern econometrics and stochastic processes.
+\end{remarkenv}
+
+---
+
+# 2. Probability Spaces
+
+## 2.1 Sample Space
+
+\begin{definition}
+A sample space $\Omega$ is the set of all possible outcomes.
+\end{definition}
+
+## 2.2 Sigma-Algebra
+
+\begin{definition}
+A sigma-algebra $\mathcal{F}$ is a collection of subsets of $\Omega$ such that:
+1. $\Omega \in \mathcal{F}$
+2. If $A \in \mathcal{F}$, then $A^c \in \mathcal{F}$
+3. If $A_n \in \mathcal{F}$, then $\bigcup_{n=1}^\infty A_n \in \mathcal{F}$
+\end{definition}
+
+\begin{theorem}
+Sigma-algebras are closed under countable intersections.
+\end{theorem}
+
+\begin{proof}
+By De Morgan’s laws,
+$$
+\bigcap_{n=1}^\infty A_n = \left(\bigcup_{n=1}^\infty A_n^c \right)^c
+$$
+and closure follows.
+\end{proof}
+
+## 2.3 Probability Measure
+
+\begin{definition}
+A probability measure $\Prob$ is a function $\Prob:\mathcal{F} \to [0,1]$ satisfying:
+1. $\Prob(A) \ge 0$
+2. $\Prob(\Omega)=1$
+3. $\Prob(\cup A_i)=\sum \Prob(A_i)$ for disjoint sets
+\end{definition}
+
+---
+
+# 3. Random Variables
+
+## 3.1 Definition
+
+\begin{definition}
+A random variable is a measurable function $X:\Omega \to \mathbb{R}$.
+\end{definition}
+
+## 3.2 Distribution Function
+
+\begin{definition}
+The distribution function is
+$$
+F_X(x)=\Prob(X \le x)
+$$
+\end{definition}
+
+---
+
+# 4. Distributions
+
+## 4.1 CDF Properties
+
+\begin{theorem}
+Every CDF is non-decreasing, right-continuous, and satisfies:
+$$
+\lim_{x\to -\infty}F(x)=0, \quad \lim_{x\to \infty}F(x)=1
+$$
+\end{theorem}
+
+## 4.2 Independence
+
+\begin{definition}
+Random variables $X,Y$ are independent if
+$$
+\Prob(X\in A, Y\in B)=\Prob(X\in A)\Prob(Y\in B)
+$$
+\end{definition}
+
+---
+
+# 5. Expectations
+
+## 5.1 Expected Value
+
+\begin{definition}
+For a random variable $X$,
+$$
+\E[X] = \int X d\Prob
+$$
+\end{definition}
+
+## 5.2 Properties
+
+\begin{theorem}
+Expectation is linear:
+$$
+\E[aX+bY]=a\E[X]+b\E[Y]
+$$
+\end{theorem}
+
+\begin{proof}
+Follows directly from properties of the Lebesgue integral.
+\end{proof}
+
+## 5.3 Jensen’s Inequality
+
+\begin{theorem}
+If $\phi$ is convex, then
+$$
+\phi(\E[X]) \le \E[\phi(X)]
+$$
+\end{theorem}
+
+---
+
+# 6. Convergence Concepts
+
+## 6.1 Almost Sure Convergence
+
+\begin{definition}
+$X_n \to X$ almost surely if
+$$
+\Prob(\lim X_n = X)=1
+$$
+\end{definition}
+
+## 6.2 Convergence in Probability
+
+\begin{definition}
+$X_n \to X$ in probability if
+$$
+\Prob(|X_n-X|>\varepsilon)\to 0
+$$
+\end{definition}
+
+## 6.3 Convergence in Distribution
+
+\begin{definition}
+$X_n \to X$ in distribution if
+$$
+F_{X_n}(x)\to F_X(x)
+$$
+\end{definition}
+
+## 6.4 Relationships
+
+\begin{theorem}
+Almost sure convergence implies convergence in probability.
+\end{theorem}
+
+---
+
+## 6.5 Weak Law of Large Numbers
+
+\begin{theorem}
+Let $X_i$ be i.i.d. with finite mean $\mu$. Then
+$$
+\bar{X}_n \to \mu \text{ in probability}
+$$
+\end{theorem}
+
+## 6.6 Central Limit Theorem
+
+\begin{theorem}
+Let $X_i$ be i.i.d. with mean $\mu$ and variance $\sigma^2$. Then
+$$
+\sqrt{n}(\bar{X}_n - \mu) \to N(0,\sigma^2)
+$$
+\end{theorem}
+
+---
+
+# 7. Exercises
+
+\begin{exercise}
+Prove that a sigma-algebra is closed under finite unions.
+\end{exercise}
+
+\begin{exercise}
+Show that independence implies zero covariance, but not vice versa.
+\end{exercise}
+
+\begin{exercise}
+Prove Jensen’s inequality for discrete random variables.
+\end{exercise}
+
+\begin{exercise}
+Simulate the Law of Large Numbers in R.
+\end{exercise}
+
+```{r}
+#| echo: true
+#| fig-cap: "Simulating the Law of Large Numbers"
+library(ggplot2)
+set.seed(123)
+x <- rnorm(1000)
+means <- cumsum(x)/seq_along(x)
+df <- data.frame(n = seq_along(means), mean = means)
+ggplot(df, aes(x = n, y = mean)) +
+  geom_line() +
+  theme_classic() +
+  labs(x = "Sample size", y = "Mean")
+```
+
