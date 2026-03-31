@@ -381,19 +381,33 @@ In short: weak stationarity only cares about mean, variance, and covariance stab
 
 Table 1 presents a compact summary of the series and models analyzed: each row corresponds to a data series or simulated DGP and columns report the sample size, the sample mean and variance, the estimated AR(1) coefficient (with its standard error), the first few autocovariances/autocorrelations, and the key test statistics with p‑values used to assess weak stationarity and unit roots. Together these entries show the degree of persistence and variability for each series, allow quick comparison of estimated dynamics across models (e.g., stationary vs. near‑unit‑root behavior), and indicate which series reject or fail to reject stationarity at conventional significance levels.
 
-Table: Summary comparison of weak (second‑order) and strong (strict) stationarity: definitions, requirements, implications, and practical considerations.
-
-| Aspect | Weak (second‑order) stationarity | Strong (strict) stationarity |
-|---|---:|---|
-|Definition| Constant mean and covariance depend only on lag: $\mathbb{E}[X_t] = \mu$ and $\mathrm{Cov}(X_{t+h}, X_t) = \gamma(h)$ for all $t, h$. | All finite‑dimensional distributions are invariant under time shifts: for every $k$, $t_1, \dots, t_k$ and shift $h$, $(X_{t_1+h}, \dots, X_{t_k+h}) \stackrel{d}{=} (X_{t_1}, \dots, X_{t_k})$. |
-|Required moments| Requires existence of first and second moments. | No moment requirement in the definition. |
-|Condition on distributions| Only first two moments must be time‑invariant. | Entire joint distributions must be time‑invariant. |
-|Implication relation| Does not imply strong stationarity in general. | Implies weak stationarity if first and second moments exist. |
-|Gaussian case| For Gaussian processes, weak $\Leftrightarrow$ strong (mean & covariance determine law). | Same as left column under Gaussianity. |
-|Typical examples| ARMA processes with finite variance. | IID processes; time‑homogeneous Markov processes. |
-|Detectability / tests| Tests focus on mean/covariance (ADF, KPSS, sample ACF). | Hard to test directly; compares finite‑dimensional distributions. |
-|Practical use| Sufficient for spectral analysis and linear forecasting. | Stronger theoretical guarantees; rarely required in practice. |
-|Vulnerabilities| Can hide nonstationary higher moments or non‑Gaussian features. | More robust but harder to verify. 
+% Replaced pipe-style markdown table with a LaTeX longtable to avoid
+% layout distortion in PDF output.
+\begin{center}
+\footnotesize
+\setlength{\tabcolsep}{6pt}
+\begin{longtable}{p{0.22\textwidth} p{0.36\textwidth} p{0.36\textwidth}}
+\caption{Summary comparison of weak (second‑order) and strong (strict) stationarity: definitions, requirements, implications, and practical considerations.}\label{tbl:stationarity_comparison}\\
+	oprule
+Aspect & Weak (second‑order) stationarity & Strong (strict) stationarity \\
+\midrule
+\endfirsthead
+	oprule
+Aspect & Weak (second‑order) stationarity & Strong (strict) stationarity \\
+\midrule
+\endhead
+Definition & Constant mean and covariance depend only on lag: $\mathbb{E}[X_t]=\mu$ and $\mathrm{Cov}(X_{t+h},X_t)=\gamma(h)$ for all $t,h$. & All finite‑dimensional distributions are invariant under time shifts: for every $k$, $t_1,\dots,t_k$ and shift $h$, $(X_{t_1+h},\dots,X_{t_k+h})\stackrel{d}{=}(X_{t_1},\dots,X_{t_k})$. \\
+Required moments & Requires existence of first and second moments. & No moment requirement in the definition. \\
+Condition on distributions & Only first two moments must be time‑invariant. & Entire joint distributions must be time‑invariant. \\
+Implication relation & Does not imply strong stationarity in general. & Implies weak stationarity if first and second moments exist. \\
+Gaussian case & For Gaussian processes, weak $\Leftrightarrow$ strong (mean \\& covariance determine law). & Same as left column under Gaussianity. \\
+Typical examples & ARMA processes with finite variance. & IID processes; time‑homogeneous Markov processes. \\
+Detectability / tests & Tests focus on mean/covariance (ADF, KPSS, sample ACF). & Hard to test directly; compares finite‑dimensional distributions. \\
+Practical use & Sufficient for spectral analysis and linear forecasting. & Stronger theoretical guarantees; rarely required in practice. \\
+Vulnerabilities & Can hide nonstationary higher moments or non‑Gaussian features. & More robust but harder to verify. \\
+\bottomrule
+\end{longtable}
+\end{center}
 
 ## Example Stationary Processes
 
@@ -478,10 +492,14 @@ $$
 
 ## Difference Stationary or Integrated Processes (Unit Root Processes)
 
-<!-- Julia simulation omitted; using pre-generated image -->
+```{julia}
+#| echo: false
+# Run the external Julia simulation (default reps = 2,000,000 in the script)
+include("simulate_ols_ar1_random_walk.jl")
+```
 
 ::: {#fig-ols fig-cap="OLS $\hat{\phi}$ distributions for stationary AR(1) and random walk processes"}
-![](properties_of_time_series_new_files/ols_estimator_distributions.pdf){width=90%}
+![](ols_estimator_distributions.png){width=90%}
 :::
 
 ```{r sim_summary, echo=FALSE, results='asis'}
@@ -525,16 +543,21 @@ if (file.exists("sim_run_1e6.log")) {
   library(knitr)
   # Use kableExtra for LaTeX/booktabs styling and scale table to fit page
   if (!requireNamespace("kableExtra", quietly = TRUE)) {
-    cat("\\nPackage 'kableExtra' not installed; printing basic table.\\n")
+    cat("\nPackage 'kableExtra' not installed; printing compact pandoc table.\n")
     names(df) <- c("Process","True $\\phi$", "Mean of $\\hat{\\phi}$", "Std of $\\hat{\\phi}$", "Bias of $\\hat{\\phi}$")
-    print(kable(df, caption = paste0("Monte Carlo summary (n=", sample_n, ", reps=", format(reps, big.mark=','), ", burn-in=", burnin, ")"), digits = 4, format = "pandoc", escape = FALSE))
+    # Use a compact pandoc table as a fallback (omit burn-in from caption)
+    print(knitr::kable(df, caption = paste0("Monte Carlo summary (n=", sample_n, ", reps=", format(reps, big.mark=','), ")"), digits = 4, format = "pandoc", escape = FALSE))
   } else {
-    library(kableExtra)
     col_names <- c("Process", "$\\phi$", "Mean of $\\hat{\\phi}$", "Std of $\\hat{\\phi}$", "Bias of $\\hat{\\phi}$")
-    tbl <- knitr::kable(df, format = "latex", booktabs = TRUE, digits = 4,
-                 caption = paste0("Monte Carlo summary (n=", sample_n, ", reps=", format(reps, big.mark=','), ", burn-in=", burnin, ")"),
-                 align = c("l","r","r","r","r"), col.names = col_names, escape = FALSE)
-    tbl <- kable_styling(tbl, latex_options = c("hold_position", "scale_down"))
+    # Use a plain LaTeX caption (avoid Quarto-style '#'-label which breaks LaTeX when
+    # emitting raw LaTeX). If you need a Quarto crossref, switch to a pandoc table.
+    # Omit burn-in from LaTeX caption to keep caption concise
+    caption_text <- paste0("Monte Carlo summary (n=", sample_n, ", reps=", format(reps, big.mark=','), ")")
+    # Produce a LaTeX longtable and scale down to fit the page to avoid distortion
+    tbl <- knitr::kable(df, format = "latex", booktabs = TRUE, longtable = TRUE, digits = 4,
+           caption = caption_text,
+           align = c("l","r","r","r","r"), col.names = col_names, escape = FALSE)
+    tbl <- kableExtra::kable_styling(tbl, latex_options = c("hold_position", "scale_down"), font_size = 8)
     cat(tbl)
   }
 } else {
