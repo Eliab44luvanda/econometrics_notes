@@ -5,6 +5,9 @@ author: "**Eliab Luvanda**"
 date: today
 lang: en
 bibliography: references.bib
+nocite:
+  - '@granger1974spurious'
+  - '@phillips1986understanding'
 abstract: |
   This handout reviews properties of stationary and integrated time
   series, covering definitions, examples, and visual illustrations. It
@@ -35,6 +38,8 @@ execute:
   echo: false
   warning: false
   message: false
+  cache: true
+  freeze: auto
 
 
 geometry:
@@ -311,7 +316,7 @@ $ (X_{t_1}, X_{t_2}, \ldots, X_{t_n}) \overset{d}{=} (X_{t_1+h}, X_{t_2+h}, \ldo
 where $ \overset{d}{=} $ denotes equality in distribution.
 \end{definition}
 
-Strong (or strict) stationarity denotes the property whereby the complete probabilistic structure of a stochastic process remains invariant under temporal translation. That is, not only the mean or variance, but the entire joint distribution of any finite collection of time-indexed random variables remains unchanged under any shift of the time index. Intuitively, if one were to extract numerous short segments of the series—such as triplets or longer contiguous subsequences—and randomly permute their temporal order, it would be impossible to determine whether a given segment originated earlier or later in time. This is because all configurations of values, along with their associated probability distributions, remain invariant under temporal translation. This constitutes a highly stringent requirement: it precludes not only the presence of trends and temporal variation in variability, but also any modification in the distributional form or dependence structure of the data. Consequently, the data-generating process is, in a fundamental sense, temporally invariant.
+Strong (or strict) stationarity denotes the property whereby the complete probabilistic structure of a stochastic process remains invariant under temporal translation. That is, not only the mean or variance, but the entire joint distribution of any finite collection of time-indexed random variables remains the same under time shifts. Intuitively, if one were to extract numerous short segments of the series—such as triplets or longer contiguous subsequences—and randomly permute their temporal order, it would be impossible to determine whether a given segment originated earlier or later in time. This is because all configurations of values, along with their associated probability distributions, remain invariant under temporal translation. This constitutes a highly stringent requirement: it precludes not only the presence of trends and temporal variation in variability, but also any modification in the distributional form or dependence structure of the data. Consequently, the data-generating process is, in a fundamental sense, temporally invariant.
 
 **Key Points**
 
@@ -497,6 +502,7 @@ $$
 #| include: false
 #| message: false
 #| warning: false
+#| cache: true
 # Run the external Julia simulation (default reps = 2,000,000 in the script)
 include("simulate_ols_ar1_random_walk.jl")
 ```
@@ -570,96 +576,198 @@ if (file.exists("sim_run_1e6.log")) {
 
 # Spurious Regression
 
-Below we run a Monte Carlo simulation in Julia to illustrate spurious
-regression when two independent random walks are regressed on one
-another. We simulate two independent random walks `y_t` and `x_t` for
-sample sizes N = 50, 100, 500, 1,000, 10,000, 100,000 and 500,000 with R = 1,000 replications.
-The Julia chunk saves the simulated slope estimates and p-values to a
-CSV file; the following R chunk reads the results, tabulates the
-percentage of significant t-statistics at the 5% level, and plots the
-densities of the OLS slope estimates using `ggplot2` with a classic
-theme arranged in a 2x2 facet grid.
+A fundamental problem in time-series econometrics arises when nonstationary series are regressed on one another. Even when the underlying stochastic processes are independent, ordinary least squares (OLS) estimation may produce statistically significant relationships. This phenomenon is known as **spurious regression**, first documented by Granger and Newbold (1974) and later formalized by Phillips (1986).
+
+In this section, we combine theory and Monte Carlo simulation to illustrate both the mechanism and the consequences of spurious regression.
+
+---
+
+## Theoretical Framework
+
+
+$$
+X_t = X_{t-1} + u_t, \qquad
+Y_t = Y_{t-1} + v_t,
+$$
+
+where $u_t$ and $v_t$ are independent white-noise processes with zero mean and finite variance.
+
+We estimate the regression:
+
+$$
+Y_t = \alpha + \beta X_t + e_t.
+$$
+
+Since $X_t$ and $Y_t$ are independent, the true relationship is null. However, OLS estimation produces nonstandard behavior.
+
+---
+
+### Brownian Motion Representation
+
+Define the partial-sum processes:
+
+$$
+\frac{1}{\sqrt{T}} X_{\lfloor Tr \rfloor} \Rightarrow W_1(r),
+\qquad
+\frac{1}{\sqrt{T}} Y_{\lfloor Tr \rfloor} \Rightarrow W_2(r),
+$$
+
+where \(W_1(r)\) and \(W_2(r)\) are independent Brownian motions on \([0,1]\).
+
+---
+
+### Limit Distribution of the OLS Estimator
+
+\begin{theorem}[Phillips (1986)]
+In the regression of one independent random walk on another, the OLS estimator satisfies
+$$
+\hat{\beta}
+\;\Rightarrow\;
+\frac{\int_0^1 W_1(r) W_2(r)\,dr}
+     {\int_0^1 W_1(r)^2\,dr}.
+$$
+\end{theorem}
+
+
+\begin{remark}
+This limiting distribution is non-normal and depends on functionals of Brownian motion. Importantly, \(\hat{\beta}\) itself converges to a nondegenerate distribution—no additional scaling is required.
+\end{remark}
+
+---
+
+### Divergence of the t-Statistic
+
+\begin{proposition}
+The conventional t-statistic for testing $(H_0:\beta=0$ diverges as $T \to \infty$, leading to spurious statistical significance.
+\end{proposition}
+
+This explains why standard inference fails in regressions involving nonstationary variables.
+
+---
 
 ```{julia}
 #| echo: false
 #| include: false
-using Random, Distributions, LinearAlgebra, CSV, DataFrames, Statistics
+#| cache: true
+using Random, Distributions, CSV, DataFrames, Statistics
 
-Random.seed!(2026)
-Ns = [50, 100, 500, 1000, 10000, 100000, 500000]
-R = 1000
+outfile = "spurious_rw_sim_results.csv"
+run_sim = get(ENV, "RUN_SPURIOUS_SIM", "0") == "1"
 
-results = DataFrame(N = Int[], rep = Int[], beta = Float64[], tstat = Float64[], pval = Float64[])
+if !run_sim && isfile(outfile)
+    @info "Skipping simulation. Using existing file: $outfile"
+else
+    Random.seed!(2026)
+    Ns = [50, 100, 500, 1000, 10000, 100000, 500000]
+    R = 1000
 
-for N in Ns
-    for r in 1:R
-        ε = randn(N)
-        η = randn(N)
-        x = cumsum(ε)
-        y = cumsum(η)
-        X = hcat(ones(N), x)
-        # OLS coefficients via QR/linear solve
-        b = X \ y
-        yhat = X * b
-        resid = y - yhat
-        s2 = sum(resid .^ 2) / (N - 2)
-        covb = s2 * inv(transpose(X) * X)
-        se_beta = sqrt(covb[2,2])
-        t = b[2] / se_beta
-        p = 2 * (1 - cdf(TDist(N - 2), abs(t)))
-        push!(results, (N, r, b[2], t, p))
+    results_list = Vector{DataFrame}(undef, length(Ns))
+
+    for (i, N) in pairs(Ns)
+        beta_vec = Vector{Float64}(undef, R)
+        t_vec = Vector{Union{Missing, Float64}}(missing, R)
+        p_vec = Vector{Union{Missing, Float64}}(missing, R)
+
+        compute_inference = N <= 10_000
+
+        Threads.@threads for r in 1:R
+            rng = MersenneTwister(1_000_000 * i + r)
+
+            x = 0.0
+            y = 0.0
+            sum_x = 0.0
+            sum_y = 0.0
+            sum_x2 = 0.0
+            sum_y2 = 0.0
+            sum_xy = 0.0
+
+            for _ in 1:N
+                x += randn(rng)
+                y += randn(rng)
+
+                sum_x += x
+                sum_y += y
+                sum_x2 += x * x
+                sum_y2 += y * y
+                sum_xy += x * y
+            end
+
+            xbar = sum_x / N
+            ybar = sum_y / N
+
+            sxx = sum_x2 - N * xbar^2
+            sxy = sum_xy - N * xbar * ybar
+
+            beta_hat = sxy / sxx
+            beta_vec[r] = beta_hat
+
+            if compute_inference
+                alpha_hat = ybar - beta_hat * xbar
+                ssr = sum_y2 - 2 * alpha_hat * sum_y - 2 * beta_hat * sum_xy +
+                    N * alpha_hat^2 + 2 * alpha_hat * beta_hat * sum_x + beta_hat^2 * sum_x2
+
+                s2 = ssr / (N - 2)
+                se_beta = sqrt(s2 / sxx)
+                t = beta_hat / se_beta
+                p = 2 * (1 - cdf(TDist(N - 2), abs(t)))
+
+                t_vec[r] = t
+                p_vec[r] = p
+            end
+        end
+
+        results_list[i] = DataFrame(
+            N = fill(N, R),
+            rep = collect(1:R),
+            beta = beta_vec,
+            tstat = t_vec,
+            pval = p_vec
+        )
     end
-    # progress messages suppressed to avoid cluttering rendered output
-end
 
-CSV.write("spurious_rw_sim_results.csv", results)
+    results = vcat(results_list...)
+    CSV.write(outfile, results)
+end
+```
+```{r spurious-table-plot}
+#| echo: false
+#| warning: false
+#| message: false
+library(readr)
+library(dplyr)
+library(knitr)
+
+sim <- read_csv("spurious_rw_sim_results.csv", show_col_types = FALSE)
+
+tbl <- sim |>
+  mutate(significant = if_else(!is.na(pval) & pval < 0.05, 1, 0)) |>
+  summarize(PercentSignificant = 100 * mean(significant), .by = N) |>
+  arrange(N)
+
+kable(tbl, digits = 2, caption = "Spurious regression rejection frequencies by sample size")
 ```
 
-```{r spurious-table-plot, echo=FALSE, results='asis', message=FALSE, warning=FALSE, fig.width=8, fig.height=6}
-# Read simulation results and produce table + plot
+```{r spurious-density-plot, fig.cap="Densities of $N\\hat{\\beta}$ across sample sizes", fig.width=8, fig.height=5}
+#| echo: false
+#| warning: false
+#| message: false
 library(readr)
 library(dplyr)
 library(ggplot2)
-library(knitr)
-library(kableExtra)
 
-res <- read_csv("spurious_rw_sim_results.csv", show_col_types = FALSE)
+sim <- read_csv("spurious_rw_sim_results.csv", show_col_types = FALSE)
 
-# Percentage of reps with two-sided t-test significant at 5%
-summary_tbl <- res %>%
-  group_by(N) %>%
-  summarize(PercentSignificant = mean(pval < 0.05) * 100,
-            MeanBeta = mean(beta),
-            SDBeta = sd(beta),
-            .groups = 'drop') %>%
-  arrange(N)
-
-# Render a compact pandoc table (avoid raw LaTeX/kableExtra which can
-# distort layout in PDF). This produces a portable markdown table that
-# Quarto/pandoc converts cleanly to LaTeX.
-## Keep only N and PercentSignificant and produce a publication-quality LaTeX table
-df_out <- summary_tbl %>%
-  select(N, PercentSignificant) %>%
+plot_df <- sim |>
+  filter(N %in% c(50, 500, 10000, 500000)) |>
   mutate(
-    N = format(N, scientific = FALSE, trim = TRUE),
-    PercentSignificant = round(PercentSignificant, 2)
+    N_beta_hat = N * beta,
+    N_f = factor(N, levels = c(50, 500, 10000, 500000))
   )
 
-# Produce a LaTeX booktabs table centered and scaled for publication
-tbl_body <- kable(df_out,
-                  format = "latex",
-                  booktabs = TRUE,
-                  digits = 2,
-                  col.names = c("Sample size (N)", "Percent Significant"),
-                  caption = NULL)
-
-## Emit a pandoc caption line followed by a pandoc table so Quarto/pandoc
-## will convert the caption correctly to LaTeX. Using pandoc-format
-## table here preserves the existing table layout while ensuring the
-## caption appears in the PDF.
-cat("Table: Percentage of significant t-tests (two-sided, 5% level) by sample size
-
-")
-print(kable(df_out, format = "pandoc", digits = 2, col.names = c("Sample size (N)", "Percent Significant")))
+ggplot(plot_df, aes(x = N_beta_hat)) +
+  geom_density(fill = "steelblue", alpha = 0.35, color = "steelblue4", linewidth = 0.4) +
+  facet_wrap(~N_f, nrow = 2, ncol = 2, scales = "free") +
+  labs(x = expression(N * hat(beta)), y = "Density") +
+  theme_classic()
 ```
 

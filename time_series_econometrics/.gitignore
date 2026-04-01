@@ -32,3 +32,5 @@ __pycache__/
 
 /.quarto/
 **/*.quarto_ipynb
+_freeze/
+spurious_rw_sim_results.csv
