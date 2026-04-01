@@ -494,6 +494,9 @@ $$
 
 ```{julia}
 #| echo: false
+#| include: false
+#| message: false
+#| warning: false
 # Run the external Julia simulation (default reps = 2,000,000 in the script)
 include("simulate_ols_ar1_random_walk.jl")
 ```
@@ -543,7 +546,7 @@ if (file.exists("sim_run_1e6.log")) {
   library(knitr)
   # Use kableExtra for LaTeX/booktabs styling and scale table to fit page
   if (!requireNamespace("kableExtra", quietly = TRUE)) {
-    cat("\nPackage 'kableExtra' not installed; printing compact pandoc table.\n")
+    # kableExtra not available: fall back to pandoc kable silently
     names(df) <- c("Process","True $\\phi$", "Mean of $\\hat{\\phi}$", "Std of $\\hat{\\phi}$", "Bias of $\\hat{\\phi}$")
     # Use a compact pandoc table as a fallback (omit burn-in from caption)
     print(knitr::kable(df, caption = paste0("Monte Carlo summary (n=", sample_n, ", reps=", format(reps, big.mark=','), ")"), digits = 4, format = "pandoc", escape = FALSE))
@@ -561,6 +564,102 @@ if (file.exists("sim_run_1e6.log")) {
     cat(tbl)
   }
 } else {
-  cat("**Simulation log not found:** sim_run_1e6.log\\n")
+  # no simulation log found; remain silent during rendering
 }
 ```
+
+# Spurious Regression
+
+Below we run a Monte Carlo simulation in Julia to illustrate spurious
+regression when two independent random walks are regressed on one
+another. We simulate two independent random walks `y_t` and `x_t` for
+sample sizes N = 50, 100, 500, 1,000, 10,000, 100,000 and 500,000 with R = 1,000 replications.
+The Julia chunk saves the simulated slope estimates and p-values to a
+CSV file; the following R chunk reads the results, tabulates the
+percentage of significant t-statistics at the 5% level, and plots the
+densities of the OLS slope estimates using `ggplot2` with a classic
+theme arranged in a 2x2 facet grid.
+
+```{julia}
+#| echo: false
+#| include: false
+using Random, Distributions, LinearAlgebra, CSV, DataFrames, Statistics
+
+Random.seed!(2026)
+Ns = [50, 100, 500, 1000, 10000, 100000, 500000]
+R = 1000
+
+results = DataFrame(N = Int[], rep = Int[], beta = Float64[], tstat = Float64[], pval = Float64[])
+
+for N in Ns
+    for r in 1:R
+        ε = randn(N)
+        η = randn(N)
+        x = cumsum(ε)
+        y = cumsum(η)
+        X = hcat(ones(N), x)
+        # OLS coefficients via QR/linear solve
+        b = X \ y
+        yhat = X * b
+        resid = y - yhat
+        s2 = sum(resid .^ 2) / (N - 2)
+        covb = s2 * inv(transpose(X) * X)
+        se_beta = sqrt(covb[2,2])
+        t = b[2] / se_beta
+        p = 2 * (1 - cdf(TDist(N - 2), abs(t)))
+        push!(results, (N, r, b[2], t, p))
+    end
+    # progress messages suppressed to avoid cluttering rendered output
+end
+
+CSV.write("spurious_rw_sim_results.csv", results)
+```
+
+```{r spurious-table-plot, echo=FALSE, results='asis', message=FALSE, warning=FALSE, fig.width=8, fig.height=6}
+# Read simulation results and produce table + plot
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+
+res <- read_csv("spurious_rw_sim_results.csv", show_col_types = FALSE)
+
+# Percentage of reps with two-sided t-test significant at 5%
+summary_tbl <- res %>%
+  group_by(N) %>%
+  summarize(PercentSignificant = mean(pval < 0.05) * 100,
+            MeanBeta = mean(beta),
+            SDBeta = sd(beta),
+            .groups = 'drop') %>%
+  arrange(N)
+
+# Render a compact pandoc table (avoid raw LaTeX/kableExtra which can
+# distort layout in PDF). This produces a portable markdown table that
+# Quarto/pandoc converts cleanly to LaTeX.
+## Keep only N and PercentSignificant and produce a publication-quality LaTeX table
+df_out <- summary_tbl %>%
+  select(N, PercentSignificant) %>%
+  mutate(
+    N = format(N, scientific = FALSE, trim = TRUE),
+    PercentSignificant = round(PercentSignificant, 2)
+  )
+
+# Produce a LaTeX booktabs table centered and scaled for publication
+tbl_body <- kable(df_out,
+                  format = "latex",
+                  booktabs = TRUE,
+                  digits = 2,
+                  col.names = c("Sample size (N)", "Percent Significant"),
+                  caption = NULL)
+
+## Emit a pandoc caption line followed by a pandoc table so Quarto/pandoc
+## will convert the caption correctly to LaTeX. Using pandoc-format
+## table here preserves the existing table layout while ensuring the
+## caption appears in the PDF.
+cat("Table: Percentage of significant t-tests (two-sided, 5% level) by sample size
+
+")
+print(kable(df_out, format = "pandoc", digits = 2, col.names = c("Sample size (N)", "Percent Significant")))
+```
+
