@@ -661,7 +661,7 @@ $$
 The design uses:
 
 - Sample sizes: $N = 50, 100, 500, 1000, 10{,}000, 100{,}000, 500{,}000$
-- Replications: $R = 10{,}000$
+- Replications: $R = 20{,}000$
 
 The Julia code above generates the simulation results, which are then analyzed in R.
 
@@ -748,7 +748,7 @@ if !run_sim && isfile(outfile)
 else
     Random.seed!(2026)
     Ns = [50, 100, 500, 1000, 10000, 100000, 500000]
-    R = 10000
+    R = 20000
 
     results_list = Vector{DataFrame}(undef, length(Ns))
 
@@ -930,7 +930,7 @@ if !run_sim && isfile(outfile)
 else
     Random.seed!(2026)
     Ns = [50, 100, 500, 1000, 10000, 100000, 500000]
-    R = 10000
+    R = 20000
     # ... full simulation code as above ...
 end
 ```
