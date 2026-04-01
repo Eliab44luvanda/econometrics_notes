@@ -33,9 +33,13 @@ format:
     number-sections: true
     colorlinks: true
     lof: true
+    lot: true
+
+code-fold: true
+code-summary: "Show code"
 
 execute:
-  echo: false
+  echo: true
   warning: false
   message: false
   cache: true
@@ -57,6 +61,9 @@ header-includes:
   - \usepackage{graphicx}
   - \usepackage{setspace}
   - \onehalfspacing
+  - \usepackage{fvextra}
+  - |
+    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere=true,commandchars=\\\{\}}
   - |
     \theoremstyle{plain}
     \newtheorem{theorem}{Theorem}[section]
@@ -186,7 +193,7 @@ ggplot(df_paths, aes(x = Time, y = Value, color = Omega, group = Omega)) +
 
 A stochastic process formalizes "random evolution over time": given a probability space $(\Omega,\mathcal{F},\mathbb{P})$, the process assigns a random variable to each time point and, for a fixed outcome $\omega$, a deterministic sample path. Figure 1 illustrates multiple sample paths (realizations) of a simple random walk. Each trajectory corresponds to a distinct realization. The figure depicts the temporal evolution of the process values across these realizations. It exemplifies the intrinsic randomness and variability that are fundamental characteristics of stochastic processes.
 
-```{r}
+```{r ar1_sim}
 #| echo: false
 #| include: false
 #| warning: false
@@ -254,7 +261,7 @@ Let $\{X_t : t \in T\}$ be a stochastic process with finite second moments. The 
 Equivalently, weak stationarity implies that $\mathrm{Var}(X_t)=\gamma(0)$ is constant over time. Many linear time-series models with finite variance (for example, ARMA models with appropriate coefficients) are weakly stationary. Weak stationarity is the common assumption used in spectral analysis, autocorrelation estimation, and linear forecasting methods.
 
 
-Weak (or covariance) stationarity refers to a property of a time series whereby, notwithstanding its apparent randomness, its fundamental second-order characteristics remain invariant over time. Specifically, the mean of the series is constant, and the covariance between any two observations depends solely on the temporal distance (lag) separating them rather than on their specific positions in time. Intuitively, if one were to apply a fixed-length moving window across the series and compute summary statistics such as the mean, variance, and autocovariances at various lags (e.g., 1, 2, or 3), these measures would remain stable and exhibit no systematic drift as the window progresses along the time axis. The series does not exhibit systematic increases in level, heightened volatility, or alterations in its correlation structure over calendar time; rather, it persistently replicates an identical variance–covariance configuration. This condition constitutes a less stringent requirement than full (strong) stationarity, as it disregards the complete distributional form and instead concentrates exclusively on the first and second moments. Such a focus is frequently sufficient for linear modeling frameworks and for a wide range of practical time-series methodologies.
+Weak (or covariance) stationarity refers to a property of a time series whereby, notwithstanding its apparent randomness, its fundamental second-order characteristics remain invariant over time. Specifically, the mean of the series is constant, and the covariance between any two observations depends solely on the temporal distance (lag) separating them rather than on their specific positions in time. Intuitively, if one were to apply a fixed-length moving window across the series and compute summary statistics such as the mean, variance, and autocorrelations at various lags (e.g., 1, 2, or 3), these measures would remain stable and exhibit no systematic drift as the window progresses along the time axis. The series does not exhibit systematic increases in level, heightened volatility, or alterations in its correlation structure over calendar time; rather, it persistently replicates an identical variance–covariance configuration. This condition constitutes a less stringent requirement than full (strong) stationarity, as it disregards the complete distributional form and instead concentrates exclusively on the first and second moments. Such a focus is frequently sufficient for linear modeling frameworks and for a wide range of practical time-series methodologies.
 
 
 The figure below illustrates a simulated weakly stationary AR(1) process, which is a common example of a stationary time series. The plot demonstrates the constancy of the mean (indicated by the red dashed line) and the stable variance over time, visually confirming the properties of weak stationarity.
@@ -262,9 +269,8 @@ The figure below illustrates a simulated weakly stationary AR(1) process, which 
 - Constancy of mean
 - Stable variance
 
-```{r, fig.cap="Simulated stationary AR(1) process (mean dashed)", fig.width=5, fig.height=3}
+```{r ar1_plot, echo=FALSE, fig.cap="Simulated stationary AR(1) process (mean dashed)", fig.width=5, fig.height=3}
 # Simulate a stationary AR(1) process
-#| echo: false
 set.seed(123)
 n <- 500
 phi <- 0.8
@@ -644,6 +650,89 @@ The conventional t-statistic for testing $(H_0:\beta=0$ diverges as $T \to \inft
 This explains why standard inference fails in regressions involving nonstationary variables.
 
 ---
+## Monte Carlo Simulation
+
+We simulate two independent random walks and estimate the regression:
+
+$$
+Y_t = \alpha + \beta X_t + e_t.
+$$
+
+The design uses:
+
+- Sample sizes: $N = 50, 100, 500, 1000, 10{,}000, 100{,}000, 500{,}000$
+- Replications: $R = 10{,}000$
+
+The Julia code above generates the simulation results, which are then analyzed in R.
+
+## Empirical Findings
+
+### Increasing False Significance
+
+The table below shows the percentage of simulations where the null hypothesis of no relationship is rejected at the 5% significance level. As sample size increases, the percentage of significant results approaches 100%, illustrating the spurious regression phenomenon.
+
+```{r spurious-table-plot}
+#| echo: false
+#| warning: false
+#| message: false
+library(readr)
+library(dplyr)
+library(knitr)
+
+sim <- read_csv("spurious_rw_sim_results.csv", show_col_types = FALSE)
+
+tbl <- sim |>
+  mutate(significant = if_else(!is.na(pval) & pval < 0.05, 1, 0)) |>
+  summarize(PercentSignificant = 100 * mean(significant), .by = N) |>
+  arrange(N) |>
+  mutate(
+    N = format(N, big.mark = ",", scientific = FALSE, trim = TRUE),
+    PercentSignificant = sprintf("%.1f", PercentSignificant)
+  )
+
+kable(
+  tbl,
+  caption = "Spurious regression rejection frequencies by sample size",
+  col.names = c("N", "Percent Significant"),
+  align = c("l", "r")
+)
+```
+
+### Distribution of the OLS Estimator
+
+After examining the rejection frequencies, we can also look at the distribution of the OLS estimator $\hat{\beta}$ across simulations. The figure below shows the density of $\hat{\beta}$ for different sample sizes.The distribution is for the unscaled OLS estimator $\hat{\beta}$. 
+
+```{r unscaled-density-plot, fig.cap="Densities of $\\hat{\\beta}$ (unscaled) across sample sizes", fig.width=8, fig.height=5}
+#| echo: false
+#| warning: false
+#| message: false
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+sim <- read_csv("spurious_rw_unscaled_sim.csv", show_col_types = FALSE)
+
+plot_df <- sim |>
+  filter(N %in% c(50, 500, 10000, 500000)) |>
+  mutate(
+    N_f = factor(N,
+                levels = c(50, 500, 10000, 500000),
+                labels = format(c(50, 500, 10000, 500000), big.mark = ",", scientific = FALSE, trim = TRUE)
+    )
+  )
+
+ggplot(plot_df, aes(x = beta)) +
+  geom_density(fill = "steelblue", alpha = 0.35, color = "steelblue4", linewidth = 0.4) +
+  facet_wrap(~N_f, nrow = 2, ncol = 2, scales = "free") +
+  labs(x = expression(hat(beta)), y = "Density") +
+  theme_classic()
+```
+
+
+The simulation shows that the distribution of $\hat{\beta}$ appears approximately normal. This is a **finite-sample illusion**. The true asymptotic distribution is non-normal, but finite samples can produce visually symmetric, bell-shaped histograms. The illusion of normality can be misleading, especially when standard inference is applied without recognizing the non-standard asymptotic behavior.
+
+
+
 
 ```{julia}
 #| echo: false
@@ -659,7 +748,7 @@ if !run_sim && isfile(outfile)
 else
     Random.seed!(2026)
     Ns = [50, 100, 500, 1000, 10000, 100000, 500000]
-    R = 1000
+    R = 10000
 
     results_list = Vector{DataFrame}(undef, length(Ns))
 
@@ -729,23 +818,11 @@ else
     CSV.write(outfile, results)
 end
 ```
-```{r spurious-table-plot}
-#| echo: false
-#| warning: false
-#| message: false
-library(readr)
-library(dplyr)
-library(knitr)
 
-sim <- read_csv("spurious_rw_sim_results.csv", show_col_types = FALSE)
 
-tbl <- sim |>
-  mutate(significant = if_else(!is.na(pval) & pval < 0.05, 1, 0)) |>
-  summarize(PercentSignificant = 100 * mean(significant), .by = N) |>
-  arrange(N)
 
-kable(tbl, digits = 2, caption = "Spurious regression rejection frequencies by sample size")
-```
+
+
 
 ```{r spurious-density-plot, fig.cap="Densities of $N\\hat{\\beta}$ across sample sizes", fig.width=8, fig.height=5}
 #| echo: false
@@ -761,7 +838,11 @@ plot_df <- sim |>
   filter(N %in% c(50, 500, 10000, 500000)) |>
   mutate(
     N_beta_hat = N * beta,
-    N_f = factor(N, levels = c(50, 500, 10000, 500000))
+    N_f = factor(
+      N,
+      levels = c(50, 500, 10000, 500000),
+      labels = format(c(50, 500, 10000, 500000), big.mark = ",", scientific = FALSE, trim = TRUE)
+    )
   )
 
 ggplot(plot_df, aes(x = N_beta_hat)) +
@@ -769,5 +850,88 @@ ggplot(plot_df, aes(x = N_beta_hat)) +
   facet_wrap(~N_f, nrow = 2, ncol = 2, scales = "free") +
   labs(x = expression(N * hat(beta)), y = "Density") +
   theme_classic()
+```
+
+### Scaled Estimator $N\hat{\beta}$
+
+The density plots above show the distribution of $N\hat{\beta}$. As sample size increases, the distribution becomes more dispersed and non-normal, consistent with the theoretical limit involving Brownian functionals. This illustrates the non-standard behavior of OLS estimators in spurious regressions.
+
+{{< pagebreak >}}
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
+
+{{< pagebreak >}}
+
+# Appendix {.unnumbered}
+
+## Random Walk Sample Paths {.unnumbered}
+
+```{r, ref.label='rw_paths', echo=TRUE, eval=FALSE}
+```
+
+## AR(1) Time Series Simulation {.unnumbered}
+
+```{r, ref.label='ar1_sim', echo=TRUE, eval=FALSE}
+```
+
+## Stationary AR(1) Process Plot {.unnumbered}
+
+```{r, ref.label='ar1_plot', echo=TRUE, eval=FALSE}
+```
+
+## Gaussian White Noise {.unnumbered}
+
+```{r, ref.label='white_noise', echo=TRUE, eval=FALSE}
+```
+
+## OLS Simulation Summary Table {.unnumbered}
+
+```{r, ref.label='sim_summary', echo=TRUE, eval=FALSE}
+```
+
+## Spurious Regression Table {.unnumbered}
+
+```{r, ref.label='spurious-table-plot', echo=TRUE, eval=FALSE}
+```
+
+## Unscaled OLS Estimator Density {.unnumbered}
+
+```{r, ref.label='unscaled-density-plot', echo=TRUE, eval=FALSE}
+```
+
+## Scaled Estimator Density {.unnumbered}
+
+```{r, ref.label='spurious-density-plot', echo=TRUE, eval=FALSE}
+```
+
+## Julia Simulation: OLS AR(1) vs Random Walk {.unnumbered}
+
+```{julia}
+#| echo: true
+#| eval: false
+include("simulate_ols_ar1_random_walk.jl")
+```
+
+## Julia Simulation: Spurious Regression {.unnumbered}
+
+```{julia}
+#| echo: true
+#| eval: false
+using Random, Distributions, CSV, DataFrames, Statistics
+
+outfile = "spurious_rw_sim_results.csv"
+run_sim = get(ENV, "RUN_SPURIOUS_SIM", "0") == "1"
+
+if !run_sim && isfile(outfile)
+    @info "Skipping simulation. Using existing file: $outfile"
+else
+    Random.seed!(2026)
+    Ns = [50, 100, 500, 1000, 10000, 100000, 500000]
+    R = 10000
+    # ... full simulation code as above ...
+end
 ```
 
