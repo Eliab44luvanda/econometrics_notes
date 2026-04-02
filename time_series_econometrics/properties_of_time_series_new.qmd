@@ -193,61 +193,7 @@ ggplot(df_paths, aes(x = Time, y = Value, color = Omega, group = Omega)) +
 
 A stochastic process formalizes "random evolution over time": given a probability space $(\Omega,\mathcal{F},\mathbb{P})$, the process assigns a random variable to each time point and, for a fixed outcome $\omega$, a deterministic sample path. Figure 1 illustrates multiple sample paths (realizations) of a simple random walk. Each trajectory corresponds to a distinct realization. The figure depicts the temporal evolution of the process values across these realizations. It exemplifies the intrinsic randomness and variability that are fundamental characteristics of stochastic processes.
 
-```{r ar1_sim}
-#| echo: false
-#| include: false
-#| warning: false
-#| message: false
-#| caption: "Simulated Stationary Time Series"
-#| fig.cap: "A simulated stationary time series"
-#| fig.width: 4
-#| fig.height: 3
-library(ggplot2)
-set.seed(123)
-n <- 100
-library(ggpubr)  # Load ggpubr for theme_classic2
-
-# Function to generate a stationary time series
-# y_t = c + \phi *y_{t-1} + \epsilon_t
-ar1_time_series <- function(n, c, phi) {
-  # Generate white noise
-  epsilon <- rnorm(n, mean = 0, sd = 1)
-  
-  # Initialize the time series
-  y <- numeric(n)
-  y[1] <- c + epsilon[1]  # Initial value
-  
-  # Generate the time series
-  for (t in 2:n) {
-    y[t] <- c + phi * y[t - 1] + epsilon[t]
-  }  # Added missing closing brace
-  
-  return(y)
-}  # Fixed brace placement
-
-# Define n before using it
-n <- 200  # Add this line
-c <- 0.2  # Constant term
-phi <- 0.6  # Autoregressive coefficient
-
-# Generate an AR(1) time series
-data <- data.frame(
-  time = 1:n,
-  time_series = ar1_time_series(n, c, phi)
-)
-
-# Plot the time series using ggplot2
-ggplot(data, aes(x = time, y = time_series)) +
-  geom_line(color = "navy") +
-  labs(
-    x = "Time",
-    y = "Value"
-  ) +
-    theme_classic2() +
-    theme(text = element_text(family = "serif"),
-      plot.title = element_text(hjust = 0.5))
-
-```
+ 
 
 # Weak Stationarity
 
@@ -303,6 +249,54 @@ ggplot(data.frame(Time = 1:n, Value = x), aes(Time, Value)) +
   ) +
   scale_x_continuous(breaks = seq(0, n, by = 50)) +
   scale_y_continuous(breaks = scales::pretty_breaks(n = 8))
+```
+
+```{r ar1_sim}
+#| echo: false
+#| include: false
+#| warning: false
+#| message: false
+#| caption: "Simulated Stationary Time Series"
+#| fig.cap: "A simulated stationary time series"
+#| fig.width: 4
+#| fig.height: 3
+library(ggplot2)
+set.seed(123)
+n <- 100
+library(ggpubr)  # Load ggpubr for theme_classic2
+
+# Function to generate a stationary time series
+# y_t = c + \phi *y_{t-1} + \epsilon_t
+ar1_time_series <- function(n, c, phi) {
+  # Generate white noise
+  epsilon <- rnorm(n, mean = 0, sd = 1)
+  
+  # Initialize the time series
+  y <- numeric(n)
+  y[1] <- c + epsilon[1]  # Initial value
+  
+  # Generate the time series
+  for (t in 2:n) {
+    y[t] <- c + phi * y[t - 1] + epsilon[t]
+  }
+  
+  return(y)
+}
+
+# Define n and parameters
+n <- 200
+c <- 0.2
+phi <- 0.6
+
+# Generate an AR(1) time series and plot
+data <- data.frame(time = 1:n, time_series = ar1_time_series(n, c, phi))
+
+ggplot(data, aes(x = time, y = time_series)) +
+  geom_line(color = "navy") +
+  labs(x = "Time", y = "Value") +
+  theme_classic2() +
+  theme(text = element_text(family = "serif"), plot.title = element_text(hjust = 0.5))
+
 ```
 
 The figure shows a simulated AR(1) series with coefficient $\phi = 0.8$ and unconditional mean approximately $\mu=5$. The dashed red horizontal line marks the sample mean, and the dotted green lines mark the bands at approximately $\pm2$ sample standard deviations. Deviations from the mean are persistent but mean‑reverting (due to $\phi<1$), and the overall variance remains roughly constant over time — together these features visually illustrate weak (second‑order) stationarity: a constant mean and a covariance structure that does not drift over time.

@@ -6,3 +6,10 @@ ggpubr
 knitr
 readr
 dplyr
+tidyverse
+tibble
+tidyr
+purrr
+stringr
+forcats
+lubridate
