@@ -5,9 +5,7 @@ author: "**Eliab Luvanda**"
 date: today
 lang: en
 bibliography: references.bib
-nocite:
-  - '@granger1974spurious'
-  - '@phillips1986understanding'
+nocite: '@*'
 abstract: |
   This handout reviews properties of stationary and integrated time
   series, covering definitions, examples, and visual illustrations. It
