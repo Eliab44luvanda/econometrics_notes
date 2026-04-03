@@ -494,9 +494,9 @@ Vulnerabilities & Can hide nonstationary higher moments or non‑Gaussian featur
 \end{longtable}
 \end{center}
 
-## Example Stationary Processes
+## Example Stationary Processes {.unnumbered}
 
-### White Noise Process
+### White Noise Process {.unnumbered}
 
 
 **Definition (White noise).** Let $(\Omega,\mathcal{F},\mathbb{P})$ be a probability space, and let $\{\varepsilon_t\}_{t\in\mathbb{Z}}$ be a real-valued stochastic process with finite second moments. The process is a white noise process with variance $\sigma^2$ if, for every $t,s\in\mathbb{Z}$,
@@ -530,7 +530,7 @@ In time-series analysis, the most cautious assumption is typically the second-or
 
 
 
-### Moving Average (MA) Processes
+### Moving Average (MA) Processes {.unnumbered}
 
 **Definition (MA(q) process)**. Let $(\Omega,\mathcal{F},\mathbb{P})$ be a probability space, and let $\{\varepsilon_t\}_{t\in\mathbb{Z}}$ be a white noise process with variance $\sigma^2$. A stochastic process $\{X_t\}_{t\in\mathbb{Z}}$ is a moving average process of order $q$ (MA($q$)) if it can be represented as 
 
@@ -577,6 +577,458 @@ $$
 ## Trend Stationary Processes
 
 ## Difference Stationary or Integrated Processes (Unit Root Processes)
+
+## OLS estimation of the autoregressive coefficient under a unit root
+
+Consider the AR(1) process
+$$
+X_t = \phi X_{t-1} + u_t, \qquad t = 1,2,\dots,T,
+$$
+where $\{u_t\}$ is a white-noise sequence with
+$$
+\mathbb{E}(u_t)=0, \qquad \mathrm{Var}(u_t)=\sigma^2,
+$$
+
+$$
+\mathbb{E}(u_t)=0, \qquad \mathrm{Var}(u_t)=\sigma^2,
+$$
+
+and suppose that $X_0$ is fixed, or for simplicity $X_0=0$.
+
+We are interested in the special case
+$$
+\phi = 1,
+$$
+so that the process becomes
+$$
+X_t = X_{t-1} + u_t.
+$$
+This is the random walk model, which is the canonical unit root process.
+
+## Step 1: Derive the OLS estimator of phi and its exact decomposition  {.unnumbered}
+
+Treating $X_t$ as the dependent variable and $X_{t-1}$ as the regressor, the OLS estimator solves
+$$
+\hat{\phi}
+=
+\arg\min_{\phi}\sum_{t=1}^T (X_t-\phi X_{t-1})^2.
+$$
+
+Define the sum of squared residuals:
+$$
+S(\phi)=\sum_{t=1}^T (X_t-\phi X_{t-1})^2.
+$$
+Differentiate with respect to $\phi$:
+$$
+\frac{\partial S(\phi)}{\partial \phi}
+=
+-2\sum_{t=1}^T X_{t-1}(X_t-\phi X_{t-1}).
+$$
+Setting the derivative equal to zero gives the normal equation:
+$$
+\sum_{t=1}^T X_{t-1}X_t
+=
+\hat{\phi}\sum_{t=1}^T X_{t-1}^2.
+$$
+Hence
+$$
+\hat{\phi}
+=
+\frac{\sum_{t=1}^T X_{t-1}X_t}{\sum_{t=1}^T X_{t-1}^2}.
+$$
+
+Using the model
+$$
+X_t=\phi X_{t-1}+u_t,
+$$
+we can write
+$$
+X_{t-1}X_t
+=
+X_{t-1}(\phi X_{t-1}+ u_t)
+=
+\phi X_{t-1}^2 + X_{t-1}u_t.
+$$
+Summing over $t$,
+$$
+\sum_{t=1}^T X_{t-1}X_t
+=
+\phi \sum_{t=1}^T X_{t-1}^2 + \sum_{t=1}^T X_{t-1}u_t.
+$$
+Substituting into the estimator gives
+$$
+\hat{\phi}
+=
+\phi
++
+\frac{\sum_{t=1}^T X_{t-1}u_t}{\sum_{t=1}^T X_{t-1}^2}.
+$$
+Therefore,
+$$
+\hat{\phi}-\phi
+=
+\frac{\sum_{t=1}^T X_{t-1}u_t}{\sum_{t=1}^T X_{t-1}^2}.
+$$
+
+This decomposition is exact. It is the starting point for the asymptotic analysis.
+
+## Step 2: Specialize to the unit root case (phi = 1) {.unnumbered}
+
+We now specialize to the unit root case $\phi=1$.
+
+When $\phi=1$, the process is
+$$
+X_t = X_{t-1}+u_t,
+$$
+so iterating backward yields
+$$
+X_t = X_0 + \sum_{s=1}^t u_s.
+$$
+If $X_0=0$, then
+$$
+X_t=\sum_{s=1}^t u_s.
+$$
+Thus $X_t$ is a partial sum process.
+
+Under $\phi=1$, the OLS estimator becomes
+$$
+\hat{\phi}-1
+=
+\frac{\sum_{t=1}^T X_{t-1}u_t}{\sum_{t=1}^T X_{t-1}^2}.
+$$
+The behavior of this ratio is very different from the stationary AR(1) case. In particular, the estimator converges at rate $T$, not at rate $\sqrt{T}$.
+
+To see why, note the orders of magnitude:
+$$
+X_t = O_p(\sqrt{T}),
+$$
+because it is a partial sum of mean-zero shocks. Hence
+$$
+X_{t-1}^2 = O_p(T),
+$$
+and therefore
+$$
+\sum_{t=1}^T X_{t-1}^2 = O_p(T^2).
+$$
+Similarly,
+$$
+\sum_{t=1}^T X_{t-1}u_t = O_p(T).
+$$
+So
+$$
+\hat{\phi}-1 = O_p(T^{-1}),
+$$
+which implies that the correct normalization is
+$$
+T(\hat{\phi}-1),
+$$
+not $\sqrt{T}(\hat{\phi}-1)$.
+
+## Step 3: Rewrite the numerator using an algebraic identity {.unnumbered}
+
+A very useful identity is obtained from
+$$
+X_t = X_{t-1}+u_t.
+$$
+Squaring both sides,
+$$
+X_t^2 = X_{t-1}^2 + 2X_{t-1}u_t + u_t^2.
+$$
+Rearranging,
+$$
+2X_{t-1}u_t = X_t^2 - X_{t-1}^2 - u_t^2.
+$$
+Summing from $t=1$ to $T$ gives
+$$
+2\sum_{t=1}^T X_{t-1}u_t
+=
+\sum_{t=1}^T (X_t^2 - X_{t-1}^2) - \sum_{t=1}^T u_t^2.
+$$
+The first sum telescopes:
+$$
+\sum_{t=1}^T (X_t^2 - X_{t-1}^2)
+=
+X_T^2 - X_0^2.
+$$
+Therefore,
+$$
+\sum_{t=1}^T X_{t-1}u_t
+=
+\frac{1}{2}\left(X_T^2 - X_0^2 - \sum_{t=1}^T u_t^2\right).
+$$
+If $X_0=0$, this reduces to
+$$
+\sum_{t=1}^T X_{t-1}u_t
+=
+\frac{1}{2}\left(X_T^2 - \sum_{t=1}^T u_t^2\right).
+$$
+
+Hence
+$$
+\hat{\phi}-1
+=
+\frac{\frac{1}{2}\left(X_T^2-\sum_{t=1}^T u_t^2\right)}
+{\sum_{t=1}^T X_{t-1}^2}.
+$$
+Multiplying by $T$,
+$$
+T(\hat{\phi}-1)
+=
+\frac{\frac{1}{2}\left(T^{-1}X_T^2 - T^{-1}\sum_{t=1}^T u_t^2\right)}
+{T^{-2}\sum_{t=1}^T X_{t-1}^2}.
+$$
+
+This formula already suggests the appropriate limits: $T^{-1}X_T^2$ and $T^{-1}\sum u_t^2$ are both $O_p(1)$, and so is $T^{-2}\sum X_{t-1}^2$.
+
+## Step 4: Functional central limit theorem representation {.unnumbered}
+
+Define the scaled partial sum process
+$$
+W_T(r)
+=
+\frac{1}{\sigma\sqrt{T}}X_{\lfloor Tr\rfloor},
+\qquad 0\le r\le 1.
+$$
+Since under the unit root
+$$
+X_{\lfloor Tr\rfloor}
+=
+\sum_{s=1}^{\lfloor Tr\rfloor} u_s,
+$$
+we may write
+$$
+W_T(r)
+=
+\frac{1}{\sigma\sqrt{T}}
+\sum_{s=1}^{\lfloor Tr\rfloor} u_s.
+$$
+Under standard assumptions on $\{u_t\}$, the functional central limit theorem implies
+$$
+W_T(\cdot)\Rightarrow W(\cdot)
+\quad \text{in } D[0,1],
+$$
+where $W(\cdot)$ is standard Brownian motion.
+
+This result is the key tool for obtaining the asymptotic distribution of the OLS estimator under a unit root.
+
+## Step 5: Limit of the denominator {.unnumbered}
+
+Consider
+$$
+T^{-2}\sum_{t=1}^T X_{t-1}^2.
+$$
+Using
+$$
+X_{t-1} = \sigma\sqrt{T}\,W_T\!\left(\frac{t-1}{T}\right),
+$$
+we have
+$$
+X_{t-1}^2 = \sigma^2 T\, W_T\!\left(\frac{t-1}{T}\right)^2.
+$$
+Therefore,
+$$
+T^{-2}\sum_{t=1}^T X_{t-1}^2
+=
+\sigma^2 \frac{1}{T}\sum_{t=1}^T
+W_T\!\left(\frac{t-1}{T}\right)^2.
+$$
+This is a Riemann sum, so by the continuous mapping theorem,
+$$
+T^{-2}\sum_{t=1}^T X_{t-1}^2
+\Rightarrow
+\sigma^2 \int_0^1 W(r)^2\,dr.
+$$
+
+## Step 6: Limit of the numerator {.unnumbered}
+
+We may proceed in two equivalent ways.
+
+**Method 1: Using the telescoping identity**
+
+Recall
+$$
+\sum_{t=1}^T X_{t-1}u_t
+=
+\frac{1}{2}\left(X_T^2-\sum_{t=1}^T u_t^2\right),
+$$
+when $X_0=0$. Divide by $T$:
+$$
+T^{-1}\sum_{t=1}^T X_{t-1}u_t
+=
+\frac{1}{2}\left(T^{-1}X_T^2 - T^{-1}\sum_{t=1}^T u_t^2\right).
+$$
+
+Now,
+$$
+T^{-1}X_T^2
+=
+\sigma^2 W_T(1)^2
+\Rightarrow
+\sigma^2 W(1)^2,
+$$
+and by the law of large numbers,
+$$
+T^{-1}\sum_{t=1}^T u_t^2 \xrightarrow{p} \sigma^2.
+$$
+Hence
+$$
+T^{-1}\sum_{t=1}^T X_{t-1}u_t
+\Rightarrow
+\frac{\sigma^2}{2}\bigl(W(1)^2-1\bigr).
+$$
+
+**Method 2: Using a stochastic integral**
+
+Write
+$$
+T^{-1}\sum_{t=1}^T X_{t-1}u_t
+=
+\sigma^2
+\sum_{t=1}^T
+W_T\!\left(\frac{t-1}{T}\right)
+\Bigl(W_T\!\left(\frac{t}{T}\right)-W_T\!\left(\frac{t-1}{T}\right)\Bigr).
+$$
+As $T\to\infty$, this converges in distribution to the It\^o integral
+$$
+\sigma^2\int_0^1 W(r)\,dW(r).
+$$
+By It\^o's formula,
+$$
+d(W(r)^2)=2W(r)\,dW(r)+dr.
+$$
+Integrating from $0$ to $1$,
+$$
+W(1)^2-W(0)^2
+=
+2\int_0^1 W(r)\,dW(r)+1.
+$$
+Since $W(0)=0$,
+$$
+\int_0^1 W(r)\,dW(r)
+=
+\frac{1}{2}\bigl(W(1)^2-1\bigr).
+$$
+Thus again,
+$$
+T^{-1}\sum_{t=1}^T X_{t-1}u_t
+\Rightarrow
+\sigma^2 \int_0^1 W(r)\,dW(r)
+=
+\frac{\sigma^2}{2}\bigl(W(1)^2-1\bigr).
+$$
+
+## Step 7: Asymptotic distribution of the OLS estimator {.unnumbered}
+
+Recall
+$$
+T(\hat{\phi}-1)
+=
+\frac{T^{-1}\sum_{t=1}^T X_{t-1}u_t}
+{T^{-2}\sum_{t=1}^T X_{t-1}^2}.
+$$
+Using the limits derived above,
+$$
+T^{-1}\sum_{t=1}^T X_{t-1}u_t
+\Rightarrow
+\sigma^2 \int_0^1 W(r)\,dW(r),
+$$
+and
+$$
+T^{-2}\sum_{t=1}^T X_{t-1}^2
+\Rightarrow
+\sigma^2 \int_0^1 W(r)^2\,dr.
+$$
+Therefore, by the continuous mapping theorem,
+$$
+T(\hat{\phi}-1)
+\Rightarrow
+\frac{\int_0^1 W(r)\,dW(r)}
+{\int_0^1 W(r)^2\,dr}.
+$$
+Using the identity
+$$
+\int_0^1 W(r)\,dW(r)
+=
+\frac{1}{2}\bigl(W(1)^2-1\bigr),
+$$
+we obtain the equivalent expression
+$$
+T(\hat{\phi}-1)
+\Rightarrow
+\frac{\frac{1}{2}\bigl(W(1)^2-1\bigr)}
+{\int_0^1 W(r)^2\,dr}.
+$$
+
+This is the asymptotic distribution of the OLS estimator under the unit root null. It is \emph{not} normal. This is the fundamental reason why conventional $t$-tests based on standard normal or Student-$t$ critical values are invalid in the unit root case.
+
+## Step 8: Interpretation {.unnumbered}
+
+The result shows that the unit root case is nonstandard because the regressor $X_{t-1}$ is itself a stochastic trend. In stationary autoregressions, the regressor has a stable second moment and the usual central limit theorem leads to a Gaussian limit for the estimator. Under a unit root, however, $X_{t-1}$ behaves like a partial sum process and, after normalization, converges to Brownian motion. Consequently, the estimator is governed by functionals of Brownian motion rather than by a normal distribution.
+
+More precisely,
+$$
+\hat{\phi}-1 = O_p(T^{-1}),
+$$
+so the estimator is \emph{superconsistent}: it converges to $1$ faster than the usual $T^{-1/2}$ rate. But despite this faster convergence, its limiting distribution is non-Gaussian:
+$$
+T(\hat{\phi}-1)
+\Rightarrow
+\frac{\frac{1}{2}(W(1)^2-1)}{\int_0^1 W(r)^2\,dr}.
+$$
+This nonstandard limit is the basis for Dickey--Fuller unit root theory.
+
+## Step 9: Useful summary formulae {.unnumbered}
+
+For the AR(1) model
+$$
+X_t=\phi X_{t-1}+u_t,
+$$
+the OLS estimator is
+$$
+\hat{\phi}
+=
+\frac{\sum_{t=1}^T X_{t-1}X_t}{\sum_{t=1}^T X_{t-1}^2}
+=
+\phi + \frac{\sum_{t=1}^T X_{t-1}u_t}{\sum_{t=1}^T X_{t-1}^2}.
+$$
+
+Under the unit root null $\phi=1$,
+$$
+X_t = \sum_{s=1}^t u_s,
+$$
+and
+$$
+\sum_{t=1}^T X_{t-1}u_t
+=
+\frac{1}{2}\left(X_T^2-\sum_{t=1}^T u_t^2\right)
+\qquad (X_0=0).
+$$
+
+The asymptotic limits are
+$$
+T^{-2}\sum_{t=1}^T X_{t-1}^2
+\Rightarrow
+\sigma^2\int_0^1 W(r)^2\,dr,
+$$
+$$
+T^{-1}\sum_{t=1}^T X_{t-1}u_t
+\Rightarrow
+\sigma^2\int_0^1 W(r)\,dW(r)
+=
+\frac{\sigma^2}{2}\bigl(W(1)^2-1\bigr),
+$$
+and hence
+$$
+T(\hat{\phi}-1)
+\Rightarrow
+\frac{\int_0^1 W(r)\,dW(r)}{\int_0^1 W(r)^2\,dr}
+=
+\frac{\frac{1}{2}(W(1)^2-1)}{\int_0^1 W(r)^2\,dr}.
+$$
+
+
+
+
 
 ```{julia}
 #| echo: false
@@ -753,32 +1205,6 @@ $$
 Since $X_t$ and $Y_t$ are independent, the true relationship is null. However, OLS estimation produces nonstandard behavior.
 
 ---
-
-### Brownian Motion Representation
-
-Define the partial-sum processes:
-
-$$
-\frac{1}{\sqrt{T}} X_{\lfloor Tr \rfloor} \Rightarrow W_1(r),
-\qquad
-\frac{1}{\sqrt{T}} Y_{\lfloor Tr \rfloor} \Rightarrow W_2(r),
-$$
-
-where \(W_1(r)\) and \(W_2(r)\) are independent Brownian motions on \([0,1]\).
-
----
-
-### Limit Distribution of the OLS Estimator
-
-\begin{theorem}[Phillips (1986)]
-In the regression of one independent random walk on another, the OLS estimator satisfies
-$$
-\hat{\beta}
-\;\Rightarrow\;
-\frac{\int_0^1 W_1(r) W_2(r)\,dr}
-     {\int_0^1 W_1(r)^2\,dr}.
-$$
-\end{theorem}
 
 
 \begin{remark}
