@@ -19,6 +19,9 @@
 _site/
 _rendered/
 
+# Ignore generated cache for properties_of_time_series_new
+properties_of_time_series_new_cache/
+
 # Python
 __pycache__/
 *.pyc
