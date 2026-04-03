@@ -659,6 +659,77 @@ if (file.exists("sim_run_1e6.log")) {
 
 A fundamental problem in time-series econometrics arises when nonstationary series are regressed on one another. Even when the underlying stochastic processes are independent, ordinary least squares (OLS) estimation may produce statistically significant relationships. This phenomenon is known as **spurious regression**, first documented by Granger and Newbold (1974) and later formalized by Phillips (1986).
 
+
+\begin{definition}[Spurious Regression]
+
+Let $Y_{t=1}^T$ and $X_{t=1}^T$ be two stochastic processes such that both are non-stationary, typically integrated of order one, i.e., 
+$$
+Y_t \sim I(1), \quad X_t \sim I(1),
+$$
+and suppose that they are not cointegrated, meaning that there does not exist any scalar $\beta$ such that 
+$$
+Y_t - \beta X_t \sim I(0).
+$$
+
+Consider the ordinary least squares (OLS) regression:
+$$
+Y_t = \alpha + \beta X_t + u_t.
+$$
+
+This regression is said to be \textit{spurious} if, despite the absence of any true underlying relationship between $Y_t$ and $X_t$, the OLS estimation yields:
+$$
+\hat{\beta} \text{ statistically significant}, \quad R^2 \text{ high}, \quad \text{and } \hat{u}_t \text{ non-stationary},
+$$
+leading to misleading inference.
+
+Formally, a regression is spurious if:
+$$
+\lim_{T \to \infty} P\left( |\hat{\beta}/\text{se}(\hat{\beta})| > c \right) \not\to 0,
+$$
+for some critical value $c$, even though $Y_t$ and $X_t$ are independent or unrelated processes.
+\end{definition}
+
+
+\begin{example}
+
+Consider two time series. Let $Y_t$ denote the growth rate of real GDP in $\text{Tanzania}$ at time $t$, and let $X_t$ denote the number of trees in $\text{Australia}$ at time $t$. Suppose that both series are highly persistent and can be approximated as integrated processes of order one:
+$$
+Y_t \sim I(1), \quad X_t \sim I(1),
+$$
+but there is no economic or causal relationship linking them.
+
+Now consider the regression:
+$$
+Y_t = \alpha + \beta X_t + u_t.
+$$
+
+Since the growth rate of GDP in Tanzania is driven by domestic economic factors—such as investment, human capital, and policy—while the number of trees in Australia evolves according to ecological and environmental processes, there is no theoretical justification for a relationship between $Y_t$ and $X_t$.
+
+However, because both series exhibit trending behavior over time, the OLS estimation may produce a statistically significant estimate of $\hat{\beta}$, along with a high $R^2$. This apparent relationship is entirely misleading and arises from the shared non-stationarity of the series rather than any genuine economic linkage.
+
+Formally, despite finding that
+$$
+\hat{\beta} \neq 0 \quad \text{and statistically significant},
+$$
+we have:
+$$
+Y_t \perp X_t,
+$$
+and
+$$
+u_t \sim I(1),
+$$
+indicating that the regression is misspecified.
+
+This is a classic example of a \textit{spurious regression}, where standard inference incorrectly suggests a meaningful relationship between unrelated non-stationary variables.
+\end{example}
+
+\begin{remark}
+
+Spurious regression occurs when non-stationary time series with stochastic trends appear strongly related despite having no true connection. If variables are integrated but not cointegrated, their shared trends can produce misleadingly high \(R^2\) values and significant \(t\)-statistics. In these cases, OLS produces coefficients with non-standard asymptotic distributions, invalidating conventional inference. The issue stems from shared trending behavior without an underlying equilibrium relationship.
+\end{remark}
+
+
 In this section, we combine theory and Monte Carlo simulation to illustrate both the mechanism and the consequences of spurious regression.
 
 ---
