@@ -1,0 +1,886 @@
+---
+title: "**Time Series Econometrics**"
+subtitle: "**Properties of Stationary and Integrated Time Series**"
+author: "**Eliab Luvanda**"
+date: today
+lang: en
+bibliography: references.bib
+nocite: '@*'
+header-includes:
+  - \usepackage{amsmath}
+  - \usepackage{amsthm}
+  - \usepackage{bm}
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{graphicx}
+  - \usepackage{setspace}
+  - \onehalfspacing
+  - \usepackage{fvextra}
+  - \newtheorem{theorem}{Theorem}[section]
+  - \newtheorem{lemma}[theorem]{Lemma}
+  - \newtheorem{proposition}[theorem]{Proposition}
+  - \newtheorem{corollary}[theorem]{Corollary}
+  - \newtheorem{definition}[theorem]{Definition}
+  - \newtheorem{example}[theorem]{Example}
+  - \newtheorem{remark}[theorem]{Remark}
+  - \renewcommand{\qedsymbol}{$\blacksquare$}
+  - \newcommand{\E}{\mathbb{E}}
+  - \newcommand{\Var}{\mathrm{Var}}
+  - \newcommand{\Cov}{\mathrm{Cov}}
+  - \newcommand{\R}{\mathbb{R}}
+format:
+  pdf:
+    pdf-engine: lualatex
+    mainfont: Palatino
+    documentclass: article
+    fontsize: 11pt
+    papersize: a4
+    toc: true
+    toc-depth: 3
+    number-sections: true
+code-fold: true
+code-summary: "Show code"
+execute:
+  echo: false
+  warning: false
+  message: false
+geometry:
+  - inner=1.3in
+  - outer=1.0in
+  - top=1.1in
+  - bottom=1.1in
+  - headsep=0.3in
+---
+
+# Introduction
+
+Time-series econometrics analyzes sequences of observations indexed by time and explicitly models temporal dependence. Time-series data commonly exhibit autocorrelation, non-stationarity, and seasonality. As a result, the standard i.i.d. assumptions often fail and require specialized methods. This handout summarizes core definitions and properties of stationary and integrated processes, and gives concise examples and illustrations.
+
+Distinguishing stationary from integrated series is essential for choosing models and making valid inferences. Central to these ideas is the notion of a stochastic process, defined below.
+
+\begin{definition}
+Let $(\Omega,\mathcal{F},\mathbb{P})$ be a probability space, and let $T$ be an index set (often representing time, e.g. $T = \mathbb{N}$ for discrete time or $T = \mathbb{R}_{+}$ for continuous time).
+
+A stochastic process is a family of random variables
+$$\{X(\tau, \omega) : \tau \in T, \; \omega \in \Omega\}$$
+
+such that for each fixed $\tau \in T$, the mapping
+$$X(\tau, \cdot) : \Omega \to \mathbb{R}$$
+
+is a random variable on $(\Omega, \mathcal{F}, \mathbb{P})$.
+
+\end{definition}
+
+```{r}
+# Simulate and plot 5 simple random walks (T = 500)
+set.seed(2026)
+T <- 500
+n_paths <- 5
+
+# Generate iid normal increments and form cumulative sums (simple random walks)
+increments <- matrix(rnorm(T * n_paths, mean = 0, sd = 1), ncol = n_paths)
+paths <- apply(increments, 2, cumsum)
+
+# Prepare long dataframe for ggplot
+df_paths <- data.frame(
+  Time = rep(1:T, times = n_paths),
+  Value = as.vector(paths),
+  Omega = factor(rep(1:n_paths, each = T))
+)
+
+library(ggplot2)
+
+# Use showtext to ensure glyphs (e.g. ω) are available in R graphics.
+# NOTE: install required packages and fonts outside the document to avoid
+# interactive installs during rendering. Recommended packages are listed in
+# README.md.
+library(showtext)
+# If you want the Google font 'Noto Sans' available automatically, install
+# it interactively (once) with: font_add_google("Noto Sans", "notosans").
+showtext_auto()
+
+ggplot(df_paths, aes(x = Time, y = Value, color = Omega, group = Omega)) +
+  geom_line(size = 0.6) +
+  labs(x = 'Time', y = expression(X[t](omega)), color = expression(omega)) +
+    theme_classic() +
+    theme(text = element_text(family = "serif"),
+      legend.position = 'right',
+      plot.title = element_text(hjust = 0.5)) +
+    scale_color_discrete(labels = parse(text = paste0("omega[", 1:n_paths, "]"))) +
+    scale_x_continuous(breaks = seq(1, T, by = 50))
+```
+
+
+
+
+A stochastic process formalizes "random evolution over time": given a probability space $(\Omega,\mathcal{F},\mathbb{P})$, the process assigns a random variable to each time point and, for a fixed outcome $\omega$, a deterministic sample path. Figure 1 illustrates multiple sample paths (realizations) of a simple random walk. Each trajectory corresponds to a distinct realization. The figure depicts the temporal evolution of the process values across these realizations. It exemplifies the intrinsic randomness and variability that are fundamental characteristics of stochastic processes.
+
+# Stationary stochastic Processes
+
+## Weak Stationarity
+
+\begin{definition}[Weak (second-order) stationarity]
+Let $\{X_t : t \in T\}$ be a stochastic process with finite second moments. The process is said to be weakly stationary (or second-order stationary) if:
+
+1. $\mathbb{E}[X_t] = \mu$ for all $t \in T$ (the mean is constant), and
+2. $\mathrm{Cov}(X_{t+h}, X_t) = \gamma(h)$ depends only on the lag $h$ (the autocovariance is a function of lag only), for all $t, h$ for which the moments exist.
+\end{definition}
+
+Equivalently, weak stationarity implies that $\mathrm{Var}(X_t)=\gamma(0)$ is constant over time. Many linear time-series models with finite variance (for example, ARMA models with appropriate coefficients) are weakly stationary. Weak stationarity is the common assumption used in spectral analysis, autocorrelation estimation, and linear forecasting methods.
+
+```{r ar1_ensemble_plot_boxed, echo=FALSE, fig.cap='Ensemble of 4 stationary AR(1) sample paths; the ensemble mean at $\\bar{X}_{t_p}=\\frac{1}{4}\\sum_{j=1}^{4} X_{t_p}^{(j)}$', fig.width=7, fig.height=3, fig.pos='H'}
+library(ggplot2)
+library(cowplot)
+library(grid)
+
+# Re-simulate and draw main plot then overlay boxed labels
+n <- 200
+n_paths <- 4
+alpha <- 1
+phi <- 0.4
+sigma <- 1
+mu <- alpha / (1 - phi)
+t_p <- 150
+paths <- matrix(NA, nrow = n, ncol = n_paths)
+for (j in seq_len(n_paths)) {
+  y <- numeric(n)
+  y[1] <- mu
+  for (t in 2:n) {
+    y[t] <- alpha + phi * y[t-1] + rnorm(1, 0, sigma)
+  }
+  paths[, j] <- y
+}
+df <- data.frame(Time = rep(seq_len(n), times = n_paths), Value = as.vector(paths), Omega = factor(rep(seq_len(n_paths), each = n)))
+values_tp <- paths[t_p, ]
+ensemble_mean <- mean(values_tp)
+y_range <- range(df$Value)
+lt_vals <- c("solid", "dashed", "dotted", "dotdash")
+
+# target point value specified by user
+target_y <- 1.943
+
+p_main <- ggplot(df, aes(x = Time, y = Value, linetype = Omega, group = Omega)) +
+  geom_line(color = "black", size = 0.8) +
+  geom_hline(yintercept = mu, color = "red", linetype = "solid", size = 0.8) +
+  geom_vline(xintercept = t_p, color = "blue", linetype = "dashed", size = 0.7) +
+  geom_point(data = data.frame(Time = t_p, Value = target_y), aes(x = Time, y = Value), inherit.aes = FALSE, shape = 21, color = "orange", fill = NA, size = 6, stroke = 1.2) +
+  geom_point(data = data.frame(Time = t_p, Value = target_y), aes(x = Time, y = Value), inherit.aes = FALSE, color = "orange", size = 3.5) +
+  annotate("text", x = t_p, y = y_range[2] + 0.04 * diff(y_range), label = expression(tau[p]), color = "blue", size = 4) +
+  labs(x = "Time", y = expression(X[t]), linetype = expression(omega)) +
+  theme_classic() +
+  scale_linetype_manual(values = lt_vals) +
+  theme(text = element_text(family = "serif"))
+
+# create ensemble mean boxed grob (left box) with formula and numeric on same line
+ens_label_grob <- grobTree(
+  rectGrob(gp = gpar(fill = "white", col = "black", lwd = 0.6)),
+  # formula on left (smaller font)
+  textGrob(label = expression(bar(X)[t[p]] == frac(1,4) * sum(X[t[p]]^{(j)}, j==1, 4)), x = unit(0.10, "npc"), y = unit(0.65, "npc"), just = "left", gp = gpar(col = "black", fontsize = 8)),
+  # numeric value placed to the right of the formula on the same line (closer)
+  textGrob(label = paste0("= ", format(round(ensemble_mean, 3), nsmall = 3)), x = unit(0.48, "npc"), y = unit(0.65, "npc"), just = "left", gp = gpar(col = "black", fontsize = 7))
+)
+
+# create mu boxed grob (right box) as before
+mu_label_grob <- grobTree(
+  rectGrob(gp = gpar(fill = "white", col = "black", lwd = 0.6)),
+  textGrob(label = expression(E(X[t]) == mu), x = unit(0.02, "npc"), y = unit(0.5, "npc"), just = "left", gp = gpar(col = "red", fontsize = 10))
+)
+
+# box positions (left ensemble mean, right mu)
+# slightly increase ensemble box width
+ens_x <- 0.44; ens_y <- 0.82; ens_w <- 0.26; ens_h <- 0.12
+mu_x <- 0.78; mu_y <- 0.82; mu_w <- 0.18; mu_h <- 0.12
+
+# --- Saved arrow variables (commented out for safe keeping) ---
+# arrow_x_start_npc <- ens_x + ens_w * 0.02
+# arrow_y_start_npc <- ens_y + ens_h * 0.5
+# x_start_data <- 1 + arrow_x_start_npc * (n - 1)
+# y_start_data <- y_range[1] + arrow_y_start_npc * diff(y_range)
+# delta_x_npc <- -2   # example delta (NPC units)
+# delta_y_npc <- 0
+# delta_x_data <- delta_x_npc * (n - 1)
+# delta_y_data <- delta_y_npc * diff(y_range)
+# x_end_data <- t_p + delta_x_data
+# y_end_data <- target_y + delta_y_data
+# (Saved: used earlier to compute arrow endpoints)
+
+# draw main plot and boxed grobs (arrow removed)
+p_final <- ggdraw() +
+  draw_plot(p_main, 0, 0, 1, 1) +
+  draw_grob(ens_label_grob, x = ens_x, y = ens_y, width = ens_w, height = ens_h) +
+  draw_grob(mu_label_grob, x = mu_x, y = mu_y, width = mu_w, height = mu_h)
+
+print(p_final)
+```
+
+```{r}
+# Simulate a stationary AR(1) process
+set.seed(123)
+n <- 500
+phi <- 0.8
+mu <- 5
+sigma <- 1
+x <- numeric(n)
+x[1] <- rnorm(1, mean = mu, sd = sigma / sqrt(1 - phi^2))
+for (t in 2:n) {
+  x[t] <- mu + phi * (x[t-1] - mu) + rnorm(1, 0, sigma)
+}
+library(ggplot2)
+
+mean_x <- mean(x)
+sd_x <- sd(x)
+upper_band <- mean_x + 2 * sd_x
+lower_band <- mean_x - 2 * sd_x
+
+# position for mean label (place near top-right)
+y_range <- range(x)
+label_y <- y_range[2] - 0.06 * diff(y_range)
+label_x <- n - 80
+arrow_xend <- n - 60
+
+ggplot(data.frame(Time = 1:n, Value = x), aes(Time, Value)) +
+  geom_line(color = 'black', linewidth = 0.6) +
+  geom_hline(yintercept = mean_x, linetype = 'dashed', color = 'red', linewidth = 1) +
+  geom_hline(yintercept = upper_band, linetype = 'dotted', color = 'darkgreen', linewidth = 0.8) +
+  geom_hline(yintercept = lower_band, linetype = 'dotted', color = 'darkgreen', linewidth = 0.8) +
+  annotate("curve", x = label_x, xend = arrow_xend, y = label_y, yend = mean_x, curvature = 0.2, colour = 'red', arrow = grid::arrow(length = grid::unit(0.18, 'cm')), size = 0.6) +
+  annotate("label", x = label_x, y = label_y, label = expression(E(X[t]) == mu), color = 'red', fill = 'white', hjust = 0, vjust = 0.5, size = 3, label.r = grid::unit(0.15, 'lines')) +
+  labs(y = expression(X(t)), x = 'Time') +
+  theme_classic(base_size = 14) +
+  theme(
+    axis.title.x = element_text(size = 10),
+    axis.title.y = element_text(size = 10),
+    axis.text.x = element_text(size = 8),
+    axis.text.y = element_text(size = 8)
+  ) +
+  scale_x_continuous(breaks = seq(0, n, by = 50)) +
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 8))
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| warning: false
+#| message: false
+#| caption: "Simulated Stationary Time Series"
+#| fig.cap: "A simulated stationary time series"
+#| fig.width: 4
+#| fig.height: 3
+library(ggplot2)
+set.seed(123)
+n <- 100
+library(ggpubr)  # Load ggpubr for theme_classic2
+
+# Function to generate a stationary time series
+# y_t = c + \phi *y_{t-1} + \epsilon_t
+ar1_time_series <- function(n, c, phi) {
+  # Generate white noise
+  epsilon <- rnorm(n, mean = 0, sd = 1)
+  
+  # Initialize the time series
+  y <- numeric(n)
+  y[1] <- c + epsilon[1]  # Initial value
+  
+  # Generate the time series
+  for (t in 2:n) {
+    y[t] <- c + phi * y[t - 1] + epsilon[t]
+  }
+  
+  return(y)
+}
+
+# Define n and parameters
+n <- 200
+c <- 0.2
+phi <- 0.6
+
+# Generate an AR(1) time series and plot
+data <- data.frame(time = 1:n, time_series = ar1_time_series(n, c, phi))
+
+ggplot(data, aes(x = time, y = time_series)) +
+  geom_line(color = "navy") +
+  labs(x = "Time", y = "Value") +
+  theme_classic2() +
+  theme(text = element_text(family = "serif"), plot.title = element_text(hjust = 0.5))
+```
+
+
+
+
+The figure shows a simulated AR(1) series with coefficient $\phi = 0.8$ and unconditional mean approximately $\mu=5$. The dashed red horizontal line marks the sample mean, and the dotted green lines mark the bands at approximately $\pm2$ sample standard deviations. Deviations from the mean are persistent but mean‑reverting (due to $\phi<1$), and the overall variance remains roughly constant over time — together these features visually illustrate weak (second‑order) stationarity: a constant mean and a covariance structure that does not drift over time.
+
+
+\begin{remark}
+Weak stationarity requires only constant mean and autocovariance, whereas strong stationarity requires full distributional invariance under time shifts. Although strict stationarity is a stronger condition, weak stationarity is often sufficient in practice, especially for linear models and analyses focused on second-order properties.
+\end{remark}
+
+## Strong Stationarity
+
+A strongly (strictly) stationary process has the same finite-dimensional distributions under any time shift. This is a stronger requirement than weak stationarity, which only constrains the first two moments; strict stationarity demands full distributional invariance.
+
+\begin{definition}[strong stationarity]
+Let $ (\Omega, \mathcal{F}, \mathbb{P}) $ be a probability space, and let $ \{X_t : t \in T\} $ be a stochastic process indexed by $ T \subseteq \mathbb{R} $. The process $ \{X_t\} $ is said to be strongly stationary (or strictly stationary) if, for every integer $ n \geq 1 $, for every choice of time points $ t_1, t_2, \ldots, t_n \in T $, and for every shift $ h \in \mathbb{R} $ such that $ t_i + h \in T $, we have
+$ (X_{t_1}, X_{t_2}, \ldots, X_{t_n}) \overset{d}{=} (X_{t_1+h}, X_{t_2+h}, \ldots, X_{t_n+h}), $
+where $ \overset{d}{=} $ denotes equality in distribution.
+\end{definition}
+
+Strong (or strict) stationarity denotes the property whereby the complete probabilistic structure of a stochastic process remains invariant under temporal translation. That is, not only the mean or variance, but the entire joint distribution of any finite collection of time-indexed random variables remains the same under time shifts. Intuitively, if one were to extract numerous short segments of the series—such as triplets or longer contiguous subsequences—and randomly permute their temporal order, it would be impossible to determine whether a given segment originated earlier or later in time. This is because all configurations of values, along with their associated probability distributions, remain invariant under temporal translation. This constitutes a highly stringent requirement: it precludes not only the presence of trends and temporal variation in variability, but also any modification in the distributional form or dependence structure of the data. Consequently, the data-generating process is, in a fundamental sense, temporally invariant.
+
+**Key Points**
+
+• Entire distribution invariance: Not just the mean, variance, or covariance, but the full joint distribution of any finite collection of random variables remains the same under time shifts.
+
+• Stronger than weak stationarity: Weak stationarity only requires invariance of first and second moments, while strong stationarity requires invariance of all finite-dimensional distributions.
+
+• Implication: Every strong stationary process is weakly stationary (if moments exist), but not every weakly stationary process is strongly stationary.
+
+Intuitively, strict stationarity means that time shifts do not change the joint distribution of observations.
+
+\begin{example}
+An everyday example is i.i.d. white noise: independence plus identical marginals imply that every finite-dimensional joint distribution is invariant under time shifts, so the process is strictly stationary.
+\end{example}
+
+```{r}
+set.seed(42)
+n <- 500
+wn <- rnorm(n, mean = 0, sd = 1)
+library(ggplot2)
+
+# compute summary lines
+mean_wn <- mean(wn)
+sd_wn <- sd(wn)
+upper <- mean_wn + 2 * sd_wn
+lower <- mean_wn - 2 * sd_wn
+
+ggplot(data.frame(Time = 1:n, Value = wn), aes(x = Time, y = Value)) +
+  geom_line(color = 'black') +
+  geom_hline(yintercept = mean_wn, linetype = 'dashed', color = 'red', linewidth = 0.6) +
+  geom_hline(yintercept = upper, linetype = 'dotted', color = 'darkgreen', linewidth = 0.5) +
+  geom_hline(yintercept = lower, linetype = 'dotted', color = 'darkgreen', linewidth = 0.5) +
+  labs(x = 'Time', y = expression(epsilon[t])) +
+  scale_x_continuous(breaks = seq(0, n, by = 50)) +
+  scale_y_continuous(breaks = seq(floor(min(wn)), ceiling(max(wn)), by = 1)) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+
+
+The figure shows a realization of Gaussian white noise: i.i.d. draws from
+$\mathcal{N}(0,1)$. The series has (approximately) zero mean, constant
+variance, and no serial correlation at nonzero lags. Because the observations
+are independent with identical marginals, this process is a canonical
+example of a strictly (strongly) stationary process: every finite‑dimensional
+distribution is invariant under time shifts. It is therefore also weakly
+stationary (second‑order) when second moments exist. This strongly stationary
+example contrasts with the AR(1) above, where temporal dependence yields
+persistence while still satisfying weak stationarity whenever $|\phi|<1$.
+
+\begin{example}
+The Bernoulli process (i.i.d. Bernoulli($p$)) is likewise strictly stationary.
+\end{example}
+
+These examples illustrate that identical marginal distributions and independence across time imply strict stationarity.
+
+A classic example of a process that is weakly stationary but not strongly stationary is a non-Gaussian process with time-invariant mean and covariance (often sharing the same covariance structure as a Gaussian stationary process), since in the non-Gaussian case weak stationarity need not imply strong stationarity. To make it concrete, consider the following:
+
+\begin{example}
+Define $X_t=Z_tY$ with $Z_t$ i.i.d. mean-zero noise and $Y\in\{\pm1\}$ independent of the $Z_t$. The process has constant mean and lag-dependent covariance (weak stationarity), and finite-dimensional distributions are invariant under time shifts, so it is strictly stationary, as well.
+\end{example}
+
+In short: weak stationarity only cares about mean, variance, and covariance stability, while strong stationarity requires full distributional invariance. This example illustrates how a process can meet the weaker conditions without satisfying the stronger ones.
+
+Table 1 (summary comparison) was intentionally removed to avoid embedding raw LaTeX table markup in the source. The discussion continues below.
+
+## Example Stationary Processes
+
+### White Noise Process
+
+
+**Definition (White noise).** Let $(\Omega,\mathcal{F},\mathbb{P})$ be a probability space, and let $\{\varepsilon_t\}_{t\in\mathbb{Z}}$ be a real-valued stochastic process with finite second moments. The process is a white noise process with variance $\sigma^2$ if, for every $t,s\in\mathbb{Z}$,
+$$\mathbb{E}[\varepsilon_t]=0,\qquad \mathbb{E}[\varepsilon_t^2]=\sigma^2<\infty,\qquad \mathrm{Cov}(\varepsilon_t,\varepsilon_s)=0\ \text{for } t\neq s.$$ 
+
+Equivalently, its autocovariance function is
+$$\gamma(h)=\mathrm{Cov}(\varepsilon_t,\varepsilon_{t-h})=\begin{cases}\sigma^2,&h=0,\\0,&h\neq0.\end{cases}$$
+
+This is the weak, wide-sense, or second-order notion of white noise: the process is centered, has constant finite variance, and is uncorrelated across distinct times. If the $\varepsilon_t$ are also independent and identically distributed (i.i.d.) with mean zero and variance $\sigma^2$, then the process is a strong (strictly) stationary white noise process, because all finite-dimensional distributions are invariant under time shifts. The Gaussian white noise process is a special case where $\varepsilon_t \sim \mathcal{N}(0,\sigma^2)$ i.i.d., which is also both weakly and strongly stationary.
+
+```{julia}
+#| echo: false
+#| include: false
+#| message: false
+#| warning: false
+#| cache: true
+# Run the external Julia simulation (default reps = 2,000,000 in the script)
+include("simulate_ols_ar1_random_walk.jl")
+```
+
+
+
+
+::: {#fig-ols fig-cap="OLS $\hat{\phi}$ distributions for stationary AR(1) and random walk processes"}
+![](ols_estimator_distributions.png){width=90%}
+:::
+
+```{r}
+if (file.exists("sim_run_1e6.log")) {
+  lines <- readLines("sim_run_1e6.log")
+
+  get_first <- function(pattern) {
+    l <- grep(pattern, lines, value = TRUE)
+    if (length(l) == 0) return(NA)
+    sub(".*:\\s*", "", l[1])
+  }
+
+  sample_n <- as.integer(get_first("Sample size"))
+  reps <- as.integer(get_first("Replications"))
+  burnin <- as.integer(get_first("Burn-in"))
+
+  get_nth_num <- function(pattern, n) {
+    idx <- grep(pattern, lines)
+    if (length(idx) < n) return(NA)
+    as.numeric(sub(".*:\\s*", "", lines[idx[n]]))
+  }
+
+  mean_phi_ar1 <- get_nth_num("Mean\\(phi_hat\\)", 1)
+  std_phi_ar1  <- get_nth_num("Std\\(phi_hat\\)", 1)
+  bias_phi_ar1 <- get_nth_num("Bias\\(phi_hat\\)", 1)
+
+  mean_phi_rw <- get_nth_num("Mean\\(phi_hat\\)", 2)
+  std_phi_rw  <- get_nth_num("Std\\(phi_hat\\)", 2)
+  bias_phi_rw <- get_nth_num("Bias\\(phi_hat\\)", 2)
+
+  true_phi_vals <- as.numeric(sub(".*:\\s*", "", grep("True phi", lines, value = TRUE)))
+
+  df <- data.frame(
+    Process = c("Stationary AR(1)", "Random Walk"),
+    True_phi = true_phi_vals,
+    Mean_phi_hat = c(mean_phi_ar1, mean_phi_rw),
+    Std_phi_hat  = c(std_phi_ar1,  std_phi_rw),
+    Bias_phi_hat = c(bias_phi_ar1, bias_phi_rw)
+  )
+
+  library(knitr)
+  # Use kableExtra for LaTeX/booktabs styling and scale table to fit page
+  if (!requireNamespace("kableExtra", quietly = TRUE)) {
+    # kableExtra not available: fall back to pandoc kable silently
+    names(df) <- c("Process","True $\\phi$", "Mean of $\\hat{\\phi}$", "Std of $\\hat{\\phi}$", "Bias of $\\hat{\\phi}$")
+    # Use a compact pandoc table as a fallback (omit burn-in from caption)
+    print(knitr::kable(df, caption = paste0("Monte Carlo summary (n=", sample_n, ", reps=", format(reps, big.mark=','), ")"), digits = 4, format = "pandoc", escape = FALSE))
+  } else {
+    col_names <- c("Process", "$\\phi$", "Mean of $\\hat{\\phi}$", "Std of $\\hat{\\phi}$", "Bias of $\\hat{\\phi}$")
+    # Use a plain LaTeX caption (avoid Quarto-style '#'-label which breaks LaTeX when
+    # emitting raw LaTeX). If you need a Quarto crossref, switch to a pandoc table.
+    # Omit burn-in from LaTeX caption to keep caption concise
+    caption_text <- paste0("Monte Carlo summary (n=", sample_n, ", reps=", format(reps, big.mark=','), ")")
+    # Produce a LaTeX longtable and scale down to fit the page to avoid distortion
+    tbl <- knitr::kable(df, format = "latex", booktabs = TRUE, longtable = TRUE, digits = 4,
+           caption = caption_text,
+           align = c("l","r","r","r","r"), col.names = col_names, escape = FALSE)
+    tbl <- kableExtra::kable_styling(tbl, latex_options = c("hold_position", "scale_down"), font_size = 8)
+    cat(tbl)
+  }
+} else {
+  # no simulation log found; remain silent during rendering
+}
+```
+
+
+
+
+# Spurious Regression
+
+A fundamental problem in time-series econometrics arises when nonstationary series are regressed on one another. Even when the underlying stochastic processes are independent, ordinary least squares (OLS) estimation may produce statistically significant relationships. This phenomenon is known as **spurious regression**, first documented by Granger and Newbold (1974) and later formalized by Phillips (1986).
+
+In this section, we combine theory and Monte Carlo simulation to illustrate both the mechanism and the consequences of spurious regression.
+
+***
+## Theoretical Framework
+
+
+$$
+X_t = X_{t-1} + u_t, \qquad
+Y_t = Y_{t-1} + v_t,
+$$
+
+where $u_t$ and $v_t$ are independent white-noise processes with zero mean and finite variance.
+
+We estimate the regression:
+
+$$
+Y_t = \alpha + \beta X_t + e_t.
+$$
+
+Since $X_t$ and $Y_t$ are independent, the true relationship is null. However, OLS estimation produces nonstandard behavior.
+
+***
+### Brownian Motion Representation
+
+Define the partial-sum processes:
+
+$$
+\frac{1}{\sqrt{T}} X_{\lfloor Tr \rfloor} \Rightarrow W_1(r),
+\qquad
+\frac{1}{\sqrt{T}} Y_{\lfloor Tr \rfloor} \Rightarrow W_2(r),
+$$
+
+where \(W_1(r)\) and \(W_2(r)\) are independent Brownian motions on \([0,1]\).
+
+***
+### Limit Distribution of the OLS Estimator
+
+\begin{theorem}[Phillips (1986)]
+In the regression of one independent random walk on another, the OLS estimator satisfies
+$$
+\hat{\beta}
+\;\Rightarrow\;
+\frac{\int_0^1 W_1(r) W_2(r)\,dr}
+     {\int_0^1 W_1(r)^2\,dr}.
+$$
+\end{theorem}
+
+
+\begin{remark}
+This limiting distribution is non-normal and depends on functionals of Brownian motion. Importantly, \(\hat{\beta}\) itself converges to a nondegenerate distribution—no additional scaling is required.
+\end{remark}
+
+***
+### Divergence of the t-Statistic
+
+\begin{proposition}
+The conventional t-statistic for testing $(H_0:\beta=0$ diverges as $T \to \infty$, leading to spurious statistical significance.
+\end{proposition}
+
+This explains why standard inference fails in regressions involving nonstationary variables.
+
+***
+## Monte Carlo Simulation
+
+We simulate two independent random walks and estimate the regression:
+
+$$
+Y_t = \alpha + \beta X_t + e_t.
+$$
+
+The design uses:
+
+- Sample sizes: $N = 50, 100, 500, 1000, 10{,}000, 100{,}000, 500{,}000$
+- Replications: $R = 20{,}000$
+
+The Julia code above generates the simulation results, which are then analyzed in R.
+
+## Empirical Findings
+
+### Increasing False Significance
+
+The table below shows the percentage of simulations where the null hypothesis of no relationship is rejected at the 5% significance level. As sample size increases, the percentage of significant results approaches 100%, illustrating the spurious regression phenomenon.
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+library(readr)
+library(dplyr)
+library(knitr)
+
+sim <- read_csv("spurious_rw_sim_results.csv", show_col_types = FALSE)
+
+tbl <- sim |>
+  mutate(significant = if_else(!is.na(pval) & pval < 0.05, 1, 0)) |>
+  summarize(PercentSignificant = 100 * mean(significant), .by = N) |>
+  arrange(N) |>
+  mutate(
+    N = format(N, big.mark = ",", scientific = FALSE, trim = TRUE),
+    PercentSignificant = sprintf("%.1f", PercentSignificant)
+  )
+
+kable(
+  tbl,
+  caption = "Spurious regression rejection frequencies by sample size",
+  col.names = c("N", "Percent Significant"),
+  align = c("l", "r")
+)
+```
+
+
+
+
+### Distribution of the OLS Estimator
+
+After examining the rejection frequencies, we can also look at the distribution of the OLS estimator $\hat{\beta}$ across simulations. The figure below shows the density of $\hat{\beta}$ for different sample sizes.The distribution is for the unscaled OLS estimator $\hat{\beta}$. 
+
+```{r unscaled-density-plot, fig.cap="Densities of $\\hat{\\beta}$ (unscaled) across sample sizes", fig.width=8, fig.height=5}
+#| echo: false
+#| warning: false
+#| message: false
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+sim <- read_csv("spurious_rw_unscaled_sim.csv", show_col_types = FALSE)
+
+plot_df <- sim |>
+  filter(N %in% c(50, 500, 10000, 500000)) |>
+  mutate(
+    N_f = factor(N,
+                levels = c(50, 500, 10000, 500000),
+                labels = format(c(50, 500, 10000, 500000), big.mark = ",", scientific = FALSE, trim = TRUE)
+    )
+  )
+
+ggplot(plot_df, aes(x = beta)) +
+  geom_density(fill = "steelblue", alpha = 0.35, color = "steelblue4", linewidth = 0.4) +
+  facet_wrap(~N_f, nrow = 2, ncol = 2, scales = "free") +
+  labs(x = expression(hat(beta)), y = "Density") +
+  theme_classic()
+```
+
+
+The simulation shows that the distribution of $\hat{\beta}$ appears approximately normal. This is a **finite-sample illusion**. The true asymptotic distribution is non-normal, but finite samples can produce visually symmetric, bell-shaped histograms. The illusion of normality can be misleading, especially when standard inference is applied without recognizing the non-standard asymptotic behavior.
+
+```{julia}
+#| echo: false
+#| include: false
+#| cache: true
+using Random, Distributions, CSV, DataFrames, Statistics
+
+outfile = "spurious_rw_sim_results.csv"
+run_sim = get(ENV, "RUN_SPURIOUS_SIM", "0") == "1"
+
+if !run_sim && isfile(outfile)
+    @info "Skipping simulation. Using existing file: $outfile"
+else
+    Random.seed!(2026)
+    Ns = [50, 100, 500, 1000, 10000, 100000, 500000]
+    R = 20000
+
+    results_list = Vector{DataFrame}(undef, length(Ns))
+
+    for (i, N) in pairs(Ns)
+        beta_vec = Vector{Float64}(undef, R)
+        t_vec = Vector{Union{Missing, Float64}}(missing, R)
+        p_vec = Vector{Union{Missing, Float64}}(missing, R)
+
+        compute_inference = N <= 10_000
+
+        Threads.@threads for r in 1:R
+            rng = MersenneTwister(1_000_000 * i + r)
+
+            x = 0.0
+            y = 0.0
+            sum_x = 0.0
+            sum_y = 0.0
+            sum_x2 = 0.0
+            sum_y2 = 0.0
+            sum_xy = 0.0
+
+            for _ in 1:N
+                x += randn(rng)
+                y += randn(rng)
+
+                sum_x += x
+                sum_y += y
+                sum_x2 += x * x
+                sum_y2 += y * y
+                sum_xy += x * y
+            end
+
+            xbar = sum_x / N
+            ybar = sum_y / N
+
+            sxx = sum_x2 - N * xbar^2
+            sxy = sum_xy - N * xbar * ybar
+
+            beta_hat = sxy / sxx
+            beta_vec[r] = beta_hat
+
+            if compute_inference
+                alpha_hat = ybar - beta_hat * xbar
+                ssr = sum_y2 - 2 * alpha_hat * sum_y - 2 * beta_hat * sum_xy +
+                    N * alpha_hat^2 + 2 * alpha_hat * beta_hat * sum_x + beta_hat^2 * sum_x2
+
+                s2 = ssr / (N - 2)
+                se_beta = sqrt(s2 / sxx)
+                t = beta_hat / se_beta
+                p = 2 * (1 - cdf(TDist(N - 2), abs(t)))
+
+                t_vec[r] = t
+                p_vec[r] = p
+            end
+        end
+
+        results_list[i] = DataFrame(
+            N = fill(N, R),
+            rep = collect(1:R),
+            beta = beta_vec,
+            tstat = t_vec,
+            pval = p_vec
+        )
+    end
+
+    results = vcat(results_list...)
+    CSV.write(outfile, results)
+end
+```
+
+
+
+
+
+
+
+
+
+```{r spurious-density-plot, fig.cap="Densities of $N\\hat{\\beta}$ across sample sizes", fig.width=8, fig.height=5}
+#| echo: false
+#| warning: false
+#| message: false
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+sim <- read_csv("spurious_rw_sim_results.csv", show_col_types = FALSE)
+
+plot_df <- sim |>
+  filter(N %in% c(50, 500, 10000, 500000)) |>
+  mutate(
+    N_beta_hat = N * beta,
+    N_f = factor(
+      N,
+      levels = c(50, 500, 10000, 500000),
+      labels = format(c(50, 500, 10000, 500000), big.mark = ",", scientific = FALSE, trim = TRUE)
+    )
+  )
+
+ggplot(plot_df, aes(x = N_beta_hat)) +
+  geom_density(fill = "steelblue", alpha = 0.35, color = "steelblue4", linewidth = 0.4) +
+  facet_wrap(~N_f, nrow = 2, ncol = 2, scales = "free") +
+  labs(x = expression(N * hat(beta)), y = "Density") +
+  theme_classic()
+```
+
+### Scaled Estimator $N\hat{\beta}$
+
+The density plots above show the distribution of $N\hat{\beta}$. As sample size increases, the distribution becomes more dispersed and non-normal, consistent with the theoretical limit involving Brownian functionals. This illustrates the non-standard behavior of OLS estimators in spurious regressions.
+
+{{< pagebreak >}}
+
+# Bibliography {.unnumbered}
+
+::: {#refs}
+:::
+
+{{< pagebreak >}}
+
+# Appendix {.unnumbered}
+
+## Random Walk Sample Paths {.unnumbered}
+
+```{r}
+```
+
+
+
+
+## AR(1) Time Series Simulation {.unnumbered}
+
+```{r}
+```
+
+
+
+
+## Stationary AR(1) Process Plot {.unnumbered}
+
+```{r}
+```
+
+
+
+
+## Gaussian White Noise {.unnumbered}
+
+```{r}
+```
+
+
+
+
+## OLS Simulation Summary Table {.unnumbered}
+
+```{r}
+```
+
+
+
+
+## Spurious Regression Table {.unnumbered}
+
+```{r}
+```
+
+
+
+
+## Unscaled OLS Estimator Density {.unnumbered}
+
+```{r}
+```
+
+
+
+
+## Scaled Estimator Density {.unnumbered}
+
+```{r}
+```
+
+
+
+
+## Julia Simulation: OLS AR(1) vs Random Walk {.unnumbered}
+
+```{julia}
+#| echo: true
+#| eval: false
+include("simulate_ols_ar1_random_walk.jl")
+```
+
+
+
+
+## Julia Simulation: Spurious Regression {.unnumbered}
+
+```{julia}
+#| echo: true
+#| eval: false
+using Random, Distributions, CSV, DataFrames, Statistics
+
+outfile = "spurious_rw_sim_results.csv"
+run_sim = get(ENV, "RUN_SPURIOUS_SIM", "0") == "1"
+
+if !run_sim && isfile(outfile)
+    @info "Skipping simulation. Using existing file: $outfile"
+else
+    Random.seed!(2026)
+    Ns = [50, 100, 500, 1000, 10000, 100000, 500000]
+    R = 20000
+    # ... full simulation code as above ...
+end
+```
+
+
+
+
+## Code Appendix {.unnumbered}
+
+The complete document source (including all code chunks) is listed below for reference. Code is hidden in the main text but reproduced here in full for reproducibility and review.
+
+```{r}
+# Print the full QMD source as a fenced code block in the Appendix
+src <- readLines("properties_of_time_series_new.qmd")
+cat('```qmd\n')
+cat(paste(src, collapse = '\n'))
+cat('\n```\n')
+```
