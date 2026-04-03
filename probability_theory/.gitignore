@@ -1,0 +1,11 @@
+/.quarto/
+**/*.quarto_ipynb
+# Allow main project files
+!probability_theory.qmd
+!references.bib
+!probability_theory.pdf
+!probability_theory.html
+!lebesgue.qmd
+# Ignore Quarto _site output but allow main HTML
+_site/
+!_site/probability_theory.html

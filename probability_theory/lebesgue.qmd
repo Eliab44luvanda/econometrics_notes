@@ -1,0 +1,277 @@
+---
+title: "Measure-Theoretic Probability Theory"
+subtitle: "Rigorous Lecture Notes for Econometrics"
+author: "Eliab Luvanda"
+date: today
+date-format: "MMMM D, YYYY"
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: scrartcl
+    classoption:
+      - DIV=11
+      - numbers=noendperiod
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    colorlinks: true
+    geometry:
+      - inner=1.25in
+      - outer=1.00in
+      - top=1.05in
+      - bottom=1.10in
+    include-in-header:
+      text: |
+        \usepackage{fontspec}
+        \setmainfont{TeX Gyre Pagella}
+        \usepackage{amsmath, amssymb, amsthm, mathtools}
+        \usepackage{bm}
+        \newcommand{\E}{\mathbb{E}}
+        \newcommand{\Prob}{\mathbb{P}}
+
+        \theoremstyle{plain}
+        \newtheorem{theorem}{Theorem}[section]
+        \newtheorem{lemma}[theorem]{Lemma}
+        \newtheorem{proposition}[theorem]{Proposition}
+        \newtheorem{corollary}[theorem]{Corollary}
+
+        \theoremstyle{definition}
+        \newtheorem{definition}[theorem]{Definition}
+        \newtheorem{assumption}[theorem]{Assumption}
+        \newtheorem{example}[theorem]{Example}
+
+        \theoremstyle{remark}
+        \newtheorem{remark}[theorem]{Remark}
+
+        \renewcommand{\qedsymbol}{$\blacksquare$}
+
+crossref:
+  eq-prefix: ""
+  sec-prefix: "Section"
+---
+
+# 1. Introduction
+
+## 1.1 Probability and Uncertainty
+
+::: definition
+Probability is a numerical measure that quantifies uncertainty associated with events.
+:::
+
+In economics, uncertainty is central to decision-making, from consumption choices to financial markets and policy design.
+
+## 1.2 Approaches to Probability
+
+### Classical
+Based on equally likely outcomes.
+
+### Frequentist
+Probability as long-run relative frequency.
+
+### Subjective
+Probability as degree of belief.
+
+### Axiomatic (Measure-Theoretic)
+Probability is defined as a measure on a measurable space.
+
+::: remark
+The axiomatic approach provides the mathematical foundation for modern econometrics and stochastic processes.
+:::
+
+---
+
+# 2. Probability Spaces
+
+## 2.1 Sample Space
+
+::: definition
+A sample space $\Omega$ is the set of all possible outcomes.
+:::
+
+## 2.2 Sigma-Algebra
+
+::: definition
+A sigma-algebra $\mathcal{F}$ is a collection of subsets of $\Omega$ such that:
+1. $\Omega \in \mathcal{F}$
+2. If $A \in \mathcal{F}$, then $A^c \in \mathcal{F}$
+3. If $A_n \in \mathcal{F}$, then $\bigcup_{n=1}^\infty A_n \in \mathcal{F}$
+:::
+
+::: theorem
+Sigma-algebras are closed under countable intersections.
+:::
+
+::: proof
+By De Morgan’s laws,
+\[
+\bigcap_{n=1}^\infty A_n = \left(\bigcup_{n=1}^\infty A_n^c \right)^c
+\]
+and closure follows.
+:::
+
+## 2.3 Probability Measure
+
+::: definition
+A probability measure $\Prob$ is a function $\Prob:\mathcal{F} \to [0,1]$ satisfying:
+1. $\Prob(A) \ge 0$
+2. $\Prob(\Omega)=1$
+3. $\Prob(\cup A_i)=\sum \Prob(A_i)$ for disjoint sets
+:::
+
+---
+
+# 3. Random Variables
+
+## 3.1 Definition
+
+::: definition
+A random variable is a measurable function $X:\Omega \to \mathbb{R}$.
+:::
+
+## 3.2 Distribution Function
+
+::: definition
+The distribution function is
+\[
+F_X(x)=\Prob(X \le x)
+\]
+:::
+
+---
+
+# 4. Distributions
+
+## 4.1 CDF Properties
+
+::: theorem
+Every CDF is non-decreasing, right-continuous, and satisfies:
+\[
+\lim_{x\to -\infty}F(x)=0, \quad \lim_{x\to \infty}F(x)=1
+\]
+:::
+
+## 4.2 Independence
+
+::: definition
+Random variables $X,Y$ are independent if
+\[
+\Prob(X\in A, Y\in B)=\Prob(X\in A)\Prob(Y\in B)
+\]
+:::
+
+---
+
+# 5. Expectations
+
+## 5.1 Expected Value
+
+::: definition
+For a random variable $X$,
+\[
+\E[X] = \int X d\Prob
+\]
+:::
+
+## 5.2 Properties
+
+::: theorem
+Expectation is linear:
+\[
+\E[aX+bY]=a\E[X]+b\E[Y]
+\]
+:::
+
+::: proof
+Follows directly from properties of the Lebesgue integral.
+:::
+
+## 5.3 Jensen’s Inequality
+
+::: theorem
+If $\phi$ is convex, then
+\[
+\phi(\E[X]) \le \E[\phi(X)]
+\]
+:::
+
+---
+
+# 6. Convergence Concepts
+
+## 6.1 Almost Sure Convergence
+
+::: definition
+$X_n \to X$ almost surely if
+\[
+\Prob(\lim X_n = X)=1
+\]
+:::
+
+## 6.2 Convergence in Probability
+
+::: definition
+$X_n \to X$ in probability if
+\[
+\Prob(|X_n-X|>\varepsilon)\to 0
+\]
+:::
+
+## 6.3 Convergence in Distribution
+
+::: definition
+$X_n \to X$ in distribution if
+\[
+F_{X_n}(x)\to F_X(x)
+\]
+:::
+
+## 6.4 Relationships
+
+::: theorem
+Almost sure convergence implies convergence in probability.
+:::
+
+---
+
+## 6.5 Weak Law of Large Numbers
+
+::: theorem
+Let $X_i$ be i.i.d. with finite mean $\mu$. Then
+\[
+\bar{X}_n \to \mu \text{ in probability}
+\]
+:::
+
+---
+
+## 6.6 Central Limit Theorem
+
+::: theorem
+Let $X_i$ be i.i.d. with mean $\mu$ and variance $\sigma^2$. Then
+\[
+\sqrt{n}(\bar{X}_n - \mu) \to N(0,\sigma^2)
+\]
+:::
+
+---
+
+# 7. Exercises
+
+## Exercise 1
+Prove that a sigma-algebra is closed under finite unions.
+
+## Exercise 2
+Show that independence implies zero covariance, but not vice versa.
+
+## Exercise 3
+Prove Jensen’s inequality for discrete random variables.
+
+## Exercise 4
+Simulate the Law of Large Numbers in R.
+
+```{r}
+set.seed(123)
+x <- rnorm(1000)
+means <- cumsum(x)/seq_along(x)
+plot(means, type="l")
