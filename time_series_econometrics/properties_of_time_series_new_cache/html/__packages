@@ -1,9 +1,12 @@
+base
+methods
+datasets
+utils
+grDevices
+graphics
+stats
 ggplot2
 sysfonts
 showtextdb
 showtext
-cowplot
 ggpubr
-knitr
-readr
-dplyr

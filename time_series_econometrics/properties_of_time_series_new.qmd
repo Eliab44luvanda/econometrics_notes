@@ -1,4 +1,81 @@
 ---
+title: "**Time Series Econometrics**"
+subtitle: "**Properties of Stationary and Integrated Processes**"
+author: "Eliab Luvanda."
+date: today
+lang: en
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    classoption:
+      - twoside
+    fontsize: 11pt
+    papersize: a4
+    toc: true
+    toc-depth: 4
+    number-sections: true
+    colorlinks: true
+    lot: true
+    lof: true
+
+geometry:
+  - inner=1.3in
+  - outer=1.0in
+  - top=1.1in
+  - bottom=1.1in
+  - headsep=0.3in
+
+mainfont: "TeX Gyre Pagella"
+sansfont: "TeX Gyre Heros"
+monofont: "Inconsolata"
+
+header-includes:
+  - \usepackage{amsmath, amssymb, amsthm, mathtools}
+  - \usepackage{bm}
+  - \usepackage{bbm}
+  - \usepackage{booktabs}
+  - \usepackage{setspace}
+  - \onehalfspacing
+
+  - |
+    \theoremstyle{plain}
+    \newtheorem{theorem}{Theorem}[section]
+    \newtheorem{lemma}[theorem]{Lemma}
+    \newtheorem{proposition}[theorem]{Proposition}
+    \newtheorem{corollary}[theorem]{Corollary}
+
+  - |
+    \theoremstyle{definition}
+    \newtheorem{definition}[theorem]{Definition}
+    \newtheorem{example}[theorem]{Example}
+    \newtheorem{exercise}[theorem]{Exercise}
+
+  - |
+    \theoremstyle{remark}
+    \newtheorem{remark}[theorem]{Remark}
+
+  - \renewcommand{\qedsymbol}{$\blacksquare$}
+
+  - |
+    \newcommand{\E}{\mathbb{E}}
+    \newcommand{\Var}{\mathrm{Var}}
+    \newcommand{\Cov}{\mathrm{Cov}}
+    \newcommand{\plim}{\mathrm{plim}}
+
+  - \usepackage{fancyhdr}
+  - |
+    \pagestyle{fancy}
+    \fancyhf{}
+    \fancyhead[LE,RO]{\thepage}
+    \fancyhead[LO]{Stationary Processes}
+    \fancyhead[RE]{PhD Econometrics}
+
+execute:
+  echo: false
+  warning: false
+  message: false
 ---
 
 # Introduction
@@ -1087,6 +1164,33 @@ p4 <- ggplot(filter(plot_df, N == 500000), aes(x = beta)) +
 ```
 
 The density plots above show the distribution of $\hat{\beta}$ for different sample sizes. As sample size increases, the distribution becomes more dispersed and non-normal, consistent with the theoretical limit involving Brownian functionals. This illustrates the non-standard behavior of OLS estimators in spurious regressions.
+
+
+# Cointegration
+
+\begin{definition}[Cointegration]
+
+Let $X_t$ be an $n$-dimensional vector of time series:
+$$
+X_t = (X_{1t}, X_{2t}, \dots, X_{nt})'.
+$$
+
+Each component $X_{it}$ is said to be integrated of order one, i.e.,
+$$
+X_{it} \sim I(1), \quad i = 1, \dots, n.
+$$
+
+Then, the vector $X_t$ is said to be cointegrated of order $(1,1)$, denoted:
+$$
+X_t \sim CI(1,1),
+$$
+if there exists a non-zero vector $\beta \in \mathbb{R}^n$ such that:
+$$
+\beta' X_t \sim I(0).
+$$
+\end{definition}
+
+
 
 {{< pagebreak >}}
 # Bibliography {.unnumbered}

@@ -4,12 +4,7 @@ showtextdb
 showtext
 ggpubr
 knitr
+tidyr
 readr
 dplyr
-tidyverse
-tibble
-tidyr
-purrr
-stringr
-forcats
-lubridate
+patchwork
