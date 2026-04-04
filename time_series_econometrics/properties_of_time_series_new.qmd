@@ -1,118 +1,4 @@
 ---
-title: "**Time Series Econometrics**"
-subtitle: "**Properties of Stationary and Integrated Time Series**"
-author: "**Eliab Luvanda**"
-date: today
-lang: en
-bibliography: references.bib
-nocite: '@*'
-abstract: |
-  This handout reviews properties of stationary and integrated time
-  series, covering definitions, examples, and visual illustrations. It
-  provides a concise reference for students and researchers in
-  time-series econometrics.
-
-keywords:
-  - time series
-  - stationarity
-  - econometrics
-
-format:
-  pdf:
-    pdf-engine: lualatex
-    mainfont: Palatino
-    documentclass: article
-    classoption:
-      - twoside
-    fontsize: 11pt
-    papersize: a4
-    toc: true
-    toc-depth: 3
-    number-sections: true
-    colorlinks: true
-    lof: true
-    lot: true
-
-code-fold: true
-code-summary: "Show code"
-
-execute:
-  echo: true
-  warning: false
-  message: false
-  cache: true
-  freeze: auto
-
-
-geometry:
-  - inner=1.3in
-  - outer=1.0in
-  - top=1.1in
-  - bottom=1.1in
-  - headsep=0.3in
-header-includes:
-  - \usepackage{amsmath, amssymb, amsthm, mathtools}
-  - \usepackage{bm}
-  - \usepackage{bbm}
-  - \usepackage{booktabs}
-  - \usepackage{longtable}
-  - \usepackage{graphicx}
-  - \usepackage{setspace}
-  - \onehalfspacing
-  - \usepackage{fvextra}
-  - |
-    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere=true,commandchars=\\\{\}}
-  - |
-    \theoremstyle{plain}
-    \newtheorem{theorem}{Theorem}[section]
-    \newtheorem{lemma}[theorem]{Lemma}
-    \newtheorem{proposition}[theorem]{Proposition}
-    \newtheorem{corollary}[theorem]{Corollary}
-  - |
-    \theoremstyle{definition}
-    \newtheorem{definition}[theorem]{Definition}
-    \newtheorem{example}[theorem]{Example}
-    \newtheorem{exercise}[theorem]{Exercise}
-  - |
-    \theoremstyle{remark}
-    \newtheorem{remark}[theorem]{Remark}
-  - \renewcommand{\qedsymbol}{$\blacksquare$}
-  - |
-    \newcommand{\E}{\mathbb{E}}
-    \newcommand{\Var}{\mathrm{Var}}
-    \newcommand{\Cov}{\mathrm{Cov}}
-    \newcommand{\plim}{\mathrm{plim}}
-    \newcommand{\R}{\mathbb{R}}
-    \newcommand{\1}{\mathbbm{1}}
-  - |
-  
-  - \usepackage{titlesec}
-  - |
-    \titleformat{\section}
-      {\normalfont\large\bfseries}{\thesection}{1em}{}
-  - |
-    \titleformat{\subsection}
-      {\normalfont\normalsize\bfseries}{\thesubsection}{1em}{}
-  - \usepackage{fancyhdr}
-  - |
-    \pagestyle{fancy}
-    \fancyhf{}
-    \fancyhead[LE,RO]{\thepage}
-    \fancyhead[LO]{Stationary and Integrated Processes}
-    \fancyhead[RE]{Stationary and Integrated Processes}
-  - \usepackage{hyperref}
-  - |
-    \hypersetup{
-      colorlinks=true,
-      linkcolor=blue,
-      citecolor=blue,
-      urlcolor=blue
-    }
-  - \usepackage{float}
-  - |
-    % reduce spacing around floats
-    \setlength{\textfloatsep}{10pt}
-  - \renewcommand{\refname}{Biblioraphy}
 ---
 
 # Introduction
@@ -276,11 +162,10 @@ p <- ggplot(df, aes(x = Time, y = Value, linetype = Omega, group = Omega)) +
 
 print(p)
 ```
- 
+
 Figure 2 plots an ensemble of four independent realizations of a stationary AR(1) process to illustrate how individual sample paths fluctuate around a constant equilibrium while their average tracks the model’s theoretical mean: the red horizontal line marks the unconditional mean $\mu=\alpha/(1-\phi)$, the vertical blue line marks the inspection time $\tau_p$ (here $t_p$), and the blue point gives the ensemble mean at that time $\bar{X}_{t_p}=\tfrac{1}{4}\sum_{j=1}^4 X_{t_p}^{(j)}$. The intuition is that, although each path exhibits idiosyncratic noise and short‑run deviations, stationarity implies their first and second moments do not drift over time, so averaging across independent realizations reduces the noise and yields an estimate centered on $\mu$ (with sampling error that decreases as the ensemble size grows, by the law of large numbers).
 
 Weak (or covariance) stationarity refers to a property of a time series whereby, notwithstanding its apparent randomness, its fundamental second-order characteristics remain invariant over time. Specifically, the mean of the series is constant, and the covariance between any two observations depends solely on the temporal distance (lag) separating them rather than on their specific positions in time. Intuitively, if one were to apply a fixed-length moving window across the series and compute summary statistics such as the mean, variance, and autocorrelations at various lags (e.g., 1, 2, or 3), these measures would remain stable and exhibit no systematic drift as the window progresses along the time axis. The series does not exhibit systematic increases in level, heightened volatility, or alterations in its correlation structure over calendar time; rather, it persistently replicates an identical variance–covariance configuration. This condition constitutes a less stringent requirement than full (strong) stationarity, as it disregards the complete distributional form and instead concentrates exclusively on the first and second moments. Such a focus is frequently sufficient for linear modeling frameworks and for a wide range of practical time-series methodologies.
-
 
 The figure below illustrates a simulated weakly stationary AR(1) process, which is a common example of a stationary time series. The plot demonstrates the constancy of the mean (indicated by the red dashed line) and the stable variance over time, visually confirming the properties of weak stationarity.
 
@@ -381,7 +266,6 @@ ggplot(data, aes(x = time, y = time_series)) +
 
 The figure shows a simulated AR(1) series with coefficient $\phi = 0.8$ and unconditional mean approximately $\mu=5$. The dashed red horizontal line marks the sample mean, and the dotted green lines mark the bands at approximately $\pm2$ sample standard deviations. Deviations from the mean are persistent but mean‑reverting (due to $\phi<1$), and the overall variance remains roughly constant over time — together these features visually illustrate weak (second‑order) stationarity: a constant mean and a covariance structure that does not drift over time.
 
-
 \begin{remark}
 Weak stationarity requires only constant mean and autocovariance, whereas strong stationarity requires full distributional invariance under time shifts. Although strict stationarity is a stronger condition, weak stationarity is often sufficient in practice, especially for linear models and analyses focused on second-order properties.
 \end{remark}
@@ -436,16 +320,7 @@ ggplot(data.frame(Time = 1:n, Value = wn), aes(x = Time, y = Value)) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-The figure shows a realization of Gaussian white noise: i.i.d. draws from
-$\mathcal{N}(0,1)$. The series has (approximately) zero mean, constant
-variance, and no serial correlation at nonzero lags. Because the observations
-are independent with identical marginals, this process is a canonical
-example of a strictly (strongly) stationary process: every finite‑dimensional
-distribution is invariant under time shifts. It is therefore also weakly
-stationary (second‑order) when second moments exist. This strongly stationary
-example contrasts with the AR(1) above, where temporal dependence yields
-persistence while still satisfying weak stationarity whenever $|\phi|<1$.
-
+The figure shows a realization of Gaussian white noise: i.i.d. draws from $\mathcal{N}(0,1)$. The series has (approximately) zero mean, constant variance, and no serial correlation at nonzero lags. Because the observations are independent with identical marginals, this process is a canonical example of a strictly (strongly) stationary process: every finite‑dimensional distribution is invariant under time shifts. It is therefore also weakly stationary (second‑order) when second moments exist. This strongly stationary example contrasts with the AR(1) above, where temporal dependence yields persistence while still satisfying weak stationarity whenever $|\phi|<1$.
 
 \begin{example}
 The Bernoulli process (i.i.d. Bernoulli($p$)) is likewise strictly stationary.
@@ -461,23 +336,20 @@ Define $X_t=Z_tY$ with $Z_t$ i.i.d. mean-zero noise and $Y\in\{\pm1\}$ independe
 
 In short: weak stationarity only cares about mean, variance, and covariance stability, while strong stationarity requires full distributional invariance. This example illustrates how a process can meet the weaker conditions without satisfying the stronger ones.
 
-
-
-
 Table 1 presents a compact summary of the series and models analyzed: each row corresponds to a data series or simulated DGP and columns report the sample size, the sample mean and variance, the estimated AR(1) coefficient (with its standard error), the first few autocovariances/autocorrelations, and the key test statistics with p‑values used to assess weak stationarity and unit roots. Together these entries show the degree of persistence and variability for each series, allow quick comparison of estimated dynamics across models (e.g., stationary vs. near‑unit‑root behavior), and indicate which series reject or fail to reject stationarity at conventional significance levels.
 
-% Replaced pipe-style markdown table with a LaTeX longtable to avoid
-% layout distortion in PDF output.
+\% Replaced pipe-style markdown table with a LaTeX longtable to avoid % layout distortion in PDF output.
+
 \begin{center}
 \footnotesize
 \setlength{\tabcolsep}{6pt}
 \begin{longtable}{p{0.22\textwidth} p{0.36\textwidth} p{0.36\textwidth}}
 \caption{Summary comparison of weak (second‑order) and strong (strict) stationarity: definitions, requirements, implications, and practical considerations.}\label{tbl:stationarity_comparison}\\
-	oprule
+    oprule
 Aspect & Weak (second‑order) stationarity & Strong (strict) stationarity \\
 \midrule
 \endfirsthead
-	oprule
+    oprule
 Aspect & Weak (second‑order) stationarity & Strong (strict) stationarity \\
 \midrule
 \endhead
@@ -498,12 +370,9 @@ Vulnerabilities & Can hide nonstationary higher moments or non‑Gaussian featur
 
 ### White Noise Process {.unnumbered}
 
+**Definition (White noise).** Let $(\Omega,\mathcal{F},\mathbb{P})$ be a probability space, and let $\{\varepsilon_t\}_{t\in\mathbb{Z}}$ be a real-valued stochastic process with finite second moments. The process is a white noise process with variance $\sigma^2$ if, for every $t,s\in\mathbb{Z}$, $$\mathbb{E}[\varepsilon_t]=0,\qquad \mathbb{E}[\varepsilon_t^2]=\sigma^2<\infty,\qquad \mathrm{Cov}(\varepsilon_t,\varepsilon_s)=0\ \text{for } t\neq s.$$
 
-**Definition (White noise).** Let $(\Omega,\mathcal{F},\mathbb{P})$ be a probability space, and let $\{\varepsilon_t\}_{t\in\mathbb{Z}}$ be a real-valued stochastic process with finite second moments. The process is a white noise process with variance $\sigma^2$ if, for every $t,s\in\mathbb{Z}$,
-$$\mathbb{E}[\varepsilon_t]=0,\qquad \mathbb{E}[\varepsilon_t^2]=\sigma^2<\infty,\qquad \mathrm{Cov}(\varepsilon_t,\varepsilon_s)=0\ \text{for } t\neq s.$$ 
-
-Equivalently, its autocovariance function is
-$$\gamma(h)=\mathrm{Cov}(\varepsilon_t,\varepsilon_{t-h})=\begin{cases}\sigma^2,&h=0,\\0,&h\neq0.\end{cases}$$
+Equivalently, its autocovariance function is $$\gamma(h)=\mathrm{Cov}(\varepsilon_t,\varepsilon_{t-h})=\begin{cases}\sigma^2,&h=0,\\0,&h\neq0.\end{cases}$$
 
 This is the weak, wide-sense, or second-order notion of white noise: the process is centered, has constant finite variance, and is uncorrelated across distinct times. If the $\varepsilon_t$ are also independent and identically distributed (i.i.d.) with mean zero and variance $\sigma^2$, then the process is a strong (strictly) stationary white noise process, because all finite-dimensional distributions are invariant under time shifts. The Gaussian white noise process is a special case where $\varepsilon_t \sim \mathcal{N}(0,\sigma^2)$ i.i.d., which is also both weakly and strongly stationary.
 
@@ -511,10 +380,9 @@ This is the weak, wide-sense, or second-order notion of white noise: the process
 
 Two stronger notions are often separated from that basic definition:
 
--	i.i.d. white noise / strong white noise: $\varepsilon_t$  are independent and identically distributed with mean
-zero and variance $\sigma^2$.
+- i.i.d. white noise / strong white noise: $\varepsilon_t$ are independent and identically distributed with mean zero and variance $\sigma^2$.
 
--	Gaussian white noise: in addition, the process is jointly Gaussian; in that case, zero covariance already implies independence.
+- Gaussian white noise: in addition, the process is jointly Gaussian; in that case, zero covariance already implies independence.
 
 So, when one says:
 
@@ -528,22 +396,16 @@ $$\varepsilon_t \sim \mathcal{WN}(0,\sigma^2),$$
 
 In time-series analysis, the most cautious assumption is typically the second-order definition mentioned earlier, unless the author clearly specifies that the process is i.i.d. or Gaussian. This difference is important because being uncorrelated is a less restrictive condition than being independent. For instance, a process may display zero autocovariances at every nonzero lag—thereby meeting the criteria for weak white noise—yet still show higher-order dependencies that contradict the i.i.d. assumption. Consequently, in time-series analysis, it is essential to specify which definition of white noise is being used, since this choice affects the behavior of estimators and the reliability of statistical inference.
 
-
-
 ### Moving Average (MA) Processes {.unnumbered}
 
-**Definition (MA(q) process)**. Let $(\Omega,\mathcal{F},\mathbb{P})$ be a probability space, and let $\{\varepsilon_t\}_{t\in\mathbb{Z}}$ be a white noise process with variance $\sigma^2$. A stochastic process $\{X_t\}_{t\in\mathbb{Z}}$ is a moving average process of order $q$ (MA($q$)) if it can be represented as 
+**Definition (MA(q) process)**. Let $(\Omega,\mathcal{F},\mathbb{P})$ be a probability space, and let $\{\varepsilon_t\}_{t\in\mathbb{Z}}$ be a white noise process with variance $\sigma^2$. A stochastic process $\{X_t\}_{t\in\mathbb{Z}}$ is a moving average process of order $q$ (MA($q$)) if it can be represented as
 
-$$
-X_t=\mu+\sum_{j=0}^{q}\theta_j\varepsilon_{t-j}.
-$$
+$$X_t=\mu+\sum_{j=0}^{q}\theta_j\varepsilon_{t-j}.$$
 
 Equivalently, in lag-operator notation,
-$$
-X_t=\mu+\theta(B)\varepsilon_t,
+$$X_t=\mu+\theta(B)\varepsilon_t,
 \qquad
-\theta(B)=\theta_0+\theta_1B+\cdots+\theta_qB^q.
-$$
+\theta(B)=\theta_0+\theta_1B+\cdots+\theta_qB^q.$$
 
 This is the conventional formal definition employed in time-series analysis.
 
@@ -551,22 +413,14 @@ The term “moving average” indicates that the variable $X_t$ is constructed a
 
 According to this definition, an $\mathrm{MA}(q)$ process is inherently weakly stationary, and its autocovariance function satisfies
 
-$$
-\gamma(h)=0 \qquad \text{for } |h|>q,
-$$
+$$\gamma(h)=0 \qquad \text{for } |h|>q,$$
 Thus, correlations disappear for lags greater than $q$. More precisely,
-$$
-\gamma(h)=\sigma^2\sum_{j=0}^{q-|h|}\theta_j\theta_{j+|h|}
-\qquad \text{for } |h|\le q,
-$$
+$$\gamma(h)=\sigma^2\sum_{j=0}^{q-|h|}\theta_j\theta_{j+|h|}
+\qquad \text{for } |h|\le q,$$
 adopting the convention that $\theta_0 = 1$.
 
 One frequently encountered special instance is the $\mathrm{MA}(1)$ process:
-$$
-X_t=\mu+\varepsilon_t+\theta_1\varepsilon_{t-1}.
-$$
-
-
+$$X_t=\mu+\varepsilon_t+\theta_1\varepsilon_{t-1}.$$
 
 ### Autoregressive (AR) Processes
 
@@ -581,94 +435,65 @@ $$
 ## OLS estimation of the autoregressive coefficient under a unit root
 
 Consider the AR(1) process
-$$
-X_t = \phi X_{t-1} + u_t, \qquad t = 1,2,\dots,T,
-$$
+$$X_t = \phi X_{t-1} + u_t, \qquad t = 1,2,\dots,T,$$
 where $\{u_t\}$ is a white-noise sequence with
-$$
-\mathbb{E}(u_t)=0, \qquad \mathrm{Var}(u_t)=\sigma^2,
-$$
+$$\mathbb{E}(u_t)=0, \qquad \mathrm{Var}(u_t)=\sigma^2,$$
 
-$$
-\mathbb{E}(u_t)=0, \qquad \mathrm{Var}(u_t)=\sigma^2,
-$$
+$$\mathbb{E}(u_t)=0, \qquad \mathrm{Var}(u_t)=\sigma^2,$$
 
 and suppose that $X_0$ is fixed, or for simplicity $X_0=0$.
 
 We are interested in the special case
-$$
-\phi = 1,
-$$
+$$\phi = 1,$$
 so that the process becomes
-$$
-X_t = X_{t-1} + u_t.
-$$
+$$X_t = X_{t-1} + u_t.$$
 This is the random walk model, which is the canonical unit root process.
 
-## Step 1: Derive the OLS estimator of phi and its exact decomposition  {.unnumbered}
+## Step 1: Derive the OLS estimator of phi and its exact decomposition {.unnumbered}
 
 Treating $X_t$ as the dependent variable and $X_{t-1}$ as the regressor, the OLS estimator solves
-$$
-\hat{\phi}
+$$\hat{\phi}
 =
-\arg\min_{\phi}\sum_{t=1}^T (X_t-\phi X_{t-1})^2.
-$$
+\arg\min_{\phi}\sum_{t=1}^T (X_t-\phi X_{t-1})^2.$$
 
 Define the sum of squared residuals:
-$$
-S(\phi)=\sum_{t=1}^T (X_t-\phi X_{t-1})^2.
-$$
+$$S(\phi)=\sum_{t=1}^T (X_t-\phi X_{t-1})^2.$$
 Differentiate with respect to $\phi$:
-$$
-\frac{\partial S(\phi)}{\partial \phi}
+$$\frac{\partial S(\phi)}{\partial \phi}
 =
--2\sum_{t=1}^T X_{t-1}(X_t-\phi X_{t-1}).
-$$
+-2\sum_{t=1}^T X_{t-1}(X_t-\phi X_{t-1}).$$
 Setting the derivative equal to zero gives the normal equation:
-$$
-\sum_{t=1}^T X_{t-1}X_t
+$$\sum_{t=1}^T X_{t-1}X_t
 =
-\hat{\phi}\sum_{t=1}^T X_{t-1}^2.
-$$
+\hat{\phi}\sum_{t=1}^T X_{t-1}^2.$$
 Hence
-$$
-\hat{\phi}
+$$\hat{\phi}
 =
-\frac{\sum_{t=1}^T X_{t-1}X_t}{\sum_{t=1}^T X_{t-1}^2}.
-$$
+\frac{\sum_{t=1}^T X_{t-1}X_t}{\sum_{t=1}^T X_{t-1}^2}.$$
 
 Using the model
-$$
-X_t=\phi X_{t-1}+u_t,
-$$
+$$X_t=\phi X_{t-1}+u_t,$$
 we can write
-$$
-X_{t-1}X_t
+$$X_{t-1}X_t
 =
 X_{t-1}(\phi X_{t-1}+ u_t)
 =
-\phi X_{t-1}^2 + X_{t-1}u_t.
-$$
+\phi X_{t-1}^2 + X_{t-1}u_t.$$
 Summing over $t$,
-$$
-\sum_{t=1}^T X_{t-1}X_t
+$$\sum_{t=1}^T X_{t-1}X_t
 =
-\phi \sum_{t=1}^T X_{t-1}^2 + \sum_{t=1}^T X_{t-1}u_t.
-$$
+\phi \sum_{t=1}^T X_{t-1}^2 + \sum_{t=1}^T X_{t-1}u_t.$$
 Substituting into the estimator gives
-$$
-\hat{\phi}
+$$\hat{\phi}
 =
 \phi
 +
-\frac{\sum_{t=1}^T X_{t-1}u_t}{\sum_{t=1}^T X_{t-1}^2}.
-$$
+\frac{\sum_{t=1}^T X_{t-1}u_t}{\sum_{t=1}^T X_{t-1}^2}.$$
+
 Therefore,
-$$
-\hat{\phi}-\phi
+$$\hat{\phi}-\phi
 =
-\frac{\sum_{t=1}^T X_{t-1}u_t}{\sum_{t=1}^T X_{t-1}^2}.
-$$
+\frac{\sum_{t=1}^T X_{t-1}u_t}{\sum_{t=1}^T X_{t-1}^2}.$$
 
 This decomposition is exact. It is the starting point for the asymptotic analysis.
 
@@ -677,136 +502,90 @@ This decomposition is exact. It is the starting point for the asymptotic analysi
 We now specialize to the unit root case $\phi=1$.
 
 When $\phi=1$, the process is
-$$
-X_t = X_{t-1}+u_t,
-$$
+$$X_t = X_{t-1}+u_t,$$
 so iterating backward yields
-$$
-X_t = X_0 + \sum_{s=1}^t u_s.
-$$
+$$X_t = X_0 + \sum_{s=1}^t u_s.$$
 If $X_0=0$, then
-$$
-X_t=\sum_{s=1}^t u_s.
-$$
+$$X_t=\sum_{s=1}^t u_s.$$
 Thus $X_t$ is a partial sum process.
 
 Under $\phi=1$, the OLS estimator becomes
-$$
-\hat{\phi}-1
+$$\hat{\phi}-1
 =
-\frac{\sum_{t=1}^T X_{t-1}u_t}{\sum_{t=1}^T X_{t-1}^2}.
-$$
+\frac{\sum_{t=1}^T X_{t-1}u_t}{\sum_{t=1}^T X_{t-1}^2}.$$
 The behavior of this ratio is very different from the stationary AR(1) case. In particular, the estimator converges at rate $T$, not at rate $\sqrt{T}$.
 
 To see why, note the orders of magnitude:
-$$
-X_t = O_p(\sqrt{T}),
-$$
+$$X_t = O_p(\sqrt{T}),$$
 because it is a partial sum of mean-zero shocks. Hence
-$$
-X_{t-1}^2 = O_p(T),
-$$
+$$X_{t-1}^2 = O_p(T),$$
 and therefore
-$$
-\sum_{t=1}^T X_{t-1}^2 = O_p(T^2).
-$$
+$$\sum_{t=1}^T X_{t-1}^2 = O_p(T^2).$$
 Similarly,
-$$
-\sum_{t=1}^T X_{t-1}u_t = O_p(T).
-$$
+$$\sum_{t=1}^T X_{t-1}u_t = O_p(T).$$
 So
-$$
-\hat{\phi}-1 = O_p(T^{-1}),
-$$
+$$\hat{\phi}-1 = O_p(T^{-1}),$$
 which implies that the correct normalization is
-$$
-T(\hat{\phi}-1),
-$$
+$$T(\hat{\phi}-1),$$
 not $\sqrt{T}(\hat{\phi}-1)$.
 
 ## Step 3: Rewrite the numerator using an algebraic identity {.unnumbered}
 
 A very useful identity is obtained from
-$$
-X_t = X_{t-1}+u_t.
-$$
+$$X_t = X_{t-1}+u_t.$$
 Squaring both sides,
-$$
-X_t^2 = X_{t-1}^2 + 2X_{t-1}u_t + u_t^2.
-$$
+$$X_t^2 = X_{t-1}^2 + 2X_{t-1}u_t + u_t^2.$$
 Rearranging,
-$$
-2X_{t-1}u_t = X_t^2 - X_{t-1}^2 - u_t^2.
-$$
+$$2X_{t-1}u_t = X_t^2 - X_{t-1}^2 - u_t^2.$$
 Summing from $t=1$ to $T$ gives
-$$
-2\sum_{t=1}^T X_{t-1}u_t
+$$2\sum_{t=1}^T X_{t-1}u_t
 =
-\sum_{t=1}^T (X_t^2 - X_{t-1}^2) - \sum_{t=1}^T u_t^2.
-$$
+\sum_{t=1}^T (X_t^2 - X_{t-1}^2) - \sum_{t=1}^T u_t^2.$$
 The first sum telescopes:
-$$
-\sum_{t=1}^T (X_t^2 - X_{t-1}^2)
+$$\sum_{t=1}^T (X_t^2 - X_{t-1}^2)
 =
-X_T^2 - X_0^2.
-$$
+X_T^2 - X_0^2.$$
 Therefore,
-$$
-\sum_{t=1}^T X_{t-1}u_t
+$$\sum_{t=1}^T X_{t-1}u_t
 =
-\frac{1}{2}\left(X_T^2 - X_0^2 - \sum_{t=1}^T u_t^2\right).
-$$
+\frac{1}{2}\left(X_T^2 - X_0^2 - \sum_{t=1}^T u_t^2\right).$$
 If $X_0=0$, this reduces to
-$$
-\sum_{t=1}^T X_{t-1}u_t
+$$\sum_{t=1}^T X_{t-1}u_t
 =
-\frac{1}{2}\left(X_T^2 - \sum_{t=1}^T u_t^2\right).
-$$
+\frac{1}{2}\left(X_T^2 - \sum_{t=1}^T u_t^2\right).$$
 
 Hence
-$$
-\hat{\phi}-1
+$$\hat{\phi}-1
 =
 \frac{\frac{1}{2}\left(X_T^2-\sum_{t=1}^T u_t^2\right)}
-{\sum_{t=1}^T X_{t-1}^2}.
-$$
+{\sum_{t=1}^T X_{t-1}^2}.$$
 Multiplying by $T$,
-$$
-T(\hat{\phi}-1)
+$$T(\hat{\phi}-1)
 =
 \frac{\frac{1}{2}\left(T^{-1}X_T^2 - T^{-1}\sum_{t=1}^T u_t^2\right)}
-{T^{-2}\sum_{t=1}^T X_{t-1}^2}.
-$$
+{T^{-2}\sum_{t=1}^T X_{t-1}^2}.$$
 
 This formula already suggests the appropriate limits: $T^{-1}X_T^2$ and $T^{-1}\sum u_t^2$ are both $O_p(1)$, and so is $T^{-2}\sum X_{t-1}^2$.
 
 ## Step 4: Functional central limit theorem representation {.unnumbered}
 
 Define the scaled partial sum process
-$$
-W_T(r)
+$$W_T(r)
 =
 \frac{1}{\sigma\sqrt{T}}X_{\lfloor Tr\rfloor},
-\qquad 0\le r\le 1.
-$$
+\qquad 0\le r\le 1.$$
 Since under the unit root
-$$
-X_{\lfloor Tr\rfloor}
+$$X_{\lfloor Tr\rfloor}
 =
-\sum_{s=1}^{\lfloor Tr\rfloor} u_s,
-$$
+\sum_{s=1}^{\lfloor Tr\rfloor} u_s,$$
 we may write
-$$
-W_T(r)
+$$W_T(r)
 =
 \frac{1}{\sigma\sqrt{T}}
-\sum_{s=1}^{\lfloor Tr\rfloor} u_s.
-$$
+\sum_{s=1}^{\lfloor Tr\rfloor} u_s.$$
 Under standard assumptions on $\{u_t\}$, the functional central limit theorem implies
-$$
-W_T(\cdot)\Rightarrow W(\cdot)
-\quad \text{in } D[0,1],
-$$
+$$W_T(\cdot)\Rightarrow W(\cdot)
+\quad \text{in } D[0,1],$$
 where $W(\cdot)$ is standard Brownian motion.
 
 This result is the key tool for obtaining the asymptotic distribution of the OLS estimator under a unit root.
@@ -814,30 +593,20 @@ This result is the key tool for obtaining the asymptotic distribution of the OLS
 ## Step 5: Limit of the denominator {.unnumbered}
 
 Consider
-$$
-T^{-2}\sum_{t=1}^T X_{t-1}^2.
-$$
+$$T^{-2}\sum_{t=1}^T X_{t-1}^2.$$
 Using
-$$
-X_{t-1} = \sigma\sqrt{T}\,W_T\!\left(\frac{t-1}{T}\right),
-$$
+$$X_{t-1} = \sigma\sqrt{T}\,W_T\!\left(\frac{t-1}{T}\right),$$
 we have
-$$
-X_{t-1}^2 = \sigma^2 T\, W_T\!\left(\frac{t-1}{T}\right)^2.
-$$
+$$X_{t-1}^2 = \sigma^2 T\, W_T\!\left(\frac{t-1}{T}\right)^2.$$
 Therefore,
-$$
-T^{-2}\sum_{t=1}^T X_{t-1}^2
+$$T^{-2}\sum_{t=1}^T X_{t-1}^2
 =
 \sigma^2 \frac{1}{T}\sum_{t=1}^T
-W_T\!\left(\frac{t-1}{T}\right)^2.
-$$
+W_T\!\left(\frac{t-1}{T}\right)^2.$$
 This is a Riemann sum, so by the continuous mapping theorem,
-$$
-T^{-2}\sum_{t=1}^T X_{t-1}^2
+$$T^{-2}\sum_{t=1}^T X_{t-1}^2
 \Rightarrow
-\sigma^2 \int_0^1 W(r)^2\,dr.
-$$
+\sigma^2 \int_0^1 W(r)^2\,dr.$$
 
 ## Step 6: Limit of the numerator {.unnumbered}
 
@@ -846,118 +615,82 @@ We may proceed in two equivalent ways.
 **Method 1: Using the telescoping identity**
 
 Recall
-$$
-\sum_{t=1}^T X_{t-1}u_t
+$$\sum_{t=1}^T X_{t-1}u_t
 =
-\frac{1}{2}\left(X_T^2-\sum_{t=1}^T u_t^2\right),
-$$
+\frac{1}{2}\left(X_T^2-\sum_{t=1}^T u_t^2\right),$$
 when $X_0=0$. Divide by $T$:
-$$
-T^{-1}\sum_{t=1}^T X_{t-1}u_t
+$$T^{-1}\sum_{t=1}^T X_{t-1}u_t
 =
-\frac{1}{2}\left(T^{-1}X_T^2 - T^{-1}\sum_{t=1}^T u_t^2\right).
-$$
+\frac{1}{2}\left(T^{-1}X_T^2 - T^{-1}\sum_{t=1}^T u_t^2\right).$$
 
 Now,
-$$
-T^{-1}X_T^2
+$$T^{-1}X_T^2
 =
 \sigma^2 W_T(1)^2
 \Rightarrow
-\sigma^2 W(1)^2,
-$$
+\sigma^2 W(1)^2,$$
 and by the law of large numbers,
-$$
-T^{-1}\sum_{t=1}^T u_t^2 \xrightarrow{p} \sigma^2.
-$$
+$$T^{-1}\sum_{t=1}^T u_t^2 \xrightarrow{p} \sigma^2.$$
 Hence
-$$
-T^{-1}\sum_{t=1}^T X_{t-1}u_t
+$$T^{-1}\sum_{t=1}^T X_{t-1}u_t
 \Rightarrow
-\frac{\sigma^2}{2}\bigl(W(1)^2-1\bigr).
-$$
+\frac{\sigma^2}{2}\bigl(W(1)^2-1\bigr).$$
 
 **Method 2: Using a stochastic integral**
 
 Write
-$$
-T^{-1}\sum_{t=1}^T X_{t-1}u_t
+$$T^{-1}\sum_{t=1}^T X_{t-1}u_t
 =
 \sigma^2
 \sum_{t=1}^T
 W_T\!\left(\frac{t-1}{T}\right)
-\Bigl(W_T\!\left(\frac{t}{T}\right)-W_T\!\left(\frac{t-1}{T}\right)\Bigr).
-$$
+\Bigl(W_T\!\left(\frac{t}{T}\right)-W_T\!\left(\frac{t-1}{T}\right)\Bigr).$$
 As $T\to\infty$, this converges in distribution to the It\^o integral
-$$
-\sigma^2\int_0^1 W(r)\,dW(r).
-$$
+$$\sigma^2\int_0^1 W(r)\,dW(r).$$
 By It\^o's formula,
-$$
-d(W(r)^2)=2W(r)\,dW(r)+dr.
-$$
+$$d(W(r)^2)=2W(r)\,dW(r)+dr.$$
 Integrating from $0$ to $1$,
-$$
-W(1)^2-W(0)^2
+$$W(1)^2-W(0)^2
 =
-2\int_0^1 W(r)\,dW(r)+1.
-$$
+2\int_0^1 W(r)\,dW(r)+1.$$
 Since $W(0)=0$,
-$$
-\int_0^1 W(r)\,dW(r)
+$$\int_0^1 W(r)\,dW(r)
 =
-\frac{1}{2}\bigl(W(1)^2-1\bigr).
-$$
+\frac{1}{2}\bigl(W(1)^2-1\bigr).$$
 Thus again,
-$$
-T^{-1}\sum_{t=1}^T X_{t-1}u_t
+$$T^{-1}\sum_{t=1}^T X_{t-1}u_t
 \Rightarrow
 \sigma^2 \int_0^1 W(r)\,dW(r)
 =
-\frac{\sigma^2}{2}\bigl(W(1)^2-1\bigr).
-$$
+\frac{\sigma^2}{2}\bigl(W(1)^2-1\bigr).$$
 
 ## Step 7: Asymptotic distribution of the OLS estimator {.unnumbered}
 
 Recall
-$$
-T(\hat{\phi}-1)
+$$T(\hat{\phi}-1)
 =
 \frac{T^{-1}\sum_{t=1}^T X_{t-1}u_t}
-{T^{-2}\sum_{t=1}^T X_{t-1}^2}.
-$$
+{T^{-2}\sum_{t=1}^T X_{t-1}^2}.$$
 Using the limits derived above,
-$$
-T^{-1}\sum_{t=1}^T X_{t-1}u_t
+$$T^{-1}\sum_{t=1}^T X_{t-1}u_t
 \Rightarrow
-\sigma^2 \int_0^1 W(r)\,dW(r),
-$$
+\sigma^2 \int_0^1 W(r)\,dW(r),$$
 and
-$$
-T^{-2}\sum_{t=1}^T X_{t-1}^2
+$$T^{-2}\sum_{t=1}^T X_{t-1}^2
 \Rightarrow
-\sigma^2 \int_0^1 W(r)^2\,dr.
-$$
+\sigma^2 \int_0^1 W(r)^2\,dr.$$
 Therefore, by the continuous mapping theorem,
-$$
-T(\hat{\phi}-1)
+$$T(\hat{\phi}-1)
 \Rightarrow
 \frac{\int_0^1 W(r)\,dW(r)}
-{\int_0^1 W(r)^2\,dr}.
-$$
+{\int_0^1 W(r)^2\,dr}.$$
 Using the identity
-$$
-\int_0^1 W(r)\,dW(r)
+$$\int_0^1 W(r)\,dW(r)
 =
-\frac{1}{2}\bigl(W(1)^2-1\bigr),
-$$
-we obtain the equivalent expression
-$$
-T(\hat{\phi}-1)
+\frac{1}{2}\bigl(W(1)^2-1\bigr),$$
+$$T(\hat{\phi}-1)
 \Rightarrow
-\frac{\frac{1}{2}\bigl(W(1)^2-1\bigr)}
-{\int_0^1 W(r)^2\,dr}.
-$$
+\frac{\frac{1}{2}(W(1)^2-1)}{\int_0^1 W(r)^2\,dr}.$$
 
 This is the asymptotic distribution of the OLS estimator under the unit root null. It is \emph{not} normal. This is the fundamental reason why conventional $t$-tests based on standard normal or Student-$t$ critical values are invalid in the unit root case.
 
@@ -966,69 +699,48 @@ This is the asymptotic distribution of the OLS estimator under the unit root nul
 The result shows that the unit root case is nonstandard because the regressor $X_{t-1}$ is itself a stochastic trend. In stationary autoregressions, the regressor has a stable second moment and the usual central limit theorem leads to a Gaussian limit for the estimator. Under a unit root, however, $X_{t-1}$ behaves like a partial sum process and, after normalization, converges to Brownian motion. Consequently, the estimator is governed by functionals of Brownian motion rather than by a normal distribution.
 
 More precisely,
-$$
-\hat{\phi}-1 = O_p(T^{-1}),
-$$
+$$\hat{\phi}-1 = O_p(T^{-1}),$$
 so the estimator is \emph{superconsistent}: it converges to $1$ faster than the usual $T^{-1/2}$ rate. But despite this faster convergence, its limiting distribution is non-Gaussian:
-$$
-T(\hat{\phi}-1)
+$$T(\hat{\phi}-1)
 \Rightarrow
-\frac{\frac{1}{2}(W(1)^2-1)}{\int_0^1 W(r)^2\,dr}.
-$$
+\frac{\frac{1}{2}(W(1)^2-1)}{\int_0^1 W(r)^2\,dr}.$$
 This nonstandard limit is the basis for Dickey--Fuller unit root theory.
 
 ## Step 9: Useful summary formulae {.unnumbered}
 
 For the AR(1) model
-$$
-X_t=\phi X_{t-1}+u_t,
-$$
+$$X_t=\phi X_{t-1}+u_t,$$
 the OLS estimator is
-$$
-\hat{\phi}
+$$\hat{\phi}
 =
 \frac{\sum_{t=1}^T X_{t-1}X_t}{\sum_{t=1}^T X_{t-1}^2}
 =
-\phi + \frac{\sum_{t=1}^T X_{t-1}u_t}{\sum_{t=1}^T X_{t-1}^2}.
-$$
+\phi + \frac{\sum_{t=1}^T X_{t-1}u_t}{\sum_{t=1}^T X_{t-1}^2}.$$
 
 Under the unit root null $\phi=1$,
-$$
-X_t = \sum_{s=1}^t u_s,
-$$
+$$X_t = \sum_{s=1}^t u_s,$$
 and
-$$
-\sum_{t=1}^T X_{t-1}u_t
+$$\sum_{t=1}^T X_{t-1}u_t
 =
 \frac{1}{2}\left(X_T^2-\sum_{t=1}^T u_t^2\right)
-\qquad (X_0=0).
-$$
+\qquad (X_0=0).$$
 
 The asymptotic limits are
-$$
-T^{-2}\sum_{t=1}^T X_{t-1}^2
+$$T^{-2}\sum_{t=1}^T X_{t-1}^2
 \Rightarrow
-\sigma^2\int_0^1 W(r)^2\,dr,
-$$
-$$
-T^{-1}\sum_{t=1}^T X_{t-1}u_t
+\sigma^2\int_0^1 W(r)^2\,dr,$$
+
+$$T^{-1}\sum_{t=1}^T X_{t-1}u_t
 \Rightarrow
 \sigma^2\int_0^1 W(r)\,dW(r)
 =
-\frac{\sigma^2}{2}\bigl(W(1)^2-1\bigr),
-$$
+\frac{\sigma^2}{2}\bigl(W(1)^2-1\bigr),$$
 and hence
-$$
-T(\hat{\phi}-1)
+$$T(\hat{\phi}-1)
 \Rightarrow
 \frac{\int_0^1 W(r)\,dW(r)}{\int_0^1 W(r)^2\,dr}
 =
-\frac{\frac{1}{2}(W(1)^2-1)}{\int_0^1 W(r)^2\,dr}.
-$$
-
-
-
-
+\frac{\frac{1}{2}(W(1)^2-1)}{\int_0^1 W(r)^2\,dr}.$$
 
 ```{julia}
 #| echo: false
@@ -1040,8 +752,8 @@ $$
 include("simulate_ols_ar1_random_walk.jl")
 ```
 
-::: {#fig-ols fig-cap="OLS $\hat{\phi}$ distributions for stationary AR(1) and random walk processes"}
-![](ols_estimator_distributions.png){width=90%}
+::: {#fig-ols fig-cap="OLS $\\hat{\\phi}$ distributions for stationary AR(1) and random walk processes"}
+![](ols_estimator_distributions.png){width="90%"}
 :::
 
 ```{r sim_summary, echo=FALSE, results='asis'}
@@ -1111,7 +823,6 @@ if (file.exists("sim_run_1e6.log")) {
 
 A fundamental problem in time-series econometrics arises when nonstationary series are regressed on one another. Even when the underlying stochastic processes are independent, ordinary least squares (OLS) estimation may produce statistically significant relationships. This phenomenon is known as **spurious regression**, first documented by Granger and Newbold (1974) and later formalized by Phillips (1986).
 
-
 \begin{definition}[Spurious Regression]
 
 Let $Y_{t=1}^T$ and $X_{t=1}^T$ be two stochastic processes such that both are non-stationary, typically integrated of order one, i.e., 
@@ -1140,6 +851,10 @@ $$
 $$
 for some critical value $c$, even though $Y_t$ and $X_t$ are independent or unrelated processes.
 \end{definition}
+
+Spurious regression can be explained intuitively in this way: when two time series are non-stationary, they often display trends as time progresses. Even if these trends are entirely unrelated, ordinary least squares may still indicate a strong relationship between the variables, simply because both series follow a similar directional pattern over time. This may produce a high $R^2$ and coefficients that appear statistically significant, despite the absence of any genuine causal or meaningful link between the variables. The residuals from this type of regression are usually non-stationary, suggesting that the model has been incorrectly specified.
+
+
 
 
 \begin{example}
@@ -1176,42 +891,97 @@ indicating that the regression is misspecified.
 This is a classic example of a \textit{spurious regression}, where standard inference incorrectly suggests a meaningful relationship between unrelated non-stationary variables.
 \end{example}
 
-\begin{remark}
 
-Spurious regression occurs when non-stationary time series with stochastic trends appear strongly related despite having no true connection. If variables are integrated but not cointegrated, their shared trends can produce misleadingly high \(R^2\) values and significant \(t\)-statistics. In these cases, OLS produces coefficients with non-standard asymptotic distributions, invalidating conventional inference. The issue stems from shared trending behavior without an underlying equilibrium relationship.
+\begin{remark}
+Spurious regression occurs when non-stationary time series with stochastic trends appear strongly related despite having no true connection. If variables are integrated but not cointegrated, their shared trends can produce misleadingly high $R^2$ values and significant $t$-statistics. In these cases, OLS produces coefficients with non-standard asymptotic distributions, invalidating conventional inference. The issue stems from shared trending behavior without an underlying equilibrium relationship.
 \end{remark}
+
+
+
+```{r spurious-table-plot_0, echo=FALSE, warning=FALSE, message=FALSE, fig.cap="Spurious regression examples", fig.width=5, fig.height=4}
+  # Load required libraries
+  library(ggplot2)
+  library(tidyr)
+  
+  # Set seed for reproducibility
+  set.seed(123)
+  
+  # Sample size
+  T <- 200
+  
+  # Drift terms
+  mu_y <- 0.5
+  mu_x <- 0.3
+  
+  # Generate white noise
+  eps_y <- rnorm(T, mean = 0, sd = 1)
+  eps_x <- rnorm(T, mean = 0, sd = 1)
+  
+  # Initialize series
+  Y <- numeric(T)
+  X <- numeric(T)
+  
+  # Starting values
+  Y[1] <- 0
+  X[1] <- 0
+  
+  # Generate random walks with drift
+  for (t in 2:T) {
+    Y[t] <- Y[t-1] + mu_y + eps_y[t]
+    X[t] <- X[t-1] + mu_x + eps_x[t]
+  }
+  
+  # Create data frame
+  df <- data.frame(
+    time = 1:T,
+    Y = Y,
+    X = X
+  )
+  
+  # Reshape data for ggplot
+  df_long <- pivot_longer(df, cols = c("Y", "X"),
+                          names_to = "Series",
+                          values_to = "Value")
+  
+  # Plot
+  ggplot(df_long, aes(x = time, y = Value, linetype = Series)) +
+    geom_line(size = 1) +
+    labs(
+      x = "Time",
+      y = "Value"
+    ) +
+    theme_classic() +
+    theme(
+      text = element_text(size = 14),
+      legend.position = "top"
+    )
+```
 
 
 In this section, we combine theory and Monte Carlo simulation to illustrate both the mechanism and the consequences of spurious regression.
 
----
+------------------------------------------------------------------------
 
 ## Theoretical Framework
 
-
-$$
-X_t = X_{t-1} + u_t, \qquad
-Y_t = Y_{t-1} + v_t,
-$$
+$$X_t = X_{t-1} + u_t, \qquad
+Y_t = Y_{t-1} + v_t,$$
 
 where $u_t$ and $v_t$ are independent white-noise processes with zero mean and finite variance.
 
 We estimate the regression:
 
-$$
-Y_t = \alpha + \beta X_t + e_t.
-$$
+$$Y_t = \alpha + \beta X_t + e_t.$$
 
 Since $X_t$ and $Y_t$ are independent, the true relationship is null. However, OLS estimation produces nonstandard behavior.
 
----
-
+------------------------------------------------------------------------
 
 \begin{remark}
 This limiting distribution is non-normal and depends on functionals of Brownian motion. Importantly, \(\hat{\beta}\) itself converges to a nondegenerate distribution—no additional scaling is required.
 \end{remark}
 
----
+------------------------------------------------------------------------
 
 ### Divergence of the t-Statistic
 
@@ -1221,14 +991,13 @@ The conventional t-statistic for testing $(H_0:\beta=0$ diverges as $T \to \inft
 
 This explains why standard inference fails in regressions involving nonstationary variables.
 
----
+------------------------------------------------------------------------
+
 ## Monte Carlo Simulation
 
 We simulate two independent random walks and estimate the regression:
 
-$$
-Y_t = \alpha + \beta X_t + e_t.
-$$
+$$Y_t = \alpha + \beta X_t + e_t.$$
 
 The design uses:
 
@@ -1272,137 +1041,13 @@ kable(
 
 ### Distribution of the OLS Estimator
 
-After examining the rejection frequencies, we can also look at the distribution of the OLS estimator $\hat{\beta}$ across simulations. The figure below shows the density of $\hat{\beta}$ for different sample sizes.The distribution is for the unscaled OLS estimator $\hat{\beta}$. 
+After examining the rejection frequencies, we can also look at the distribution of the OLS estimator $\hat{\beta}$ across simulations. The figure below shows the density of $\hat{\beta}$ for different sample sizes. The distribution is for the unscaled OLS estimator $\hat{\beta}$.
 
-```{r unscaled-density-plot, fig.cap="Densities of $\\hat{\\beta}$ (unscaled) across sample sizes", fig.width=8, fig.height=5}
-#| echo: false
-#| warning: false
-#| message: false
+```{r spurious-density-plot, echo=FALSE, include=TRUE, eval=TRUE, fig.cap="Densities of $\\hat{\\beta}$ across sample sizes", fig.width=8, fig.height=5}
 library(readr)
 library(dplyr)
 library(ggplot2)
-
-sim <- read_csv("spurious_rw_unscaled_sim.csv", show_col_types = FALSE)
-
-plot_df <- sim |>
-  filter(N %in% c(50, 500, 10000, 500000)) |>
-  mutate(
-    N_f = factor(N,
-                levels = c(50, 500, 10000, 500000),
-                labels = format(c(50, 500, 10000, 500000), big.mark = ",", scientific = FALSE, trim = TRUE)
-    )
-  )
-
-ggplot(plot_df, aes(x = beta)) +
-  geom_density(fill = "steelblue", alpha = 0.35, color = "steelblue4", linewidth = 0.4) +
-  facet_wrap(~N_f, nrow = 2, ncol = 2, scales = "free") +
-  labs(x = expression(hat(beta)), y = "Density") +
-  theme_classic()
-```
-
-
-The simulation shows that the distribution of $\hat{\beta}$ appears approximately normal. This is a **finite-sample illusion**. The true asymptotic distribution is non-normal, but finite samples can produce visually symmetric, bell-shaped histograms. The illusion of normality can be misleading, especially when standard inference is applied without recognizing the non-standard asymptotic behavior.
-
-
-
-
-```{julia}
-#| echo: false
-#| include: false
-#| cache: true
-using Random, Distributions, CSV, DataFrames, Statistics
-
-outfile = "spurious_rw_sim_results.csv"
-run_sim = get(ENV, "RUN_SPURIOUS_SIM", "0") == "1"
-
-if !run_sim && isfile(outfile)
-    @info "Skipping simulation. Using existing file: $outfile"
-else
-    Random.seed!(2026)
-    Ns = [50, 100, 500, 1000, 10000, 100000, 500000]
-    R = 20000
-
-    results_list = Vector{DataFrame}(undef, length(Ns))
-
-    for (i, N) in pairs(Ns)
-        beta_vec = Vector{Float64}(undef, R)
-        t_vec = Vector{Union{Missing, Float64}}(missing, R)
-        p_vec = Vector{Union{Missing, Float64}}(missing, R)
-
-        compute_inference = N <= 10_000
-
-        Threads.@threads for r in 1:R
-            rng = MersenneTwister(1_000_000 * i + r)
-
-            x = 0.0
-            y = 0.0
-            sum_x = 0.0
-            sum_y = 0.0
-            sum_x2 = 0.0
-            sum_y2 = 0.0
-            sum_xy = 0.0
-
-            for _ in 1:N
-                x += randn(rng)
-                y += randn(rng)
-
-                sum_x += x
-                sum_y += y
-                sum_x2 += x * x
-                sum_y2 += y * y
-                sum_xy += x * y
-            end
-
-            xbar = sum_x / N
-            ybar = sum_y / N
-
-            sxx = sum_x2 - N * xbar^2
-            sxy = sum_xy - N * xbar * ybar
-
-            beta_hat = sxy / sxx
-            beta_vec[r] = beta_hat
-
-            if compute_inference
-                alpha_hat = ybar - beta_hat * xbar
-                ssr = sum_y2 - 2 * alpha_hat * sum_y - 2 * beta_hat * sum_xy +
-                    N * alpha_hat^2 + 2 * alpha_hat * beta_hat * sum_x + beta_hat^2 * sum_x2
-
-                s2 = ssr / (N - 2)
-                se_beta = sqrt(s2 / sxx)
-                t = beta_hat / se_beta
-                p = 2 * (1 - cdf(TDist(N - 2), abs(t)))
-
-                t_vec[r] = t
-                p_vec[r] = p
-            end
-        end
-
-        results_list[i] = DataFrame(
-            N = fill(N, R),
-            rep = collect(1:R),
-            beta = beta_vec,
-            tstat = t_vec,
-            pval = p_vec
-        )
-    end
-
-    results = vcat(results_list...)
-    CSV.write(outfile, results)
-end
-```
-
-
-
-
-
-
-```{r spurious-density-plot, fig.cap="Densities of $N\\hat{\\beta}$ across sample sizes", fig.width=8, fig.height=5}
-#| echo: false
-#| warning: false
-#| message: false
-library(readr)
-library(dplyr)
-library(ggplot2)
+library(patchwork)
 
 sim <- read_csv("spurious_rw_sim_results.csv", show_col_types = FALSE)
 
@@ -1410,6 +1055,7 @@ plot_df <- sim |>
   filter(N %in% c(50, 500, 10000, 500000)) |>
   mutate(
     N_beta_hat = N * beta,
+    deflated_beta = beta / sqrt(N),
     N_f = factor(
       N,
       levels = c(50, 500, 10000, 500000),
@@ -1417,19 +1063,32 @@ plot_df <- sim |>
     )
   )
 
-ggplot(plot_df, aes(x = N_beta_hat)) +
+p1 <- ggplot(filter(plot_df, N == 50), aes(x = beta)) +
   geom_density(fill = "steelblue", alpha = 0.35, color = "steelblue4", linewidth = 0.4) +
-  facet_wrap(~N_f, nrow = 2, ncol = 2, scales = "free") +
-  labs(x = expression(N * hat(beta)), y = "Density") +
+  labs(title = "N = 50", x = expression(hat(beta)), y = "Density") +
   theme_classic()
+
+p2 <- ggplot(filter(plot_df, N == 500), aes(x = beta)) +
+  geom_density(fill = "steelblue", alpha = 0.35, color = "steelblue4", linewidth = 0.4) +
+  labs(title = "N = 500", x = expression(hat(beta)), y = "Density") +
+  theme_classic()
+
+p3 <- ggplot(filter(plot_df, N == 10000), aes(x = beta)) +
+  geom_density(fill = "steelblue", alpha = 0.35, color = "steelblue4", linewidth = 0.4) +
+  labs(title = "N = 10,000", x = expression(hat(beta)), y = "Density") +
+  theme_classic()
+
+p4 <- ggplot(filter(plot_df, N == 500000), aes(x = beta)) +
+  geom_density(fill = "steelblue", alpha = 0.35, color = "steelblue4", linewidth = 0.4) +
+  labs(title = "N = 500,000", x = expression(hat(beta)), y = "Density") +
+  theme_classic()
+
+(p1 + p2) / (p3 + p4)
 ```
 
-### Scaled Estimator $N\hat{\beta}$
-
-The density plots above show the distribution of $N\hat{\beta}$. As sample size increases, the distribution becomes more dispersed and non-normal, consistent with the theoretical limit involving Brownian functionals. This illustrates the non-standard behavior of OLS estimators in spurious regressions.
+The density plots above show the distribution of $\hat{\beta}$ for different sample sizes. As sample size increases, the distribution becomes more dispersed and non-normal, consistent with the theoretical limit involving Brownian functionals. This illustrates the non-standard behavior of OLS estimators in spurious regressions.
 
 {{< pagebreak >}}
-
 # Bibliography {.unnumbered}
 
 ::: {#refs}
@@ -1476,8 +1135,6 @@ The density plots above show the distribution of $N\hat{\beta}$. As sample size 
 
 ## Scaled Estimator Density {.unnumbered}
 
-```{r, ref.label='spurious-density-plot', echo=TRUE, eval=FALSE}
-```
 
 ## Julia Simulation: OLS AR(1) vs Random Walk {.unnumbered}
 
@@ -1506,4 +1163,3 @@ else
     # ... full simulation code as above ...
 end
 ```
-
