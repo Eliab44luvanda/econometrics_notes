@@ -1168,6 +1168,13 @@ The density plots above show the distribution of $\hat{\beta}$ for different sam
 
 # Cointegration
 
+Let $\mathbf{x}_t = (x_{1t},\, x_{2t},\, \ldots,\, x_{nt})'$ be a vector of $n$ time series observed at
+discrete times $t = 1, 2, \ldots, T$.  Recall that a scalar series $y_t$ is said to be
+\emph{integrated of order} $d$, written $y_t \sim I(d)$, if $\Delta^d y_t$ is stationary
+(with $\Delta^d$ denoting the $d$-th difference operator) while $\Delta^{d-1} y_t$ is
+non-stationary.
+ 
+
 \begin{definition}[Cointegration]
 
 Let $X_t$ be an $n$-dimensional vector of time series:

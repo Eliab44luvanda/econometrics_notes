@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Eliab Luvanda">
-<meta name="dcterms.date" content="2026-03-31">
+<meta name="dcterms.date" content="2026-04-06">
 
 <title>Measure-Theoretic Probability Theory</title>
 <style>
@@ -60,7 +60,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="probability_theory_files/libs/clipboard/clipboard.min.js"></script>
@@ -75,7 +94,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="probability_theory_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="probability_theory_files/libs/bootstrap/bootstrap-138a6193a3bd40baf1e627da441a4734.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="palatino.css">
 </head>
 
 <body class="quarto-light">
@@ -105,7 +154,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 31, 2026</p>
+      <p class="date">April 6, 2026</p>
     </div>
   </div>
   
@@ -118,45 +167,82 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <section id="introduction" class="level1">
-<h1>1. Introduction</h1>
+<h1>Introduction</h1>
 <section id="probability-and-uncertainty" class="level2">
-<h2 class="anchored" data-anchor-id="probability-and-uncertainty">1.1 Probability and Uncertainty</h2>
-<p>In economics, uncertainty is central to decision-making, from consumption choices to financial markets and policy design.</p>
+<h2 class="anchored" data-anchor-id="probability-and-uncertainty">Probability and Uncertainty</h2>
+<p>In a world of perfect information, economic analysis would reduce to a deterministic calculus: households would allocate resources with certainty, firms would optimise production against known prices and costs, and governments would design policy in full knowledge of its consequences. The real world, however, is irreducibly uncertain. Outcomes that matter enormously to economic agents — harvests, prices, wages, health shocks, interest rates, policy changes — are not known in advance and cannot be controlled. Probability theory provides the only rigorous language for reasoning about such uncertainty. By assigning numerical measures to the likelihood of events before they are realised, probability transforms vague intuitions about chance into a precise, internally consistent calculus that can be embedded in optimisation problems, tested against data, and used to derive welfare implications. Without this foundation, the core constructs of modern economics — expected utility, risk aversion, insurance, option pricing, hypothesis testing, and identification in causal inference — would have no formal basis.</p>
+<p>The importance of probability in economics goes beyond mere bookkeeping of likelihoods. It provides the structural scaffolding for rational decision-making under uncertainty. When an agent faces a decision whose consequences depend on an unknown state of the world, the probability space <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span> formalises the environment: <span class="math inline">\(\Omega\)</span> lists the states that might obtain, <span class="math inline">\(\mathcal{F}\)</span> specifies which events are observable and contractible, and <span class="math inline">\(P\)</span> encodes beliefs about how likely each state is. The agent’s objective — typically the maximisation of expected utility — is then a probability-weighted average of utilities across states, and the entire machinery of constrained optimisation can be brought to bear. Crucially, probability also disciplines empirical work: econometric estimators, confidence intervals, hypothesis tests, and identification strategies are all defined in terms of probability limits, distributions, and measures. The probability space is therefore not an abstract luxury but the invisible infrastructure on which both economic theory and empirical practice rest.</p>
+<p>To make these ideas concrete, consider agents operating in environments representative of the Tanzanian and broader developing-country context. The following examples illustrate how probability structures the decision problems of a smallholder farmer, a rural household, and a firm, each facing a distinct but equally fundamental form of uncertainty.</p>
+<p>In economics, uncertainty is central to decision-making, from consumption choices to financial markets and policy design. Probability theory provides the only rigorous language for reasoning about suchuncertainty, transforming vague intuitions about chance into a precise, internally consistent calculus that can be embedded in optimisation problems, tested against data, and used to derive welfare implications. Without this foundation, the core constructs of modern economics — expected utility, risk aversion, insurance, option pricing, hypothesis testing, and identification in causal inference — would have no formal basis.</p>
+</section>
+<section id="probability-theory-as-the-foundation-of-econometric-theory" class="level2">
+<h2 class="anchored" data-anchor-id="probability-theory-as-the-foundation-of-econometric-theory">Probability Theory as the Foundation of Econometric Theory</h2>
+<p>Econometrics is, at its foundational level, an application of probability theory to the empirical analysis of economic relationships. This insight was stated with remarkable clarity and force by Trygve Haavelmo in his landmark 1944 monograph , for which he was awarded the Nobel Memorial Prize in Economic Sciences in 1989. Haavelmo’s central argument was that economic models should not be treated as deterministic algebraic relationships fitted to data by minimising discrepancies, but should instead be conceived from the outset as — complete specifications of the joint probability distribution of all variables entering the analysis.</p>
+<p>On this view, the observed data are not a fixed object to be described but a single realisation drawn from a well-defined probability space <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span>, and the task of econometrics is to use that realisation to learn about the probability measure <span class="math inline">\(P\)</span> that generated it. Without an explicit probabilistic framework, the concepts of estimation, consistency, efficiency, and statistical inference are simply undefined, and the applied researcher has no principled basis for distinguishing signal from noise or for quantifying the uncertainty that surrounds any empirical conclusion.</p>
+<p>To see why the probability framework is not merely convenient but logically indispensable, consider the classical consumption function</p>
+<p><span class="math display">\[
+C_t = \alpha + \beta Y_t + u_t,
+\]</span></p>
+<p>where <span class="math inline">\(C_t\)</span> is household consumption in period <span class="math inline">\(t\)</span>, <span class="math inline">\(Y_t\)</span> is disposable income, <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> are structural parameters, and <span class="math inline">\(u_t\)</span> is an unobservable disturbance. In a purely algebraic reading, this equation is simply a line with an error attached, and estimation reduces to a curve-fitting exercise. Haavelmo’s probability approach transforms this interpretation entirely. Because we work with observational rather than experimental data, income <span class="math inline">\(Y_t\)</span> is not set by the researcher but is itself generated by an underlying economic process — it is a random variable with its own marginal distribution, reflecting the aggregate interactions of labour markets, policy, technology, and household decisions that lie outside the model. Conditional on the realised value of <span class="math inline">\(Y_t\)</span> and the true but unobservable structural parameter <span class="math inline">\(\beta\)</span> — which encodes the rational marginal propensity to consume of a utility-maximising household — we observe a further random variable <span class="math inline">\(C_t\)</span>, whose stochastic variation is governed by <span class="math inline">\(u_t\)</span>. The full probability model is therefore a specification of the joint distribution</p>
+<p><span class="math display">\[
+(C_t, Y_t) \sim F_{\alpha, \beta, \sigma^2},
+\]</span></p>
+<p>parameterised by the structural parameters <span class="math inline">\((\alpha, \beta, \sigma^2)\)</span>. The population is this distribution; the sample <span class="math inline">\(\{(C_t, Y_t)\}_{t=1}^{T}\)</span> is a sequence of realisations drawn from it. Probability theory operates on the population side, characterising the data-generating process; econometrics operates on the sample side, using the observed realisations to form estimators — such as the ordinary least squares estimator <span class="math inline">\(\hat{\beta}\)</span> — and to evaluate their properties. The consistency of <span class="math inline">\(\hat{\beta}\)</span>, meaning that <span class="math inline">\(\hat{\beta} \overset{p}{\to} \beta\)</span> as <span class="math inline">\(T \to \infty\)</span>, is a theorem about probability limits, proved using the Law of Large Numbers. The asymptotic normality of <span class="math inline">\(\hat{\beta}\)</span>, which underpins <span class="math inline">\(t\)</span>-tests and confidence intervals, is a theorem about convergence in distribution, proved using the Central Limit Theorem. Every inferential statement an econometrician makes is therefore a statement about the probability model, and its validity depends entirely on whether the assumed probability space is an adequate representation of the true data-generating process.</p>
+<p>This intimate relationship between probability theory and econometrics has a direct and consequential implication for how econometrics should be learned and practised. Econometric methods are not a self-contained toolkit that can be mastered independently of the probabilistic foundations on which they rest; they are theorems and procedures derived from, and interpretable only within, a probability-theoretic framework. A researcher who does not understand the probability space underlying a model cannot assess whether its assumptions are satisfied in a given application, cannot diagnose the source of an inconsistency when an estimator fails, and cannot evaluate whether a proposed extension or modification of a standard method is internally coherent. Conversely, a researcher with a thorough command of probability theory can reconstruct the logic of any standard estimator from first principles, detect violations of identifying assumptions by reasoning about the underlying distributions, and engage critically with the frontier of econometric theory as it evolves.</p>
 </section>
 <section id="approaches-to-probability" class="level2">
-<h2 class="anchored" data-anchor-id="approaches-to-probability">1.2 Approaches to Probability</h2>
+<h2 class="anchored" data-anchor-id="approaches-to-probability">Approaches to Probability</h2>
 <section id="classical" class="level3">
 <h3 class="anchored" data-anchor-id="classical">Classical</h3>
-<p>Based on equally likely outcomes.</p>
+<p>The classical (or Laplacean) approach to probability defines probability in terms of equally likely outcomes within a finite sample space. Formally, let <span class="math inline">\(\Omega\)</span> be a finite sample space with <span class="math inline">\(|\Omega| &lt; \infty\)</span>, and suppose that all elementary outcomes <span class="math inline">\(\omega \in \Omega\)</span> are equally likely. Then, for any event <span class="math inline">\(A \subseteq \Omega\)</span>, the probability of <span class="math inline">\(A\)</span> is defined as <span class="math display">\[
+P(A) = \frac{|A|}{|\Omega|},
+\]</span> where <span class="math inline">\(|A|\)</span> denotes the number of favorable outcomes in <span class="math inline">\(A\)</span>, and <span class="math inline">\(|\Omega|\)</span> is the total number of possible outcomes. This approach relies critically on the principle of insufficient reason (or indifference), which assigns equal probabilities to all outcomes in the absence of further information. While the classical definition provides an intuitive and mathematically convenient foundation for probability theory—particularly in games of chance such as coin tosses, dice rolls, and card draws—it is limited to settings with finite and symmetric outcome spaces, and does not readily extend to situations involving infinite sample spaces or outcomes that are not equally likely.</p>
 </section>
 <section id="frequentist" class="level3">
 <h3 class="anchored" data-anchor-id="frequentist">Frequentist</h3>
-<p>Probability as long-run relative frequency.</p>
+<p>The frequentist approach to probability defines the probability of an event in terms of its long-run relative frequency in repeated, identical trials of a random experiment. Formally, consider a sequence of independent and identically distributed trials, and let <span class="math inline">\(A\)</span> be an event of interest. Let <span class="math inline">\(N_n(A)\)</span> denote the number of occurrences of <span class="math inline">\(A\)</span> in the first <span class="math inline">\(n\)</span> trials. Then, the probability of <span class="math inline">\(A\)</span> is defined as the limiting relative frequency: <span class="math display">\[
+P(A) = \lim_{n \to \infty} \frac{N_n(A)}{n},
+\]</span> provided that this limit exists. This definition is grounded in the law of large numbers, which ensures that, under suitable regularity conditions, the sample frequency converges to a stable value as the number of trials becomes large. The frequentist interpretation is particularly well-suited for empirical and experimental contexts where repeatability is meaningful; however, it is conceptually limited when dealing with unique or non-repeatable events, and it presumes the existence of an underlying stochastic mechanism generating the observed outcomes.</p>
 </section>
 <section id="subjective" class="level3">
 <h3 class="anchored" data-anchor-id="subjective">Subjective</h3>
-<p>Probability as degree of belief.</p>
+<p>The subjective (or Bayesian) approach to probability defines probability as a degree of belief or confidence that an individual assigns to the occurrence of an event, based on their personal judgment, information, and prior experience. Formally, let <span class="math inline">\(A\)</span> be an event, and let <span class="math inline">\(\Prob(A)\)</span> represent the subjective probability assigned to <span class="math inline">\(A\)</span>. This interpretation is inherently personal and can vary between individuals, as it reflects their unique perspectives and information sets. The subjective approach is particularly useful in decision-making under uncertainty, where probabilities are used to guide choices in the absence of objective frequencies or symmetries. However, it can be criticized for its lack of objectivity and potential for inconsistency across different individuals.</p>
 </section>
 <section id="axiomatic-measure-theoretic" class="level3">
 <h3 class="anchored" data-anchor-id="axiomatic-measure-theoretic">Axiomatic (Measure-Theoretic)</h3>
 <p>Probability is defined as a measure on a measurable space.</p>
-<hr>
+<p>The axiomatic (measure-theoretic) approach to probability, formalized by , defines probability as a measure on a structured set, thereby providing a rigorous and general foundation for both finite and infinite probabilistic models. Let <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span> be a probability space, where <span class="math inline">\(\Omega\)</span> is the sample space, <span class="math inline">\(\mathcal{F}\)</span> is a <span class="math inline">\(\sigma\)</span>-algebra of subsets of <span class="math inline">\(\Omega\)</span> (the collection of events), and <span class="math inline">\(P: \mathcal{F} \to [0,1]\)</span> is a probability measure. The measure <span class="math inline">\(P\)</span> satisfies three axioms: (i) non-negativity, <span class="math inline">\(P(A) \geq 0\)</span> for all <span class="math inline">\(A \in \mathcal{F}\)</span>; (ii) normalization, <span class="math inline">\(P(\Omega) = 1\)</span>; and (iii) countable additivity, such that for any countable sequence of disjoint events <span class="math inline">\(\{A_i\}_{i=1}^{\infty} \subset \mathcal{F}\)</span>, <span class="math display">\[
+P\left(\bigcup_{i=1}^{\infty} A_i\right) = \sum_{i=1}^{\infty} P(A_i).
+\]</span> This framework unifies probability with measure theory and allows probabilistic reasoning to be conducted with full mathematical rigor.</p>
+<p>A key strength of the axiomatic approach is its ability to handle infinite and uncountable sample spaces, which arise naturally in economics and stochastic processes. For example, when <span class="math inline">\(\Omega = \mathbb{R}\)</span> (e.g., modeling continuous variables such as income, time, or prices), it is not meaningful to assign equal probability to individual outcomes. Instead, the <span class="math inline">\(\sigma\)</span>-algebra <span class="math inline">\(\mathcal{F}\)</span> (typically the Borel <span class="math inline">\(\sigma\)</span>-algebra) restricts attention to well-behaved subsets of <span class="math inline">\(\mathbb{R}\)</span>, and probabilities are assigned via measures such as the Lebesgue measure. In this setting, probabilities are defined over intervals and more complex measurable sets, rather than points, thereby resolving the conceptual limitations of classical probability. The use of countable additivity ensures that probabilities remain consistent even when dealing with infinite collections of events, while avoiding paradoxes associated with uncountable unions that are not measurable.</p>
+<p>The structure of a probability space can be visualized as a rectangle representing the sample space <span class="math inline">\(\Omega\)</span>, whose total area is normalized to 1. The <span class="math inline">\(\sigma\)</span>-algebra <span class="math inline">\(\mathcal{F}\)</span> is not a region within <span class="math inline">\(\Omega\)</span> but rather a of <span class="math inline">\(\Omega\)</span> — those subsets to which the probability measure <span class="math inline">\(P\)</span> is permitted to assign a value. An event <span class="math inline">\(A \in \mathcal{F}\)</span> is one such admissible subset, depicted as the shaded region, and its probability <span class="math inline">\(P(A)\)</span> corresponds to the ratio of the shaded area to the total area of <span class="math inline">\(\Omega\)</span>:</p>
+<p>This diagram highlights that <span class="math inline">\(P(A)\)</span> is always measured relative to the whole of <span class="math inline">\(\Omega\)</span>, consistently with the requirement <span class="math inline">\(P(\Omega) = 1\)</span>. The role of <span class="math inline">\(\mathcal{F}\)</span> is not to carve out a sub-region of <span class="math inline">\(\Omega\)</span> but to specify which subsets are — a distinction that becomes essential when <span class="math inline">\(\Omega\)</span> is uncountable, since not every subset of an uncountable space can be assigned a probability in a logically consistent way. By embedding probability within measure theory, the axiomatic approach provides a coherent and flexible framework capable of supporting modern econometrics, stochastic calculus, and advanced statistical inference.</p>
 </section>
 </section>
 </section>
 <section id="probability-spaces" class="level1">
-<h1>2. Probability Spaces</h1>
+<h1>Probability Spaces</h1>
+<p>A probability space is the fundamental mathematical structure that underlies all of modern probability theory, providing a rigorous foundation for reasoning about uncertainty. Formally introduced by Andrei Kolmogorov in his 1933 , it is defined as a triple <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span> consisting of three objects that work in concert: a sample space <span class="math inline">\(\Omega\)</span>, a <span class="math inline">\(\sigma\)</span>-algebra <span class="math inline">\(\mathcal{F}\)</span>, and a probability measure <span class="math inline">\(P\)</span>. The power of this construction lies not in any single component but in the disciplined way the three interact — <span class="math inline">\(\Omega\)</span> specifies what can happen, <span class="math inline">\(\mathcal{F}\)</span> specifies what can be meaningfully measured, and <span class="math inline">\(P\)</span> assigns to each measurable event a number in <span class="math inline">\([0,1]\)</span> that quantifies its likelihood. Together, they elevate probability from an informal intuition about chance to a branch of measure theory, granting it the full deductive machinery of mathematical analysis and enabling a unified treatment of both discrete and continuous phenomena within a single, coherent framework.</p>
 <section id="sample-space" class="level2">
-<h2 class="anchored" data-anchor-id="sample-space">2.1 Sample Space</h2>
-
+<h2 class="anchored" data-anchor-id="sample-space">Sample Space</h2>
+<p>The sample space is the starting point of any probabilistic model: before assigning likelihoods to outcomes, one must first declare precisely what outcomes are possible. Intuitively, it is an exhaustive list of everything that could happen in a given experiment or situation, with no ambiguity about what constitutes a distinct outcome.</p>
+<p>The two conditions embedded in this definition carry real logical weight. Mutual exclusivity requires that the outcomes be defined finely enough that no two can occur simultaneously: if two outcomes overlap, the model is underspecified. Collective exhaustiveness requires that the sample space be defined broadly enough to contain every conceivable realization: if an outcome occurs that is not in <span class="math inline">\(\Omega\)</span>, the model is incomplete. In practice, the analyst constructs <span class="math inline">\(\Omega\)</span> by a deliberate act of abstraction — retaining only those features of reality that are relevant to the question at hand and discarding the rest. A sample space may be finite, countably infinite, or uncountable, and this distinction has profound consequences for the subsequent mathematical machinery required to assign probabilities.</p>
 </section>
 <section id="sigma-algebra" class="level2">
-<h2 class="anchored" data-anchor-id="sigma-algebra">2.2 Sigma-Algebra</h2>
-
+<h2 class="anchored" data-anchor-id="sigma-algebra">Sigma-Algebra</h2>
+<p>Where the sample space <span class="math inline">\(\Omega\)</span> catalogues every possible outcome of a random experiment, the <span class="math inline">\(\sigma\)</span>-algebra refines the model by specifying precisely which of outcomes are admissible objects of probabilistic reasoning. Not every subset of <span class="math inline">\(\Omega\)</span> need be — or, in uncountable spaces, can be — assigned a probability in a logically consistent way, and the <span class="math inline">\(\sigma\)</span>-algebra is the mathematical device that enforces this discipline.</p>
+<p>Each axiom has a precise logical purpose. The first ensures that the certain event — something happens — is always assignable a probability, namely <span class="math inline">\(P(\Omega) = 1\)</span>. The second ensures coherence under negation: if one can speak meaningfully about the probability of an event <span class="math inline">\(A\)</span> occurring, one must equally be able to speak about the probability of <span class="math inline">\(A\)</span> occurring, and that complement must also be a measurable event. The third axiom extends this coherence to countably infinite sequences of events, ensuring that asking whether of a sequence of events occurs is always a well-posed question. Taken together, the three axioms guarantee that <span class="math inline">\(\mathcal{F}\)</span> is closed under all the set-theoretic operations — complementation, countable union, and hence countable intersection by De Morgan’s laws — that arise naturally in probabilistic arguments.</p>
+<div class="proof remark">
+<p><span class="proof-title"><em>Remark</em>. </span>In a finite sample space, the <span class="math inline">\(\sigma\)</span>-algebra generated by <span class="math inline">\(\Omega\)</span> is typically taken to be the full power set, ensuring that subsets are measurable. This guarantees that any economically meaningful event — whether simple (e.g.&nbsp;“flood”) or composite (e.g.&nbsp;“not good weather”) — can be assigned a probability. In more general (infinite) settings, however, not every subset of <span class="math inline">\(\Omega\)</span> can be assigned a probability in a logically consistent way: such subsets are said to be extit{non-measurable}, and no <span class="math inline">\(\sigma\)</span>-algebra can contain them without destroying the coherence of the probability measure. The <span class="math inline">\(\sigma\)</span>-algebra therefore delineates precisely the boundary between sets that are amenable to probabilistic measurement and those that are not — the latter being not merely excluded by convention but genuinely uncontrollable within any coherent probability framework.</p>
+</div>
 </section>
 <section id="probability-measure" class="level2">
-<h2 class="anchored" data-anchor-id="probability-measure">2.3 Probability Measure</h2>
-<hr>
+<h2 class="anchored" data-anchor-id="probability-measure">Probability Measure</h2>
+<p>With the sample space <span class="math inline">\(\Omega\)</span> enumerating all possible outcomes and the <span class="math inline">\(\sigma\)</span>-algebra <span class="math inline">\(\mathcal{F}\)</span> identifying which events are admissible objects of measurement, the final ingredient of a probability space is the probability measure <span class="math inline">\(P\)</span> — the function that completes the triple <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span> by assigning to each measurable event a number that quantifies its likelihood. The probability measure is not defined arbitrarily; it must satisfy a set of axioms, known as the Kolmogorov axioms, that encode the minimal logical requirements for a coherent calculus of chance.</p>
+<p>Each axiom distills a fundamental requirement of rational belief about uncertainty. Non-negativity reflects the irreducibly non-negative nature of likelihood: no event can be less probable than impossible, and impossibility itself is represented by <span class="math inline">\(P(\emptyset) = 0\)</span>, which follows immediately from the other axioms. Normalization anchors the scale: by convention, certainty is assigned the value one, so that all probabilities are expressed as fractions of the whole. It is this axiom that gives the geometric interpretation its force — <span class="math inline">\(P(A)\)</span> is literally the proportion of the total probability mass, normalized to unity, that is allocated to <span class="math inline">\(A\)</span>. Countable additivity is the most substantive of the three: it asserts that when events are mutually exclusive, their probabilities , and that this additivity extends to countably infinite collections of events, not merely finite ones. This extension to the countably infinite case is what distinguishes <span class="math inline">\(\sigma\)</span>-additivity from the weaker requirement of finite additivity, and it is precisely what enables the passage from sums to integrals and from discrete to continuous probability distributions. Together the three axioms imply all the familiar rules of probability — the complement rule <span class="math inline">\(P(A^{c}) = 1 - P(A)\)</span>, the addition rule <span class="math inline">\(P(A \cup B) = P(A) + P(B) - P(A \cap B)\)</span>, and monotonicity <span class="math inline">\(A \subseteq B \Rightarrow P(A) \leq P(B)\)</span> — as purely logical consequences, requiring no further assumptions.</p>
+<p>The three Kolmogorov axioms are not merely definitional conveniences; they are sufficiently powerful to imply a rich set of properties that govern the behaviour of any probability measure. The following theorem collects the four most fundamental of these derived properties.</p>
+<p>Each of these four properties illuminates a distinct facet of probabilistic reasoning. Property~1 establishes that impossibility is represented by zero probability: the empty set <span class="math inline">\(\emptyset\)</span> contains no outcomes, so no probability mass can be allocated to it, and this follows as a theorem rather than an additional assumption. Property~2 formalises the intuition that certainty is conserved: since <span class="math inline">\(A\)</span> and its complement <span class="math inline">\(A^{c}\)</span> together account for all possibilities, their probabilities must sum to one, and knowing <span class="math inline">\(P(A)\)</span> immediately determines <span class="math inline">\(P(A^{c})\)</span>. This is one of the most frequently used tools in applied probability, since it is often far easier to compute the probability of an event occurring and subtract from one than to compute its probability directly.</p>
+<p>Property~3 encodes a basic requirement of logical consistency: if every outcome in <span class="math inline">\(A\)</span> is also an outcome in <span class="math inline">\(B\)</span>, then <span class="math inline">\(B\)</span> is at least as likely as <span class="math inline">\(A\)</span>, and the probability measure must respect this ordering. In econometric applications, monotonicity underpins the coherence of nested hypothesis tests and the nesting of information sets in dynamic models. Property~4, the inclusion-exclusion principle, corrects for double-counting: when two events overlap, summing their individual probabilities counts the intersection twice, and subtracting <span class="math inline">\(P(A \cap B)\)</span> restores the correct total. This property generalises to arbitrarily many events and is the foundation of combinatorial probability calculations, as well as of the union bound widely used in asymptotic theory and statistical learning.</p>
 </section>
 </section>
 <section id="random-variables" class="level1">
@@ -242,6 +328,60 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <figcaption>Simulating the Law of Large Numbers</figcaption>
 </figure>
 </div>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="references" class="level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-axler2010measure" class="csl-entry" role="listitem">
+Axler, S. 2010. <em>Measure, Integration and Real Analysis</em>. Springer Open.
+</div>
+<div id="ref-bieren2004introduction" class="csl-entry" role="listitem">
+Bieren, Heman, and J. 2004. <em>Introduction to the Mathematical and Statistical Foundations of Econometrics</em>. Cambridge University Press.
+</div>
+<div id="ref-billingsley1995probability" class="csl-entry" role="listitem">
+Billingsley, P. 1995. <em>Probability and Measure</em>. Third. John Wiley &amp; Sons Inc.
+</div>
+<div id="ref-capinski2005measure" class="csl-entry" role="listitem">
+Capinski, M., and E. Kopp. 2005. <em>Measure, Integral and Probability</em>. Second. Springer.
+</div>
+<div id="ref-cinlar2011probability" class="csl-entry" role="listitem">
+Cinlar, E. 2011. <em>Probability and Stochastics</em>. Springer.
+</div>
+<div id="ref-davidson2021stochastic" class="csl-entry" role="listitem">
+Davidson, J. 2021. <em>Stochastic Limit Theory: An Introduction for Econometricians</em>. Second. Oxford University Press.
+</div>
+<div id="ref-dhrymes1989topics" class="csl-entry" role="listitem">
+Dhrymes, P. J. 1989. <em>Topics in Advanced Econometrics</em>. Springer Verlag.
+</div>
+<div id="ref-durrett2019probability" class="csl-entry" role="listitem">
+Durrett, R. 2019. <em>Probability Theory and Examples</em>. Fifth. Cambridge University Press.
+</div>
+<div id="ref-hansen2022probability" class="csl-entry" role="listitem">
+Hansen, B. E. 2022. <em>Probability and Statistics for Economists</em>. Princeton University Press.
+</div>
+<div id="ref-hong2018probability" class="csl-entry" role="listitem">
+Hong, Y. 2018. <em>Probability and Statistics for Economists</em>. World Scientific Publishing Co. Pte. Ltd.
+</div>
+<div id="ref-linton2017probability" class="csl-entry" role="listitem">
+Linton, O. 2017. <em>Probability, Statistics and Econometrics</em>. First. Academic Press.
+</div>
+<div id="ref-pollard2002users" class="csl-entry" role="listitem">
+Pollard, R. 2002. <em>A User’s Guide to Measure Theoretic Probability</em>. Cambridge University Press.
+</div>
+<div id="ref-resnick1999probability" class="csl-entry" role="listitem">
+Resnick, S. I. 1999. <em>A Probability Path</em>. Birkhauser.
+</div>
+<div id="ref-rosenthal2006first" class="csl-entry" role="listitem">
+Rosenthal, J. S. 2006. <em>A First Look at Rigorous Probability Theory</em>. Second. World Scientific.
+</div>
+<div id="ref-schilling2017measures" class="csl-entry" role="listitem">
+Schilling, R. 2017. <em>Measures, Integrals and Martingales</em>. Second. Cambridge University Press.
+</div>
+<div id="ref-taylor1997introduction" class="csl-entry" role="listitem">
+Taylor, J. C. 1997. <em>An Introduction to Measure and Probability</em>. Springer.
 </div>
 </div>
 </section>
