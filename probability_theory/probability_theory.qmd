@@ -352,7 +352,7 @@ Probability is defined as a measure on a measurable space.
 
 The axiomatic (measure-theoretic) approach to probability, formalized by \textit{Andrey Kolmogorov}, defines probability as a measure on a structured set, thereby providing a rigorous and general foundation for both finite and infinite probabilistic models. Let $(\Omega, \mathcal{F}, P)$ be a probability space, where $\Omega$ is the sample space, $\mathcal{F}$ is a $\sigma$-algebra of subsets of $\Omega$ (the collection of events), and $P: \mathcal{F} \to [0,1]$ is a probability measure. The measure $P$ satisfies three axioms: (i) non-negativity, $P(A) \geq 0$ for all $A \in \mathcal{F}$; (ii) normalization, $P(\Omega) = 1$; and (iii) countable additivity, such that for any countable sequence of disjoint events $\{A_i\}_{i=1}^{\infty} \subset \mathcal{F}$,
 $$
-P\left(\bigcup_{i=1}^{\infty} A_i\right) = \sum_{i=1}^{\infty} P(A_i).
+P\bigl(\bigcup_{i=1}^{\infty} A_i\bigr) = \sum_{i=1}^{\infty} P(A_i).
 $$
 This framework unifies probability with measure theory and allows probabilistic reasoning to be conducted with full mathematical rigor.
 
@@ -645,7 +645,7 @@ is a function $P: \mathcal{F} \to [0,1]$ satisfying the following three axioms:
           \in \mathcal{F}$ satisfying $A_{i} \cap A_{j} = \emptyset$ for all
           $i \neq j$,
           \[
-          P\!\left(\bigcup_{i=1}^{\infty} A_{i}\right) = \sum_{i=1}^{\infty} P(A_{i}).
+          P\bigl(\bigcup_{i=1}^{\infty} A_{i}\bigr) = \sum_{i=1}^{\infty} P(A_{i}).
           \]
 \end{enumerate}
 The triple $(\Omega, \mathcal{F}, P)$ is called a \textbf{probability space}.
@@ -843,15 +843,138 @@ probability calculations, as well as of the union bound widely used in
 asymptotic theory and statistical learning.
 
 
-# 3. Random Variables
+#  Random Variables
 
-## 3.1 Definition
+Recall that a probability space is a triple $(\Omega, \mathcal{F}, P)$, where $\Omega$ is the
+\emph{sample space} (the set of all possible outcomes), $\mathcal{F}$ is a $\sigma$-algebra of
+subsets of $\Omega$ (the collection of events to which we can assign probabilities), and
+$P : \mathcal{F} \to [0,1]$ is a probability measure satisfying Kolmogorov's axioms. In many
+applications, we are not directly interested in the raw outcomes $\omega \in \Omega$ but rather in
+some numerical quantity that depends on the outcome. A \emph{random variable} $X$ is a rule that
+assigns a number to each outcome---a bridge from the abstract probability space into the real line
+$\mathbb{R}$, where standard analytical tools become available.
+ 
 
-\begin{definition}
-A random variable is a measurable function $X:\Omega \to \mathbb{R}$.
+ 
+\begin{definition}[Random Variable]
+Let $(\Omega, \mathcal{F}, P)$ be a probability space and let $(\mathbb{R}, \mathcal{B}(\mathbb{R}))$
+be the measurable space consisting of the real line equipped with its Borel $\sigma$-algebra. A
+\textbf{random variable} is a function
+\[
+  X : \Omega \longrightarrow \mathbb{R}
+\]
+that is $\mathcal{F}$-\emph{measurable}, meaning that for every Borel set
+$B \in \mathcal{B}(\mathbb{R})$,
+\[
+  X^{-1}(B) \;=\; \{\,\omega \in \Omega : X(\omega) \in B\,\} \;\in\; \mathcal{F}.
+\]
+Equivalently, $X$ is a random variable if and only if
+\[
+  \{\,\omega \in \Omega : X(\omega) \leq x\,\} \;\in\; \mathcal{F}
+  \qquad \text{for every } x \in \mathbb{R}.
+\]
 \end{definition}
+ 
 
-## 3.2 Distribution Function
+ 
+The definition may appear technical at first, but its logic is both natural and necessary. The
+measurability condition says that for any numerical range of interest $B$---for instance, the
+outcome produces a value no greater than~5---the set of raw outcomes $\omega$ that lead to a value
+in $B$ must be an \emph{event}, that is, a member of $\mathcal{F}$. This is precisely the
+requirement needed for the statement $X$ lies in $B$ to have a well-defined probability: we need
+the pre-image $X^{-1}(B)$ to live inside $\mathcal{F}$ so that $P$ can be applied to it. Without
+measurability, the expression $P(X \in B)$ would be meaningless---we would be asking for the
+probability of a set that the probability measure cannot evaluate. In short, a random variable is
+not ``random'' in the colloquial sense of being haphazard; it is a perfectly deterministic function.
+What is random is the input $\omega$, drawn according to $P$. The randomness of the outcome flows
+through the function $X$ to produce a random numerical value.
+ 
+
+
+ 
+\begin{example}[Tossing a fair coin.]
+Let $\Omega = \{H, T\}$, $\mathcal{F} = 2^{\Omega}$, and $P(H) = P(T) = \tfrac{1}{2}$. Define
+$X : \Omega \to \mathbb{R}$ by $X(H) = 1$ and $X(T) = 0$. Then $X$ is a random variable that
+encodes ``heads'' as 1 and ``tails'' as 0. Every subset of $\Omega$ is in $\mathcal{F}$, so
+measurability is trivially satisfied. $X$ follows a $\mathrm{Bernoulli}\bigl(\tfrac{1}{2}\bigr)$
+distribution.
+\end{example}
+ 
+\begin{example}[Tossing a fair die]
+Let $\Omega = \{1, 2, 3, 4, 5, 6\}$, $\mathcal{F} = 2^{\Omega}$, and $P(\{\omega\}) = \tfrac{1}{6}$
+for each $\omega$. The identity function $X(\omega) = \omega$ is a random variable mapping each face
+to its numerical value. Again measurability holds trivially. More interesting random variables on the
+same space include $Y(\omega) = \mathbf{1}[\omega \text{ is even}]$ (indicator of an even outcome)
+or $Z(\omega) = \omega^{2}$.
+\end{example}
+ 
+\begin{example}[A smallholder farmer in Tanzania]
+Consider a small-scale farmer in a village facing uncertain rainfall during the growing season. Let
+$\Omega$ be the set of all possible weather scenarios over the season (combinations of rainfall
+amounts, timing, and temperature). Define $\mathcal{F}$ as a suitable $\sigma$-algebra of weather
+events and $P$ as the probability measure reflecting climatological knowledge. The farmer's harvest
+yield $Y$ (in kilograms) is a function of the realised weather scenario: $Y(\omega)$ is the harvest
+that results when weather scenario $\omega$ occurs. Since $Y$ maps uncertain environmental outcomes
+to real numbers and the event $\{Y \leq y\}$ is measurable for each $y$, $Y$ is a random variable.
+The farmer faces not just a single unknown number but an entire \emph{distribution} of possible
+yields induced by $P$ through $Y$.
+\end{example}
+ 
+\begin{example}[A household]
+Consider a household whose monthly consumption expenditure depends on random factors such as income
+shocks, health events, and price fluctuations. Let $\Omega$ be the space of all possible states of
+the world affecting the household, equipped with an appropriate $\sigma$-algebra $\mathcal{F}$ and
+probability measure $P$. The household's consumption expenditure $C(\omega)$ is a random variable
+mapping each state of the world to a non-negative real number. Events such as
+$\{C(\omega) \leq c\}$---the event that the household spends no more than $c$---must be in
+$\mathcal{F}$ for $C$ to qualify as a proper random variable, ensuring that we can compute
+$P(C \leq c)$, the probability that consumption falls at or below a given threshold.
+\end{example}
+ 
+\begin{example}[A firm]
+A firm produces output whose quantity and price depend on uncertain demand conditions, input costs,
+and productivity shocks. Let $\omega \in \Omega$ represent a realised state of the business
+environment. The firm's profit
+\[
+  \Pi(\omega) \;=\; p(\omega)\,q(\omega) \;-\; c(\omega)
+\]
+is a function of random prices $p$, quantities $q$, and costs $c$---each themselves random variables
+on the same probability space. The composite function $\Pi$ is also a random variable (since
+measurable functions are closed under algebraic operations), enabling the analysis of expected
+profit, profit volatility, and the probability of loss.
+\end{example}
+
+## Random Variables as Measurable Functions
+
+
+It is worth pausing to unpack what it means, in plain terms, to say that $X$ is a
+\emph{measurable function}. Measurability is simply a \emph{compatibility} requirement between two
+structures: the $\sigma$-algebra $\mathcal{F}$ on the domain $\Omega$ (which says which subsets of
+outcomes are observable events) and the Borel $\sigma$-algebra $\mathcal{B}(\mathbb{R})$ on the
+codomain $\mathbb{R}$ (which says which subsets of numbers are well-behaved sets). The condition
+$X^{-1}(B) \in \mathcal{F}$ for all $B \in \mathcal{B}(\mathbb{R})$ says precisely: whenever you
+identify a "nice" numerical set $B$ on the output side, pulling it back through $X$ gives you a
+"nice" event on the input side. The function \emph{respects} the observable structure.
+ 
+A useful way to build intuition is to think about what \emph{fails} when measurability is violated.
+If $X^{-1}(B) \notin \mathcal{F}$ for some $B$, it means there is a perfectly sensible numerical
+question---does $X$ land in $B$---for which no probability can be assigned. The probability
+measure $P$ is only defined on $\mathcal{F}$, so if the pre-image falls outside $\mathcal{F}$, the
+question is literally unanswerable within the model. Measurability ensures this never happens: every
+numerical question about $X$ translates back into an event whose probability is defined. In
+practice, all functions encountered in economics and finance---continuous functions, step functions,
+limits of sequences of measurable functions---are automatically measurable with respect to standard
+$\sigma$-algebras, so measurability is rarely a binding constraint in applications. Its importance
+is foundational: it guarantees that the induced distribution
+guarantees that the induced distribution $P_X(B) \equiv P\bigl(X^{-1}(B)\bigr)$,
+known as the \emph{pushforward measure} or \emph{law} of $X$, is itself a well-defined probability
+measure on $(\mathbb{R}, \mathcal{B}(\mathbb{R}))$. In this sense, a random variable does not merely
+``produce'' random numbers---it \emph{transports} the entire probability structure from the abstract
+sample space to the real line.
+ 
+
+
+## Distribution Function
 
 \begin{definition}
 The distribution function is
