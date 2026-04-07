@@ -574,13 +574,13 @@ Define the $\sigma$-algebra $\mathcal{F}$ as the power set of $\Omega$, i.e.
 \mathcal{F} = 2^{\Omega} =
 \left\{
 \begin{aligned}
-&\emptyset, \\
-&\{\text{good}\}, \\
-&\{\text{flood}\}, \\
-&\{\text{drought}\}, \\
-&\{\text{good}, \text{flood}\}, \\
-&\{\text{good}, \text{drought}\}, \\
-&\{\text{flood}, \text{drought}\}, \\
+&\emptyset, \
+&\{\text{good}\}, \
+&\{\text{flood}\}, \
+&\{\text{drought}\}, \
+&\{\text{good}, \text{flood}\}, \
+&\{\text{good}, \text{drought}\}, \
+&\{\text{flood}, \text{drought}\}, \
 &\Omega
 \end{aligned}
 \right\}.
@@ -841,6 +841,123 @@ twice, and subtracting $P(A \cap B)$ restores the correct total. This property
 generalises to arbitrarily many events and is the foundation of combinatorial
 probability calculations, as well as of the union bound widely used in
 asymptotic theory and statistical learning.
+
+## Continuity Properties of Probability Measures
+
+
+Imagine watching a sequence of events slowly shrink or expand toward some limiting event.
+For instance, picture a nested sequence of intervals on the real line, each one contained
+in the previous, all collapsing toward a single point. Intuitively, the probability of
+landing in any one of those intervals should gradually approach the probability of landing
+exactly at the limiting point. This natural and reassuring behavior---that probabilities
+\emph{follow} their events to the limit---is precisely what the \textbf{Continuity of
+Probability} theorem guarantees. Far from being an abstract technicality, this result is
+the bridge between the combinatorial, finite world where probability is easy to compute
+and the analytic, infinite world where calculus and limits live. It tells us that a
+probability measure, much like a continuous function, does not jump erratically: as sets
+converge, so do their probabilities. This idea can be formally stated in a proposition.
+
+
+\begin{proposition}[Continuity of Probability]
+Let $(\Omega, \mathcal{F}, P)$ be a probability space.
+
+	extbf{(i) Continuity from below.} If $A_1 \subseteq A_2 \subseteq A_3 \subseteq \cdots$ is an increasing sequence of events in $\mathcal{F}$, then
+
+$$
+P\left(\bigcup_{n=1}^{\infty} A_n\right) = \lim_{n \to \infty} P(A_n).
+$$
+
+	extbf{(ii) Continuity from above.} If $A_1 \supseteq A_2 \supseteq A_3 \supseteq \cdots$ is a decreasing sequence of events in $\mathcal{F}$, then
+
+$$
+P\left(\bigcap_{n=1}^{\infty} A_n\right) = \lim_{n \to \infty} P(A_n).
+$$
+
+\end{proposition}
+
+\begin{proof}
+	extbf{(i) Continuity from below.}
+Define disjoint sets by "peeling off" successive layers:
+$$
+B_1 := A_1, \qquad B_n := A_n \setminus A_{n-1} \quad \text{for } n \geq 2.
+$$
+By construction the $B_n$ are pairwise disjoint, each $B_n \in \mathcal{F}$, and
+$$
+\bigcup_{n=1}^{\infty} B_n = \bigcup_{n=1}^{\infty} A_n, \qquad
+\bigcup_{k=1}^{n} B_k = A_n \quad \text{for all } n.
+$$
+Applying countable additivity of $P$ and then finite additivity yields
+$$
+P\left(\bigcup_{n=1}^{\infty} A_n\right)
+= P\left(\bigcup_{n=1}^{\infty} B_n\right)
+= \sum_{n=1}^{\infty} P(B_n)
+= \lim_{n \to \infty} \sum_{k=1}^{n} P(B_k)
+= \lim_{n \to \infty} P\left(\bigcup_{k=1}^{n} B_k\right)
+= \lim_{n \to \infty} P(A_n).
+$$
+
+	extbf{(ii) Continuity from above.}
+Consider the complementary sequence $A_n^c$. Since $A_1 \supseteq A_2 \supseteq \cdots$,
+we have $A_1^c \subseteq A_2^c \subseteq \cdots$, an increasing sequence. By part~(i):
+$$
+P\left(\bigcup_{n=1}^{\infty} A_n^c\right) = \lim_{n \to \infty} P(A_n^c).
+$$
+By De~Morgan's law, $\bigcup_{n=1}^{\infty} A_n^c =\left(\bigcap_{n=1}^{\infty} A_n\right)^{\!c}$. Using complementation $P(E^c) = 1 - P(E)$:
+$$
+1 - P\left(\bigcap_{n=1}^{\infty} A_n\right) = \lim_{n \to \infty}\bigl(1 - P(A_n)\bigr)
+= 1 - \lim_{n \to \infty} P(A_n),
+$$
+and rearranging gives the result.
+\end{proof}
+
+### Intuition and Logic
+
+The deep idea here is that a probability measure behaves like a \emph{flow of mass}: every
+outcome $\omega \in \Omega$ carries a tiny parcel of probability, and when we accumulate
+outcomes into a set we collect the corresponding mass. For an increasing sequence of sets,
+each new set merely \emph{adds} more outcomes and hence more mass; the running total $P(A_n)$
+is monotone non-decreasing and bounded above by $1$, so it must converge. The key algebraic
+trick in the proof---decomposing the union into disjoint ``rings'' $B_n$---lets us cash in
+countable additivity, the cornerstone axiom, and turn an infinite union into a convergent
+series. Continuity from above follows almost for free by duality: complementation flips a
+decreasing family into an increasing one, and we recycle the first result. Together, the two
+statements say that the probability measure $P$ is \emph{sequentially continuous} with respect
+to monotone set limits, in perfect analogy with how a continuous real-valued function commutes
+with limits of sequences.
+
+
+
+\begin{remark}[Necessity of the finiteness condition]
+In continuity from above, the hypothesis $P(A_1) < \infty$ is automatically satisfied since
+we are in a probability space ($P(\Omega) = 1$). In the more general setting of
+$\sigma$-finite measures, the analogous result \emph{requires} $P(A_1) < \infty$; without
+it, the statement can fail. A classical counterexample in measure theory is $A_n =
+[n, \infty)$ on $(\mathbb{R}, \mathcal{B}(\mathbb{R}), \lambda)$ with Lebesgue measure:
+$\lambda(A_n) = \infty$ for all $n$, yet $\bigcap_n A_n = \varnothing$ has measure zero.
+\end{remark}
+
+\begin{remark}[Equivalent formulation via $\sigma$-additivity]
+Continuity from below is in fact \emph{equivalent} to countable additivity given finite
+additivity and the other Kolmogorov axioms. Some axiomatic treatments therefore adopt
+continuity from below as the third axiom in place of $\sigma$-additivity, yielding an
+equivalent but sometimes more geometrically transparent foundation.
+\end{remark}
+
+\begin{remark}[Subadditivity and Borel--Cantelli]
+Continuity of probability underpins many classical results. For instance, the first
+Borel--Cantelli lemma---which states that if $\sum_n P(A_n) < \infty$ then $P(A_n
+\text{ i.o.}) = 0$---relies on writing the limsup event as a decreasing intersection of
+unions and then applying continuity from above to pass the limit through $P$.
+\end{remark}
+
+\begin{remark}[Topological perspective]
+From a functional-analytic viewpoint, the space of probability measures on a metric space
+can itself be equipped with the topology of weak convergence. Continuity of probability
+for monotone set sequences is a special case of the more general principle that integrals
+(and hence probabilities) behave continuously under dominated convergence, a result that
+ultimately rests on the same $\sigma$-additivity arguments presented above.
+\end{remark}
+
 
 
 #  Random Variables
@@ -1137,4 +1254,182 @@ ggplot(df, aes(x = n, y = mean)) +
 
 ::: {#refs}
 :::
+
+# Appendix
+
+## Lebesgue Measure and Lebesgue Integration
+
+This appendix is a self-contained, intuition-first introduction to two ideas that
+underlie modern probability theory: **Lebesgue measure** and the **Lebesgue integral**.
+No prior exposure to real analysis is assumed. The goal is not a complete treatment---
+proofs of the harder theorems are omitted---but rather to give you enough geometric
+and conceptual grounding to read measure-theoretic probability with confidence.
+
+### Why Do We Need a New Notion of “Length”?
+
+You already have a perfectly good notion of length: the length of the interval
+$[a,b]$ is $b-a$.  What could go wrong?
+
+It turns out that when we try to build a theory of probability on the real line, we
+need to assign a “size” (a probability, or more generally a measure) not just to
+intervals, but to complicated sets formed by taking countably many unions, intersections,
+and complements of intervals.  The naive approach—just add up the lengths of the
+pieces—runs into serious problems once we allow infinitely many operations.
+
+> **Motivating example.**
+>
+> Consider the set $\mathbb{Q} \cap [0,1]$, the rational numbers in $[0,1]$.  This set
+> is *dense* (between any two points there is a rational), so it “looks” as if
+> it should have positive length.  Yet there are only *countably many* rationals,
+> and each single point has length zero.  Intuitively, infinitely many zeros should
+> still sum to zero.  Lebesgue measure will confirm this: $\lambda(\mathbb{Q} \cap
+> [0,1]) = 0$, even though the rationals are dense.  The Riemann integral, by contrast,
+> cannot even “integrate” the indicator function of $\mathbb{Q}$ over $[0,1]$.
+
+### Building Lebesgue Measure Step by Step
+
+Think of Lebesgue measure $\lambda$ as the “correct” generalisation of length from
+intervals to a much larger collection of sets.  We build it in three intuitive steps.
+
+#### Step 1 — Start with intervals
+
+For any interval (open, closed, or half-open), declare its measure to equal its
+length:
+$$
+      \lambda\bigl([a,b]\bigr) \;=\; \lambda\bigl((a,b)\bigr) \;=\; b - a.
+$$
+Single points have measure zero: $\lambda(\{a\}) = a - a = 0$.
+
+#### Step 2 — Cover complicated sets with intervals
+
+For a general set $E \subseteq \mathbb{R}$, we define the *outer measure*
+$\lambda^*(E)$ by trying to cover $E$ with a countable collection of open intervals
+$\{I_1, I_2, \ldots\}$ and asking: what is the smallest total length we can achieve?
+
+$$
+      \lambda^*(E) \;=\; \inf\!\left\{ \sum_{n=1}^{\infty} |I_n| \;\Big|\;
+      E \subseteq \bigcup_{n=1}^{\infty} I_n,\; I_n \text{ open intervals} \right\}.
+$$
+
+> **Geometric picture.**
+>
+> Imagine draping a “net” of open intervals over the set $E$.  Outer measure is the
+> least amount of net you must use, optimised over all possible covers.  For an
+> interval $[a,b]$ the optimum cover is just $(a-\varepsilon, b+\varepsilon)$, and
+> shrinking $\varepsilon\to 0$ recovers $\lambda^*([a,b])=b-a$.  For a single point the
+> cover can be made arbitrarily thin, giving $\lambda^*(\{a\})=0$.
+
+#### Step 3 — Identify the “well-behaved” sets (measurable sets)
+
+Not every subset of $\mathbb{R}$ behaves nicely under this covering procedure.
+A set $E$ is called *Lebesgue measurable* if it does not “straddle” any other set in a
+pathological way; the precise condition (Carathéodory's criterion) is:
+
+$$
+      \lambda^*(A) \;=\; \lambda^*(A \cap E) \;+
+      \;\lambda^*(A \cap E^c) \quad \text{for every set } A \subseteq \mathbb{R}.
+$$
+
+For measurable sets, we simply write $\lambda(E) := \lambda^*(E)$ and call it the
+*Lebesgue measure* of $E$.
+
+The collection $\mathcal{L}$ of all Lebesgue measurable sets is enormous.  It contains:
+all open sets, all closed sets, all countable unions and intersections thereof (the
+Borel sets), and many more.  In practice, every set you will ever encounter in
+economics or probability is Lebesgue measurable.
+
+**Definition (Lebesgue Measure)**
+The *Lebesgue measure* on $\mathbb{R}$ is the function
+$$\lambda : \mathcal{L} \to [0,\infty]$$
+satisfying:
+
+1. $\lambda([a,b]) = b - a$ for all $a \le b$.
+2. Countable additivity: if $E_1, E_2, \ldots$ are pairwise disjoint measurable sets, then
+       $\lambda\!\left(\bigcup_{n=1}^{\infty} E_n\right) = \sum_{n=1}^{\infty} \lambda(E_n)$.
+3. Translation invariance: $\lambda(E + t) = \lambda(E)$ for all $t \in \mathbb{R}$.
+
+### Key Properties of Lebesgue Measure
+
+**Countable sets have measure zero.**
+If $E = \{x_1, x_2, x_3, \ldots\}$ is a countable set, then by countable additivity,
+ $\lambda(E) = \sum_{n=1}^{\infty} \lambda(\{x_n\}) = \sum_{n=1}^{\infty} 0 = 0$.
+In particular, $\lambda(\mathbb{Q}) = 0$: the rational numbers, despite being dense
+in $\mathbb{R}$, occupy no space at all in the sense of Lebesgue measure.
+
+**Measure is monotone.** If $A \subseteq B$ and both are measurable, then $\lambda(A) \le \lambda(B)$.
+
+**Countable subadditivity.** For any sequence of measurable sets (not necessarily disjoint),
+ $\lambda\!\left(\bigcup_{n} E_n\right) \le \sum_{n} \lambda(E_n)$.
+
+**Continuity of measure.** If $E_1 \subseteq E_2 \subseteq \cdots$ is an increasing sequence with union $E$,
+ then $\lambda(E_n) \to \lambda(E)$; if $E_1 \supseteq E_2 \supseteq \cdots$ is decreasing with $\lambda(E_1) < \infty$, then $\lambda(E_n) \to \lambda\!\left(\bigcap_n E_n\right)$.
+
+### The Lebesgue Integral
+
+The central insight behind Lebesgue integration is to change what we partition.
+Rather than slicing the *domain* (the $x$-axis, as Riemann does), we slice the *range*
+(the $y$-axis) and ask how much of the domain maps into each slice.  Figure~\ref{fig:riemann_vs_lebesgue} illustrates this contrast.
+
+#### Step 1 — Simple functions
+
+A *simple function* takes only finitely many values.  If $\phi =
+\sum_{i=1}^{n} a_i \,\mathbf{1}_{E_i}$ where the $E_i$ are disjoint measurable
+sets and $a_i \ge 0$, its Lebesgue integral over a measurable set $A$ is defined
+as the natural weighted sum:
+
+$$
+      \int_A \phi \,d\lambda \;=\; \sum_{i=1}^{n} a_i \,\lambda(E_i \cap A).
+$$
+
+> **Analogy.**
+>
+> Think of a simple function as a salary schedule that pays $a_i$ dollars per hour
+> to employees in group $E_i$.  The integral is the total wage bill: rate \times
+> size-of-group, summed over all groups.  Lebesgue measure plays the role of
+> “group size.”
+
+#### Step 2 — Non-negative measurable functions
+
+For a non-negative measurable function $f \ge 0$, we approximate $f$ from below by
+an increasing sequence of simple functions $\phi_1 \le \phi_2 \le \cdots \uparrow f$
+and define:
+
+$$
+      \int_A f\,d\lambda \;=\; \lim_{n\to\infty} \int_A \phi_n\,d\lambda.
+$$
+
+#### Step 3 — General measurable functions
+
+Any measurable function can be split into its positive and negative parts:
+ $f = f^+ - f^-$, where $f^+ = \max(f,0)$ and $f^- = \max(-f,0)$.  Both $f^+$ and
+ $f^-$ are non-negative, so Step 2 applies to each.  We then define:
+
+$$
+      \int_A f\,d\lambda \;=\; \int_A f^+\,d\lambda \; - \; \int_A f^-\,d\lambda,
+$$
+provided at least one of the two terms is finite.  If both are finite, $f$ is called
+*Lebesgue integrable* and we write $f \in L^1(\lambda)$.
+
+### What Makes Lebesgue Integration Better?
+
+The Lebesgue integral agrees with the Riemann integral whenever the Riemann
+integral exists — so nothing is lost.  But the Lebesgue integral handles many
+situations the Riemann integral cannot.  Three properties are especially important
+for probability theory.
+
+1. Integrable functions can be wildly discontinuous. The indicator function $\mathbf{1}_{\mathbb{Q}}$ is not Riemann integrable over $[0,1]$. Its Lebesgue integral is $0$.
+
+2. “Almost everywhere” is the right notion of equality. We say two functions $f$ and $g$ are equal *almost everywhere* (a.e.) if $\lambda(\{x : f(x) \ne g(x)\}) = 0$.
+
+3. Limit and integral can be swapped under mild conditions (Monotone Convergence, Fatou's Lemma, Dominated Convergence).
+
+### Connection to Probability
+
+Everything above extends directly to probability spaces.  A *probability measure* $P$ on a measurable space $(\Omega, \mathcal{F})$ is simply a measure with $P(\Omega)=1$.  The Lebesgue integral of a random variable $X$ with respect to $P$ is its expected value:
+
+$$
+      \mathbb{E}[X] \;=\; \int_\Omega X(\omega)\,dP(\omega).
+$$
+
+For a thorough treatment at the graduate level, see Royden and Fitzpatrick *Real Analysis* (4th ed.) and Billingsley *Probability and Measure* (3rd ed.).
 
