@@ -1,0 +1,453 @@
+---
+title: "Endogeneity, Instrumental Variables, Two-Stage Least Squares, and GMM"
+subtitle: "Identification, Consistent Estimation, and Efficient Inference When Regressors Are Endogenous"
+author: "Eliab Luvanda"
+date: today
+date-format: "MMMM D, YYYY"
+
+format:
+  pdf:
+    documentclass: article
+    classoption:
+      - 12pt
+      - a4paper
+      - twoside
+    number-sections: true
+    toc: true
+    toc-depth: 3
+    toc-title: "Contents"
+    colorlinks: true
+    linkcolor: "NavyBlue"
+    citecolor: "NavyBlue"
+    urlcolor: "NavyBlue"
+    keep-tex: false
+    geometry:
+      - top=1.25in
+      - bottom=1.25in
+      - inner=1.25in
+      - outer=1in
+      - heightrounded
+    header-includes:
+      - '\usepackage{fontspec}'
+      - '\setmainfont{TeX Gyre Pagella}'
+      - '\usepackage{unicode-math}'
+      - '\setmathfont{TeX Gyre Pagella Math}'
+      - '\linespread{1.05}'
+      - '% Micro-typography'
+      - '\usepackage{microtype}'
+      - '% Mathematics'
+      - '\usepackage{mathtools}'
+      - '\usepackage{amsthm}'
+      - '% Bold math alias'
+      - "\\newcommand{\\bm}[1]{\\symbf{#1}}"
+      - '% Theorem environments'
+      - '\theoremstyle{plain}'
+      - "\\newtheorem{theorem}{Theorem}[section]"
+      - "\\newtheorem{proposition}[theorem]{Proposition}"
+      - "\\newtheorem{lemma}[theorem]{Lemma}"
+      - "\\newtheorem{corollary}[theorem]{Corollary}"
+      - '\theoremstyle{definition}'
+      - "\\newtheorem{definition}[theorem]{Definition}"
+      - "\\newtheorem{assumption}[theorem]{Assumption}"
+      - "\\newtheorem{example}[theorem]{Example}"
+      - "\\newtheorem{exercise}{Exercise}[section]"
+      - '\theoremstyle{remark}'
+      - "\\newtheorem*{remark}{Remark}"
+      - "\\newtheorem*{note}{Note}"
+      - "\\newtheorem*{notation}{Notation}"
+      - "\\renewcommand{\\qedsymbol}{\\$\\blacksquare\\$}"
+      - '% Enumeration'
+      - '\usepackage{enumitem}'
+      - "\\setlist[enumerate,1]{label=(\\roman*)}"
+      - "\\setlist[enumerate,2]{label=(\\alph*)}"
+      - '% Section headings'
+      - '\usepackage{titlesec}'
+      - "\\titleformat{\\section}{\\normalfont\\large\\scshape\\centering}{\\thesection.}{0.5em}{}"
+      - "\\titleformat{\\subsection}{\\normalfont\\normalsize\\bfseries}{\\thesubsection}{0.5em}{}"
+      - "\\titleformat{\\subsubsection}{\\normalfont\\normalsize\\itshape}{\\thesubsubsection}{0.5em}{}"
+      - '% Headers/footers'
+      - '\usepackage{fancyhdr}'
+      - '\pagestyle{fancy}'
+      - '\fancyhf{}'
+      - "\\fancyhead[LE]{\\small\\scshape Endogeneity, IV, 2SLS, and GMM}"
+      - "\\fancyhead[RO]{\\small\\scshape\\nouppercase{\\leftmark}}"
+      - "\\fancyfoot[C]{\\small\\thepage}"
+      - "\\renewcommand{\\headrulewidth}{0.4pt}"
+      - '% Macros'
+      - "\\newcommand{\\bX}{\\symbf{X}}"
+      - "\\newcommand{\\bY}{\\symbf{Y}}"
+      - "\\newcommand{\\bZ}{\\symbf{Z}}"
+      - "\\newcommand{\\bW}{\\symbf{W}}"
+      - "\\newcommand{\\bbeta}{\\symbf{\\beta}}"
+      - "\\newcommand{\\bgamma}{\\symbf{\\gamma}}"
+      - "\\newcommand{\\beps}{\\symbf{\\varepsilon}}"
+      - "\\newcommand{\\bu}{\\symbf{u}}"
+      - "\\newcommand{\\bSigma}{\\symbf{\\Sigma}}"
+      - "\\DeclareMathOperator{\\plim}{plim}"
+      - "\\DeclareMathOperator{\\Var}{Var}"
+      - "\\DeclareMathOperator{\\Cov}{Cov}"
+      - "\\DeclareMathOperator{\\E}{\\mathbb{E}}"
+      - "\\DeclareMathOperator{\\rank}{rank}"
+      - "\\DeclareMathOperator*{\\argmin}{arg\\,min}"
+      - "\\newcommand{\\norm}[1]{\\left\\lVert #1 \\right\\rVert}"
+      - "\\newcommand{\\Proj}[1]{\\symbf{P}_{#1}}"
+      - "\\newcommand{\\Mproj}[1]{\\symbf{M}_{#1}}"
+      - "\\newcommand{\\pto}{\\xrightarrow{\\,p\\,}}"
+      - "\\newcommand{\\dto}{\\xrightarrow{\\,d\\,}}"
+      - "\\newcommand{\\asto}{\\xrightarrow{\\,a.s.\\,}}"
+      - "\\newcommand{\\N}{\\mathcal{N}}"
+      - "\\newcommand{\\iid}{\\overset{\\text{i.i.d.}}{\\sim}}"
+
+bibliography: references.bib
+# biblio-style omitted to avoid requiring additional TeX packages during local render.
+cite-method: natbib
+
+execute:
+  echo: false
+  warning: false
+---
+
+
+
+\section{Introduction and Motivation}
+
+The empirical study of economic relationships rests, almost without
+exception, on some version of the regression model. Yet the
+conditions under which regression yields reliable estimates of
+structural parameters are considerably more stringent than is often
+acknowledged in applied work. This section lays out the classical
+framework, identifies the precise point at which it breaks down, and
+sketches the remedies that the remainder of these notes develop in
+full.
+
+
+\subsection{The Classical Linear Model and Its Assumptions}
+
+
+Let $\{(y_i, \bm{x}_i)\}_{i=1}^{n}$ be a sample of $n$ observations,
+where $y_i \in \mathbb{R}$ is the dependent variable and
+$\bm{x}_i \in \mathbb{R}^k$ is a vector of regressors, with the
+convention that its first component equals unity. The \emph{classical
+linear model} (CLM) postulates
+
+\begin{equation}
+  y_i \;=\; \bm{x}_i^\top\,\bbeta_{0} + \varepsilon_i, \qquad i = 1,\ldots,n,
+  \label{eq:clm}
+\end{equation}
+
+\noindent where $\bbeta_{0} \in \mathbb{R}^k$ is the vector of true
+parameters and $\varepsilon_i$ is an unobservable disturbance. Written
+in matrix form, \eqref{eq:clm} becomes $\bY = \bX\bbeta_{0} + \beps$,
+where $\bY \in \mathbb{R}^n$, $\bX \in \mathbb{R}^{n \times k}$, and
+$\beps \in \mathbb{R}^n$ collect the observations in the obvious way.
+
+\medskip
+
+The ordinary least-squares (OLS) estimator is
+
+\begin{equation}
+  \hat{\bbeta}_{\mathrm{OLS}} \;=\;
+  \bigl(\bX'\bX\bigr)^{-1}\bX'\bY \;=\;
+  \bbeta_{0} + \bigl(\bX'\bX\bigr)^{-1}\bX'\beps.
+  \label{eq:ols}
+\end{equation}
+
+Its desirable properties depend on the following assumptions, which
+we state in a form suitable for asymptotic analysis.
+
+\begin{assumption}[Linearity]
+\label{ass:linearity}
+The data-generating process satisfies \eqref{eq:clm} for some
+$\bbeta_0 \in \mathbb{R}^k$.
+\end{assumption}
+
+\begin{assumption}[Random Sampling]
+\label{ass:sampling}
+$\{(y_i, \bm{x}_i)\}_{i=1}^{n}$ is an independent and identically
+distributed (i.i.d.) sequence drawn from a well-defined population
+distribution.
+\end{assumption}
+
+\begin{assumption}[Full Rank]
+\label{ass:rank}
+$\E[\bm{x}_i \bm{x}_i^\top]$ is finite and positive definite, so that
+$\rank(\bX'\bX) = k$ almost surely for $n$ sufficiently large.
+\end{assumption}
+
+\begin{assumption}[Strict Exogeneity]
+\label{ass:exogeneity}
+$\E[\varepsilon_i \mid \bm{x}_i] = 0$ almost surely. As an immediate
+consequence, $\E[\bm{x}_i \varepsilon_i] = \bm{0}$ and
+$\E[\varepsilon_i] = 0$.
+\end{assumption}
+
+\begin{assumption}[Spherical Disturbances]
+\label{ass:spherical}
+$\E[\varepsilon_i^2 \mid \bm{x}_i] = \sigma^2 \in (0,\infty)$ and
+$\E[\varepsilon_i \varepsilon_j \mid \bm{x}_i, \bm{x}_j] = 0$ for all
+$i \neq j$.
+\end{assumption}
+
+\begin{remark}
+Assumption~\ref{ass:exogeneity} is the pivot around which the entire
+analysis turns. It is substantially stronger than the \emph{mean
+independence} condition $\E[\varepsilon_i \mid \bm{x}_i] = 0$; the
+latter implies $\Cov(\bm{x}_i, \varepsilon_i) = \bm{0}$, but the
+converse does not hold in general. The analysis below requires only
+the zero-correlation form, $\E[\bm{x}_i \varepsilon_i] = \bm{0}$,
+for consistency of OLS. We invoke the stronger form only where finite-
+sample results are concerned.
+\end{remark}
+
+Under Assumptions~\ref{ass:linearity}--\ref{ass:exogeneity}, the
+Gauss--Markov theorem establishes that OLS is the best linear
+unbiased estimator (BLUE) of $\bbeta_0$. Consistency and asymptotic
+normality follow from a standard application of the law of large
+numbers and the central limit theorem.
+
+\begin{theorem}[Consistency and Asymptotic Normality of OLS]
+\label{thm:ols-can}
+Under Assumptions~\ref{ass:linearity}--\ref{ass:exogeneity} and the
+moment condition $\E\!\left[\norm{\bm{x}_i}^2 \varepsilon_i^2\right] 
+\infty$,
+
+\begin{enumerate}
+  \item $\hat{\bbeta}_{\mathrm{OLS}} \pto \bbeta_0$; and
+  \item $\sqrt{n}\,\bigl(\hat{\bbeta}_{\mathrm{OLS}} - \bbeta_0\bigr)
+        \dto \N\!\bigl(\bm{0},\, \bSigma_{\mathrm{OLS}}\bigr)$,
+        where
+        $\bSigma_{\mathrm{OLS}} =
+         \bigl(\E[\bm{x}_i\bm{x}_i^\top]\bigr)^{-1}
+         \E\!\left[\varepsilon_i^2 \bm{x}_i \bm{x}_i^\top\right]
+         \bigl(\E[\bm{x}_i\bm{x}_i^\top]\bigr)^{-1}$.
+\end{enumerate}
+Under the additional Assumption~\ref{ass:spherical},
+$\bSigma_{\mathrm{OLS}}$ simplifies to
+$\sigma^2\bigl(\E[\bm{x}_i\bm{x}_i^\top]\bigr)^{-1}$.
+\end{theorem}
+
+\begin{proof}
+From \eqref{eq:ols},
+$$
+  \hat{\bbeta}_{\mathrm{OLS}} - \bbeta_0
+  \;=\;
+  \left(\frac{1}{n}\bX'\bX\right)^{-1}
+  \frac{1}{n}\bX'\beps.
+$$
+
+By the LLN (Assumption~\ref{ass:sampling}),
+$n^{-1}\bX'\bX \pto \E[\bm{x}_i\bm{x}_i^\top]$, which is invertible by
+Assumption~\ref{ass:rank}, and $n^{-1}\bX'\beps \pto
+\E[\bm{x}_i\varepsilon_i] = \bm{0}$ by Assumption~\ref{ass:exogeneity}.
+Part (i) follows from Slutsky's theorem. For part (ii), write
+$n^{-1/2}\bX'\beps = n^{-1/2}\sum_{i=1}^n \bm{x}_i\varepsilon_i$.
+The summands are i.i.d. with mean zero and covariance matrix
+$\E[\varepsilon_i^2 \bm{x}_i\bm{x}_i^\top]$; the CLT yields
+$n^{-1/2}\bX'\beps \dto \N\!\bigl(\bm{0},
+\E[\varepsilon_i^2\bm{x}_i\bm{x}_i^\top]\bigr)$. The delta method (or
+Slutsky) completes the argument.
+\end{proof}
+
+
+\subsection{Endogeneity: Definition, Sources, and Consequences}
+
+
+The entire edifice of Theorem~\ref{thm:ols-can} collapses the moment
+Assumption~\ref{ass:exogeneity} is violated.
+
+\begin{definition}[Endogeneity]
+\label{def:endogeneity}
+A regressor $x_{ji}$ (the $j$-th component of $\bm{x}_i$) is said to
+be \emph{endogenous} if $\Cov(x_{ji},\varepsilon_i) \neq 0$, or,
+more generally, if $\E[\bm{x}_i\varepsilon_i] \neq \bm{0}$. The
+model \eqref{eq:clm} is then said to suffer from \emph{endogeneity}.
+\end{definition}
+
+Endogeneity is not a single pathology but a family of related problems
+sharing a common algebraic signature. We distinguish three principal
+sources.
+
+\subsubsection{Omitted Variable Bias}
+
+Suppose the true model is
+$$
+  y_i \;=\; \bm{x}_i^\top\,\bbeta_0 + \gamma_0 c_i + u_i,
+  \qquad \E[u_i \mid \bm{x}_i, c_i] = 0,
+$$
+where $c_i$ is an unobserved confounder correlated with $\bm{x}_i$.
+If we estimate the misspecified model \eqref{eq:clm} with
+$\varepsilon_i = \gamma_0 c_i + u_i$, then
+$\E[\bm{x}_i \varepsilon_i] = \gamma_0 \E[\bm{x}_i c_i] \neq
+\bm{0}$ whenever $\gamma_0 \neq 0$ and $c_i$ is correlated with at
+least one regressor. This is the \emph{omitted variable bias} (OVB)
+problem, arguably the most common form of endogeneity in applied
+economics.
+
+\subsubsection{Simultaneity Bias}
+
+In many economic settings, $y_i$ and one or more components of
+$\bm{x}_i$ are determined jointly by a system of equations. The
+canonical example is a supply-and-demand system:
+\begin{align*}
+  q_i^d &= \alpha_0 + \alpha_1 p_i + \alpha_2 \bm{w}_i' \bm{\delta} + u_i^d
+           \quad \text{(demand)}, \\
+  q_i^s &= \beta_0  + \beta_1  p_i + \beta_2  \bm{r}_i' \bm{\phi}  + u_i^s
+           \quad \text{(supply)}, \\
+  q_i^d &= q_i^s
+           \quad \text{(market clearing)}.
+\end{align*}
+In equilibrium, price $p_i$ is a function of both structural errors
+$u_i^d$ and $u_i^s$. Regressing quantity on price therefore yields an
+estimator that is inconsistent for either structural parameter.
+
+\subsubsection{Measurement Error}
+
+Let $x_i^*$ be the true value of a regressor, observed with error:
+$x_i = x_i^* + v_i$, where $v_i$ is classical measurement error
+with $\E[v_i] = 0$, $\Cov(x_i^*, v_i) = 0$. Substituting into the
+true model $y_i = \beta_0 + \beta_1 x_i^* + u_i$ gives
+
+$$
+  y_i \;=\; \beta_0 + \beta_1 x_i + \underbrace{(u_i - \beta_1 v_i)}_{=\,\varepsilon_i}.
+$$
+
+Since $\Cov(x_i, \varepsilon_i) = -\beta_1 \Var(v_i) \neq 0$, OLS
+is inconsistent. The resulting \emph{attenuation bias} pushes the
+estimate of $\beta_1$ toward zero in absolute value.
+
+\medskip
+
+The consequences of endogeneity are stark.
+
+\begin{theorem}[Inconsistency of OLS under Endogeneity]
+\label{thm:ols-inconsistent}
+Suppose Assumption~\ref{ass:exogeneity} fails, so that
+$\bm{\delta} \equiv \E[\bm{x}_i\varepsilon_i] \neq \bm{0}$.
+Then, under Assumptions~\ref{ass:linearity}--\ref{ass:rank},
+
+$$
+  \plim_{n\to\infty} \hat{\bbeta}_{\mathrm{OLS}}
+  \;=\;
+  \bbeta_0 + \bigl(\E[\bm{x}_i\bm{x}_i^\top]\bigr)^{-1}\bm{\delta}
+  \;\neq\; \bbeta_0.
+$$
+
+Moreover, no amount of additional data can eliminate this
+\emph{asymptotic bias}.
+\end{theorem}
+
+\begin{proof}
+By the LLN applied to \eqref{eq:ols},
+$$
+  \plim\,\hat{\bbeta}_{\mathrm{OLS}}
+  = \bbeta_0 +
+  \left(\plim\,\frac{\bX'\bX}{n}\right)^{\!-1}
+  \left(\plim\,\frac{\bX'\beps}{n}\right)
+  = \bbeta_0 +
+  \bigl(\E[\bm{x}_i\bm{x}_i^\top]\bigr)^{-1}\bm{\delta}.
+$$
+Because $\bm{\delta} \neq \bm{0}$ by hypothesis and
+$\E[\bm{x}_i\bm{x}_i^\top]$ is non-singular by Assumption~\ref{ass:rank},
+the second term is non-zero and persists as $n \to \infty$.
+\end{proof}
+
+\begin{remark}
+Theorem~\ref{thm:ols-inconsistent} makes clear that endogeneity is
+fundamentally an identification problem, not a finite-sample one.
+Collecting more data merely produces a more precise estimate of the
+wrong quantity. The solution must address the source of the correlation
+$\bm{\delta}$, not the sample size.
+\end{remark}
+
+\begin{example}[Returns to Schooling]
+\label{ex:schooling}
+Consider the classic Mincer earnings equation,
+$$
+  \log w_i \;=\; \beta_0 + \beta_1 S_i + \bm{x}_i^\top\bgamma + \varepsilon_i,
+$$
+where $w_i$ is the wage, $S_i$ is years of schooling, and
+$\bm{x}_i$ contains observable controls (age, region, etc.). The
+parameter of interest, $\beta_1$, measures the average causal return
+to an additional year of education. The problem is that $S_i$ is
+almost certainly correlated with unobserved \emph{ability} $a_i$,
+which also affects wages and is absorbed into $\varepsilon_i$. OLS
+therefore overstates $\beta_1$. \citet{Card1993} addresses this by
+instrumenting $S_i$ with proximity to a college, a variable that
+plausibly affects schooling attainment without directly influencing
+wages --- an application of the IV strategy introduced in
+Section~\ref{sec:iv}.
+\end{example}
+
+
+\subsection{A Preview of Solutions}
+\label{sec:preview}
+
+
+Three broad strategies have been developed to recover consistent
+estimates of $\bbeta_0$ in the presence of endogeneity. These notes
+treat the first two in depth and briefly touch on their connections
+to the third.
+
+\medskip
+
+\noindent\textbf{Instrumental Variables (IV).}\quad
+The IV approach introduces a vector of \emph{instruments}
+$\bm{z}_i \in \mathbb{R}^{\ell}$ that satisfy two conditions:
+\emph{relevance}, $\Cov(\bm{z}_i, \bm{x}_i) \neq \bm{0}$, and
+\emph{exogeneity}, $\E[\bm{z}_i\varepsilon_i] = \bm{0}$. These two
+conditions together restore identification. Section~\ref{sec:iv}
+develops the IV estimator, establishes its asymptotic properties, and
+discusses the critical practical issue of \emph{instrument strength}.
+
+\medskip
+
+\noindent\textbf{Two-Stage Least Squares (2SLS).}\quad
+When $\ell > k$ --- i.e.\ when there are more instruments than
+endogenous regressors --- the model is \emph{overidentified} and IV
+is no longer unique. 2SLS provides an optimal way to exploit all
+available instruments simultaneously. Section~\ref{sec:tsls} derives
+the 2SLS estimator, relates it to IV in the just-identified case, and
+establishes its efficiency within the class of IV estimators under
+homoskedastic errors.
+
+\medskip
+
+\noindent\textbf{Generalized Method of Moments (GMM).}\quad
+GMM nests both IV and 2SLS as special cases. It begins from a set of
+moment conditions $\E[\bm{g}(\bm{w}_i, \bbeta_0)] = \bm{0}$ and
+constructs the estimator by minimising a quadratic form in the sample
+analogue. With an \emph{optimal} weighting matrix, GMM achieves the
+semiparametric efficiency bound within the class of estimators
+exploiting the same moment conditions. Crucially, GMM extends to
+heteroskedastic and autocorrelated errors without altering the
+estimating equations --- a feature that makes it indispensable in
+applied work. Section~\ref{sec:gmm} provides a self-contained
+treatment.
+
+\medskip
+
+\noindent\textbf{Diagnostics.}\quad
+Identifying endogeneity in a given dataset, assessing instrument
+validity, and testing overidentifying restrictions are tasks of
+independent importance. Section~\ref{sec:testing} covers the
+Hausman test, the Sargan--Hansen $J$-statistic, and the
+Stock--Yogo weak-instrument test.
+
+\begin{exercise}
+\label{ex:intro1}
+Consider the bivariate model $y_i = \beta_0 + \beta_1 x_i +
+\varepsilon_i$ with $\Cov(x_i, \varepsilon_i) = \sigma_{x\varepsilon}
+\neq 0$ and $\Var(x_i) = \sigma_x^2$.
+\begin{enumerate}
+  \item Show that $\plim\,\hat{\beta}_{1,\mathrm{OLS}} = \beta_1 +
+        \sigma_{x\varepsilon}/\sigma_x^2$.
+  \item Determine the sign of the asymptotic bias when (a) ability
+        is the omitted variable in the schooling example, and (b)
+        classical measurement error is present.
+  \item Suppose you observe a variable $z_i$ with
+        $\Cov(z_i, x_i) = \sigma_{zx} \neq 0$ and
+        $\Cov(z_i, \varepsilon_i) = 0$. Propose an estimator for
+        $\beta_1$ based on these covariances, and verify that it is
+        consistent.
+\end{enumerate}
+\end{exercise}

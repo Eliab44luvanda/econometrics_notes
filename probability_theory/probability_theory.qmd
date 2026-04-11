@@ -54,6 +54,29 @@ format:
 
                         \usepackage{tikz}
                         \usetikzlibrary{arrows.meta, patterns, positioning}
+                         \usetikzlibrary{patterns,calc,decorations.pathreplacing}
+%                       \usepackage{pgfplots}
+%                        \pgfplotsset{compat=1.18}
+%                        \usepackage{booktabs,xcolor,mdframed,enumitem}
+%                        \definecolor{leblue}{RGB}{24,95,165}
+%                       \definecolor{legreen}{RGB}{15,110,86}
+%                        \definecolor{legray}{RGB}{95,94,90}
+%                       \mdfdefinestyle{intubox}{%
+%                             backgroundcolor=leblue!7,
+%                              linecolor=leblue!40,
+%                              linewidth=0.6pt,
+%                              innerleftmargin=10pt,
+%                              innerrightmargin=10pt,
+%                              innertopmargin=8pt,
+%                             innerbottommargin=8pt,
+%                             skipabove=8pt,
+%                             skipbelow=8pt}
+%                         \newtheoremstyle{mydef}{}{}{}{}{\bfseries}{.}{.5em}{}
+%                        \theoremstyle{mydef}
+%                        \newtheorem{definition}{Definition}[section]
+%                        \newtheorem{example}[definition]{Example}
+%
+
 
       html:
             css: palatino.css

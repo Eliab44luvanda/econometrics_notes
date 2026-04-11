@@ -501,6 +501,15 @@ $$X_t=\mu+\varepsilon_t+\theta_1\varepsilon_{t-1}.$$
 
 ### Autoregressive (AR) Processes
 
+Autoregressive processes are defined by the property that the current value of the series can be expressed as a linear function of its own past values plus a stochastic error term. The order of the autoregressive process, denoted by $p$, indicates how many past values are included in the model.
+
+\begin{definition}[Autoregressive process]
+Let $(\Omega,\mathcal{F},\mathbb{P})$ be a probability space, and let $\{\varepsilon_t\}_{t\in\mathbb{Z}}$ be a white noise process with variance $\sigma^2$. A stochastic process $\{X_t\}_{t\in\mathbb{Z}}$ is an autoregressive process of order $p$ (AR($p$)) if it can be represented as 
+\end{definition}
+
+
+
+
 ### Autoregressisive Moving Average (ARMA) Processes
 
 # Non-stationary Stationary Processes
