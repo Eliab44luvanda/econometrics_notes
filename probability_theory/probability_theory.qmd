@@ -1,5 +1,5 @@
 ---
-title: "Measure-Theoretic Probability Theory"
+title: "Basic Measure-Theoretic Probability Theory"
 subtitle: "Lecture Notes for Econometrics."
 author: "Eliab Luvanda"
 date: today
