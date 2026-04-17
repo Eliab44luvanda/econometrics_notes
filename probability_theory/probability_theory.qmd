@@ -5,7 +5,7 @@ author: "Eliab Luvanda"
 date: today
 date-format: "MMMM D, YYYY"
 bibliography: references.bib
-reference-section-title: "References"
+reference-section-title: "Bibliography"
 nocite: "@*"
 
 format:
@@ -27,7 +27,16 @@ format:
             include-in-header:
                   text: |
                         \usepackage{fontspec}
-                        \setmainfont{Palatino}
+                        \usepackage{unicode-math}
+                        % TeX Gyre Pagella is the TeX-distributed Palatino family.
+                        \setmainfont{TeX Gyre Pagella}
+                        \setmathfont{TeX Gyre Pagella Math}
+                        % Apply the same serif family to the title block and KOMA heading styles.
+                        \setkomafont{title}{\rmfamily}
+                        \setkomafont{subtitle}{\rmfamily}
+                        \setkomafont{author}{\rmfamily}
+                        \setkomafont{date}{\rmfamily}
+                        \setkomafont{disposition}{\rmfamily}
                         \usepackage{amsmath, amssymb, amsthm, mathtools}
                         \usepackage{bm}
                         \newcommand{\E}{\mathbb{E}}
@@ -1250,7 +1259,7 @@ ggplot(df, aes(x = n, y = mean)) +
 
 \newpage
 
-# References {.unnumbered}
+# Bibliography {.unnumbered}
 
 ::: {#refs}
 :::
@@ -1432,4 +1441,3 @@ $$
 $$
 
 For a thorough treatment at the graduate level, see Royden and Fitzpatrick *Real Analysis* (4th ed.) and Billingsley *Probability and Measure* (3rd ed.).
-
