@@ -72,46 +72,15 @@ crossref:
       sec-prefix: "Section"
 ---
 
-#  Introduction
+# Introduction
 
 ## Probability and Uncertainty
 
-In a world of perfect information, economic analysis would reduce to a deterministic
-calculus: households would allocate resources with certainty, firms would optimise
-production against known prices and costs, and governments would design policy in
-full knowledge of its consequences. The real world, however, is irreducibly
-uncertain. Outcomes that matter enormously to economic agents --- harvests, prices,
-wages, health shocks, interest rates, policy changes --- are not known in advance
-and cannot be controlled. Probability theory provides the only rigorous language
-for reasoning about such uncertainty. By assigning numerical measures to the
-likelihood of events before they are realised, probability transforms vague
-intuitions about chance into a precise, internally consistent calculus that can
-be embedded in optimisation problems, tested against data, and used to derive
-welfare implications. Without this foundation, the core constructs of modern
-economics --- expected utility, risk aversion, insurance, option pricing,
-hypothesis testing, and identification in causal inference --- would have no
-formal basis.
+In a world of perfect information, economic analysis would reduce to a deterministic calculus: households would allocate resources with certainty, firms would optimise production against known prices and costs, and governments would design policy in full knowledge of its consequences. The real world, however, is irreducibly uncertain. Outcomes that matter enormously to economic agents --- harvests, prices, wages, health shocks, interest rates, policy changes --- are not known in advance and cannot be controlled. Probability theory provides the only rigorous language for reasoning about such uncertainty. By assigning numerical measures to the likelihood of events before they are realised, probability transforms vague intuitions about chance into a precise, internally consistent calculus that can be embedded in optimisation problems, tested against data, and used to derive welfare implications. Without this foundation, the core constructs of modern economics --- expected utility, risk aversion, insurance, option pricing, hypothesis testing, and identification in causal inference --- would have no formal basis.
 
-The importance of probability in economics goes beyond mere bookkeeping of
-likelihoods. It provides the structural scaffolding for rational decision-making
-under uncertainty. When an agent faces a decision whose consequences depend on
-an unknown state of the world, the probability space $(\Omega, \mathcal{F}, P)$
-formalises the environment: $\Omega$ lists the states that might obtain,
-$\mathcal{F}$ specifies which events are observable and contractible, and $P$
-encodes beliefs about how likely each state is. The agent's objective --- typically
-the maximisation of expected utility --- is then a probability-weighted average
-of utilities across states, and the entire machinery of constrained optimisation
-can be brought to bear. Crucially, probability also disciplines empirical work:
-econometric estimators, confidence intervals, hypothesis tests, and identification
-strategies are all defined in terms of probability limits, distributions, and
-measures. The probability space is therefore not an abstract luxury but the
-invisible infrastructure on which both economic theory and empirical practice rest.
+The importance of probability in economics goes beyond mere bookkeeping of likelihoods. It provides the structural scaffolding for rational decision-making under uncertainty. When an agent faces a decision whose consequences depend on an unknown state of the world, the probability space $(\Omega, \mathcal{F}, P)$ formalises the environment: $\Omega$ lists the states that might obtain, $\mathcal{F}$ specifies which events are observable and contractible, and $P$ encodes beliefs about how likely each state is. The agent's objective --- typically the maximisation of expected utility --- is then a probability-weighted average of utilities across states, and the entire machinery of constrained optimisation can be brought to bear. Crucially, probability also disciplines empirical work: econometric estimators, confidence intervals, hypothesis tests, and identification strategies are all defined in terms of probability limits, distributions, and measures. The probability space is therefore not an abstract luxury but the invisible infrastructure on which both economic theory and empirical practice rest.
 
-To make these ideas concrete, consider agents operating in environments
-representative of the Tanzanian and broader developing-country context. The
-following examples illustrate how probability structures the decision problems
-of a smallholder farmer, a rural household, and a firm, each facing a distinct
-but equally fundamental form of uncertainty.
+To make these ideas concrete, consider agents operating in environments representative of the Tanzanian and broader developing-country context. The following examples illustrate how probability structures the decision problems of a smallholder farmer, a rural household, and a firm, each facing a distinct but equally fundamental form of uncertainty.
 
 \begin{example}[Tanzanian Smallholder Farmer and Weather Uncertainty]
 Consider a smallholder farmer in a village in the Dodoma region of Tanzania,
@@ -142,7 +111,6 @@ and $\pi$ is the insurance premium per unit. Without the probability space
 $(\Omega, \mathcal{F}, P)$, this problem cannot even be stated, let alone solved
 or estimated from household survey data.
 \end{example}
-
 \begin{example}[Rural Household and Income Uncertainty]
 Consider a rural household in Tanzania whose total income is drawn from two
 sources: on-farm crop income, which is subject to weather risk, and off-farm
@@ -164,7 +132,6 @@ distributions they induce over income outcomes, making the probability space the
 indispensable foundation of household welfare analysis and the design of social
 protection policy.
 \end{example}
-
 \begin{example}[Firm and Price Uncertainty]
 Consider a firm operating in an agricultural output market in Tanzania, deciding
 how much to invest in processing capacity before the harvest price $\tilde{p}$
@@ -196,82 +163,21 @@ In economics, uncertainty is central to decision-making, from consumption choice
 
 ## Probability Theory as the Foundation of Econometric Theory
 
-Econometrics is, at its foundational level, an application of probability theory
-to the empirical analysis of economic relationships. This insight was stated with
-remarkable clarity and force by Trygve Haavelmo in his landmark 1944 monograph
-\textit{The Probability Approach in Econometrics}, for which he was awarded the
-Nobel Memorial Prize in Economic Sciences in 1989. Haavelmo's central argument
-was that economic models should not be treated as deterministic algebraic
-relationships fitted to data by minimising discrepancies, but should instead be
-conceived from the outset as \textit{probability models} --- complete
-specifications of the joint probability distribution of all variables entering
-the analysis. 
+Econometrics is, at its foundational level, an application of probability theory to the empirical analysis of economic relationships. This insight was stated with remarkable clarity and force by Trygve Haavelmo in his landmark 1944 monograph \textit{The Probability Approach in Econometrics}, for which he was awarded the Nobel Memorial Prize in Economic Sciences in 1989. Haavelmo's central argument was that economic models should not be treated as deterministic algebraic relationships fitted to data by minimising discrepancies, but should instead be conceived from the outset as \textit{probability models} --- complete specifications of the joint probability distribution of all variables entering the analysis.
 
-On this view, the observed data are not a fixed object to be
-described but a single realisation drawn from a well-defined probability space
-$(\Omega, \mathcal{F}, P)$, and the task of econometrics is to use that
-realisation to learn about the probability measure $P$ that generated it. Without
-an explicit probabilistic framework, the concepts of estimation, consistency,
-efficiency, and statistical inference are simply undefined, and the applied
-researcher has no principled basis for distinguishing signal from noise or for
-quantifying the uncertainty that surrounds any empirical conclusion.
+On this view, the observed data are not a fixed object to be described but a single realisation drawn from a well-defined probability space $(\Omega, \mathcal{F}, P)$, and the task of econometrics is to use that realisation to learn about the probability measure $P$ that generated it. Without an explicit probabilistic framework, the concepts of estimation, consistency, efficiency, and statistical inference are simply undefined, and the applied researcher has no principled basis for distinguishing signal from noise or for quantifying the uncertainty that surrounds any empirical conclusion.
 
-To see why the probability framework is not merely convenient but logically
-indispensable, consider the classical consumption function
+To see why the probability framework is not merely convenient but logically indispensable, consider the classical consumption function
 
-$$
-C_t = \alpha + \beta Y_t + u_t,
-$$
+$$C_t = \alpha + \beta Y_t + u_t,$$
 
-where $C_t$ is household consumption in period $t$, $Y_t$ is disposable income,
-$\alpha$ and $\beta$ are structural parameters, and $u_t$ is an unobservable
-disturbance. In a purely algebraic reading, this equation is simply a line with
-an error attached, and estimation reduces to a curve-fitting exercise. Haavelmo's
-probability approach transforms this interpretation entirely. Because we work with
-observational rather than experimental data, income $Y_t$ is not set by the
-researcher but is itself generated by an underlying economic process --- it is a
-random variable with its own marginal distribution, reflecting the aggregate
-interactions of labour markets, policy, technology, and household decisions that
-lie outside the model. Conditional on the realised value of $Y_t$ and the true
-but unobservable structural parameter $\beta$ --- which encodes the rational
-marginal propensity to consume of a utility-maximising household --- we observe
-a further random variable $C_t$, whose stochastic variation is governed by $u_t$.
-The full probability model is therefore a specification of the joint distribution
+where $C_t$ is household consumption in period $t$, $Y_t$ is disposable income, $\alpha$ and $\beta$ are structural parameters, and $u_t$ is an unobservable disturbance. In a purely algebraic reading, this equation is simply a line with an error attached, and estimation reduces to a curve-fitting exercise. Haavelmo's probability approach transforms this interpretation entirely. Because we work with observational rather than experimental data, income $Y_t$ is not set by the researcher but is itself generated by an underlying economic process --- it is a random variable with its own marginal distribution, reflecting the aggregate interactions of labour markets, policy, technology, and household decisions that lie outside the model. Conditional on the realised value of $Y_t$ and the true but unobservable structural parameter $\beta$ --- which encodes the rational marginal propensity to consume of a utility-maximising household --- we observe a further random variable $C_t$, whose stochastic variation is governed by $u_t$. The full probability model is therefore a specification of the joint distribution
 
-$$
-(C_t, Y_t) \sim F_{\alpha, \beta, \sigma^2},
-$$
+$$(C_t, Y_t) \sim F_{\alpha, \beta, \sigma^2},$$
 
-parameterised by the structural parameters $(\alpha, \beta, \sigma^2)$. The
-population is this distribution; the sample $\{(C_t, Y_t)\}_{t=1}^{T}$ is a
-sequence of realisations drawn from it. Probability theory operates on the
-population side, characterising the data-generating process; econometrics
-operates on the sample side, using the observed realisations to form estimators
---- such as the ordinary least squares estimator $\hat{\beta}$ --- and to
-evaluate their properties. The consistency of $\hat{\beta}$, meaning that
-$\hat{\beta} \overset{p}{\to} \beta$ as $T \to \infty$, is a theorem about
-probability limits, proved using the Law of Large Numbers. The asymptotic
-normality of $\hat{\beta}$, which underpins $t$-tests and confidence intervals,
-is a theorem about convergence in distribution, proved using the Central Limit
-Theorem. Every inferential statement an econometrician makes is therefore a
-statement about the probability model, and its validity depends entirely on
-whether the assumed probability space is an adequate representation of the
-true data-generating process.
+parameterised by the structural parameters $(\alpha, \beta, \sigma^2)$. The population is this distribution; the sample $\{(C_t, Y_t)\}_{t=1}^{T}$ is a sequence of realisations drawn from it. Probability theory operates on the population side, characterising the data-generating process; econometrics operates on the sample side, using the observed realisations to form estimators --- such as the ordinary least squares estimator $\hat{\beta}$ --- and to evaluate their properties. The consistency of $\hat{\beta}$, meaning that $\hat{\beta} \overset{p}{\to} \beta$ as $T \to \infty$, is a theorem about probability limits, proved using the Law of Large Numbers. The asymptotic normality of $\hat{\beta}$, which underpins $t$-tests and confidence intervals, is a theorem about convergence in distribution, proved using the Central Limit Theorem. Every inferential statement an econometrician makes is therefore a statement about the probability model, and its validity depends entirely on whether the assumed probability space is an adequate representation of the true data-generating process.
 
-This intimate relationship between probability theory and econometrics has a
-direct and consequential implication for how econometrics should be learned and
-practised. Econometric methods are not a self-contained toolkit that can be
-mastered independently of the probabilistic foundations on which they rest; they
-are theorems and procedures derived from, and interpretable only within, a
-probability-theoretic framework. A researcher who does not understand the
-probability space underlying a model cannot assess whether its assumptions are
-satisfied in a given application, cannot diagnose the source of an inconsistency
-when an estimator fails, and cannot evaluate whether a proposed extension or
-modification of a standard method is internally coherent. Conversely, a
-researcher with a thorough command of probability theory can reconstruct the
-logic of any standard estimator from first principles, detect violations of
-identifying assumptions by reasoning about the underlying distributions, and
-engage critically with the frontier of econometric theory as it evolves.
+This intimate relationship between probability theory and econometrics has a direct and consequential implication for how econometrics should be learned and practised. Econometric methods are not a self-contained toolkit that can be mastered independently of the probabilistic foundations on which they rest; they are theorems and procedures derived from, and interpretable only within, a probability-theoretic framework. A researcher who does not understand the probability space underlying a model cannot assess whether its assumptions are satisfied in a given application, cannot diagnose the source of an inconsistency when an estimator fails, and cannot evaluate whether a proposed extension or modification of a standard method is internally coherent. Conversely, a researcher with a thorough command of probability theory can reconstruct the logic of any standard estimator from first principles, detect violations of identifying assumptions by reasoning about the underlying distributions, and engage critically with the frontier of econometric theory as it evolves.
 
 \begin{remark}[Probability Theory as a Necessary and Sufficient Foundation]
 A thorough understanding of probability theory is both a \textit{necessary} and
@@ -291,7 +197,6 @@ variables, convergence concepts, and the limit theorems can derive the propertie
 of any estimator, construct valid tests, and assess identification from first
 principles, without relying on the authority of textbook results.
 \end{remark}
-
 \begin{remark}[Probability Theory as a Foundation for Responsible Empirical Practice]
 Beyond theoretical understanding, a solid grounding in probability theory is
 essential for the informed and responsible application of econometrics in
@@ -311,7 +216,6 @@ treat it as a measure of the probability that the null hypothesis is true.
 These distinctions are probabilistic in nature, and their mastery is a
 precondition for credible empirical work.
 \end{remark}
-
 \begin{remark}[Haavelmo's Legacy and the Modern Structural Approach]
 Haavelmo's probability approach is not a historical curiosity but the living
 foundation of modern structural econometrics. The potential outcomes framework
@@ -330,26 +234,18 @@ probabilistic reasoning that Haavelmo placed at the centre of econometric
 methodology eight decades ago.
 \end{remark}
 
-
-
-
-
 ## Approaches to Probability
 
 ### Classical
 
 The classical (or Laplacean) approach to probability defines probability in terms of equally likely outcomes within a finite sample space. Formally, let $\Omega$ be a finite sample space with $|\Omega| < \infty$, and suppose that all elementary outcomes $\omega \in \Omega$ are equally likely. Then, for any event $A \subseteq \Omega$, the probability of $A$ is defined as
-$$
-P(A) = \frac{|A|}{|\Omega|},
-$$
+$$P(A) = \frac{|A|}{|\Omega|},$$
 where $|A|$ denotes the number of favorable outcomes in $A$, and $|\Omega|$ is the total number of possible outcomes. This approach relies critically on the principle of insufficient reason (or indifference), which assigns equal probabilities to all outcomes in the absence of further information. While the classical definition provides an intuitive and mathematically convenient foundation for probability theory—particularly in games of chance such as coin tosses, dice rolls, and card draws—it is limited to settings with finite and symmetric outcome spaces, and does not readily extend to situations involving infinite sample spaces or outcomes that are not equally likely.
 
 ### Frequentist
 
 The frequentist approach to probability defines the probability of an event in terms of its long-run relative frequency in repeated, identical trials of a random experiment. Formally, consider a sequence of independent and identically distributed trials, and let $A$ be an event of interest. Let $N_n(A)$ denote the number of occurrences of $A$ in the first $n$ trials. Then, the probability of $A$ is defined as the limiting relative frequency:
-$$
-P(A) = \lim_{n \to \infty} \frac{N_n(A)}{n},
-$$
+$$P(A) = \lim_{n \to \infty} \frac{N_n(A)}{n},$$
 provided that this limit exists. This definition is grounded in the law of large numbers, which ensures that, under suitable regularity conditions, the sample frequency converges to a stable value as the number of trials becomes large. The frequentist interpretation is particularly well-suited for empirical and experimental contexts where repeatability is meaningful; however, it is conceptually limited when dealing with unique or non-repeatable events, and it presumes the existence of an underlying stochastic mechanism generating the observed outcomes.
 
 ### Subjective
@@ -357,23 +253,17 @@ provided that this limit exists. This definition is grounded in the law of large
 The subjective (or Bayesian) approach to probability defines probability as a degree of belief or confidence that an individual assigns to the occurrence of an event, based on their personal judgment, information, and prior experience. Formally, let $A$ be an event, and let $\Prob(A)$ represent the subjective probability assigned to $A$. This interpretation is inherently personal and can vary between individuals, as it reflects their unique perspectives and information sets. The subjective approach is particularly useful in decision-making under uncertainty, where probabilities are used to guide choices in the absence of objective frequencies or symmetries. However, it can be criticized for its lack of objectivity and potential for inconsistency across different individuals.
 
 ### Axiomatic (Measure-Theoretic)
+
 Probability is defined as a measure on a measurable space.
 
 The axiomatic (measure-theoretic) approach to probability, formalized by \textit{Andrey Kolmogorov}, defines probability as a measure on a structured set, thereby providing a rigorous and general foundation for both finite and infinite probabilistic models. Let $(\Omega, \mathcal{F}, P)$ be a probability space, where $\Omega$ is the sample space, $\mathcal{F}$ is a $\sigma$-algebra of subsets of $\Omega$ (the collection of events), and $P: \mathcal{F} \to [0,1]$ is a probability measure. The measure $P$ satisfies three axioms: (i) non-negativity, $P(A) \geq 0$ for all $A \in \mathcal{F}$; (ii) normalization, $P(\Omega) = 1$; and (iii) countable additivity, such that for any countable sequence of disjoint events $\{A_i\}_{i=1}^{\infty} \subset \mathcal{F}$,
-$$
-P\bigl(\bigcup_{i=1}^{\infty} A_i\bigr) = \sum_{i=1}^{\infty} P(A_i).
-$$
+$$P\bigl(\bigcup_{i=1}^{\infty} A_i\bigr) = \sum_{i=1}^{\infty} P(A_i).$$
 This framework unifies probability with measure theory and allows probabilistic reasoning to be conducted with full mathematical rigor.
 
 A key strength of the axiomatic approach is its ability to handle infinite and uncountable sample spaces, which arise naturally in economics and stochastic processes. For example, when $\Omega = \mathbb{R}$ (e.g., modeling continuous variables such as income, time, or prices), it is not meaningful to assign equal probability to individual outcomes. Instead, the $\sigma$-algebra $\mathcal{F}$ (typically the Borel $\sigma$-algebra) restricts attention to well-behaved subsets of $\mathbb{R}$, and probabilities are assigned via measures such as the Lebesgue measure. In this setting, probabilities are defined over intervals and more complex measurable sets, rather than points, thereby resolving the conceptual limitations of classical probability. The use of countable additivity ensures that probabilities remain consistent even when dealing with infinite collections of events, while avoiding paradoxes associated with uncountable unions that are not measurable.
 
-The structure of a probability space can be visualized as a rectangle representing
-the sample space $\Omega$, whose total area is normalized to 1. The $\sigma$-algebra
-$\mathcal{F}$ is not a region within $\Omega$ but rather a \textit{collection of
-admissible subsets} of $\Omega$ --- those subsets to which the probability measure
-$P$ is permitted to assign a value. An event $A \in \mathcal{F}$ is one such admissible
-subset, depicted as the shaded region, and its probability $P(A)$ corresponds to the
-ratio of the shaded area to the total area of $\Omega$:
+The structure of a probability space can be visualized as a rectangle representing the sample space $\Omega$, whose total area is normalized to 1. The $\sigma$-algebra $\mathcal{F}$ is not a region within $\Omega$ but rather a \textit{collection of
+admissible subsets} of $\Omega$ --- those subsets to which the probability measure $P$ is permitted to assign a value. An event $A \in \mathcal{F}$ is one such admissible subset, depicted as the shaded region, and its probability $P(A)$ corresponds to the ratio of the shaded area to the total area of $\Omega$:
 
 \begin{figure}[ht]
 \centering
@@ -397,38 +287,16 @@ subsets of $\Omega$ --- such as $A$ --- to which $P$ can be legitimately assigne
 \label{fig:prob-space}
 \end{figure}
 
-This diagram highlights that $P(A)$ is always measured relative to the whole of
-$\Omega$, consistently with the requirement $P(\Omega) = 1$. The role of $\mathcal{F}$
-is not to carve out a sub-region of $\Omega$ but to specify which subsets are
-\textit{measurable} --- a distinction that becomes essential when $\Omega$ is
-uncountable, since not every subset of an uncountable space can be assigned a
-probability in a logically consistent way. By embedding probability within measure
-theory, the axiomatic approach provides a coherent and flexible framework capable
-of supporting modern econometrics, stochastic calculus, and advanced statistical
-inference.
+This diagram highlights that $P(A)$ is always measured relative to the whole of $\Omega$, consistently with the requirement $P(\Omega) = 1$. The role of $\mathcal{F}$ is not to carve out a sub-region of $\Omega$ but to specify which subsets are \textit{measurable} --- a distinction that becomes essential when $\Omega$ is uncountable, since not every subset of an uncountable space can be assigned a probability in a logically consistent way. By embedding probability within measure theory, the axiomatic approach provides a coherent and flexible framework capable of supporting modern econometrics, stochastic calculus, and advanced statistical inference.
 
 # Probability Spaces
 
-A probability space is the fundamental mathematical structure that underlies all of
-modern probability theory, providing a rigorous foundation for reasoning about
-uncertainty. Formally introduced by Andrei Kolmogorov in his 1933 \textit{Grundbegriffe
-der Wahrscheinlichkeitsrechnung}, it is defined as a triple $(\Omega, \mathcal{F}, P)$
-consisting of three objects that work in concert: a sample space $\Omega$, a
-$\sigma$-algebra $\mathcal{F}$, and a probability measure $P$. The power of this
-construction lies not in any single component but in the disciplined way the three
-interact --- $\Omega$ specifies what can happen, $\mathcal{F}$ specifies what can be
-meaningfully measured, and $P$ assigns to each measurable event a number in $[0,1]$
-that quantifies its likelihood. Together, they elevate probability from an informal
-intuition about chance to a branch of measure theory, granting it the full deductive
-machinery of mathematical analysis and enabling a unified treatment of both discrete
-and continuous phenomena within a single, coherent framework.
+A probability space is the fundamental mathematical structure that underlies all of modern probability theory, providing a rigorous foundation for reasoning about uncertainty. Formally introduced by Andrei Kolmogorov in his 1933 \textit{Grundbegriffe
+der Wahrscheinlichkeitsrechnung}, it is defined as a triple $(\Omega, \mathcal{F}, P)$ consisting of three objects that work in concert: a sample space $\Omega$, a $\sigma$-algebra $\mathcal{F}$, and a probability measure $P$. The power of this construction lies not in any single component but in the disciplined way the three interact --- $\Omega$ specifies what can happen, $\mathcal{F}$ specifies what can be meaningfully measured, and $P$ assigns to each measurable event a number in $[0,1]$ that quantifies its likelihood. Together, they elevate probability from an informal intuition about chance to a branch of measure theory, granting it the full deductive machinery of mathematical analysis and enabling a unified treatment of both discrete and continuous phenomena within a single, coherent framework.
 
 ## Sample Space
 
-The sample space is the starting point of any probabilistic model: before assigning
-likelihoods to outcomes, one must first declare precisely what outcomes are possible.
-Intuitively, it is an exhaustive list of everything that could happen in a given
-experiment or situation, with no ambiguity about what constitutes a distinct outcome.
+The sample space is the starting point of any probabilistic model: before assigning likelihoods to outcomes, one must first declare precisely what outcomes are possible. Intuitively, it is an exhaustive list of everything that could happen in a given experiment or situation, with no ambiguity about what constitutes a distinct outcome.
 
 \begin{definition}[Sample Space]
 The \textbf{sample space}, denoted $\Omega$, is the set of all possible outcomes of
@@ -438,16 +306,7 @@ and collectively exhaustive --- that is, exactly one $\omega \in \Omega$ will be
 realized on any given run of the experiment.
 \end{definition}
 
-The two conditions embedded in this definition carry real logical weight. Mutual
-exclusivity requires that the outcomes be defined finely enough that no two can occur
-simultaneously: if two outcomes overlap, the model is underspecified. Collective
-exhaustiveness requires that the sample space be defined broadly enough to contain
-every conceivable realization: if an outcome occurs that is not in $\Omega$, the
-model is incomplete. In practice, the analyst constructs $\Omega$ by a deliberate act
-of abstraction --- retaining only those features of reality that are relevant to the
-question at hand and discarding the rest. A sample space may be finite, countably
-infinite, or uncountable, and this distinction has profound consequences for the
-subsequent mathematical machinery required to assign probabilities.
+The two conditions embedded in this definition carry real logical weight. Mutual exclusivity requires that the outcomes be defined finely enough that no two can occur simultaneously: if two outcomes overlap, the model is underspecified. Collective exhaustiveness requires that the sample space be defined broadly enough to contain every conceivable realization: if an outcome occurs that is not in $\Omega$, the model is incomplete. In practice, the analyst constructs $\Omega$ by a deliberate act of abstraction --- retaining only those features of reality that are relevant to the question at hand and discarding the rest. A sample space may be finite, countably infinite, or uncountable, and this distinction has profound consequences for the subsequent mathematical machinery required to assign probabilities.
 
 \begin{example}[Tossing a Coin]
 A fair coin is tossed once. The two possible outcomes are a head and a tail, so the
@@ -458,7 +317,6 @@ sample space is
 This is the simplest non-trivial sample space: finite, with two mutually exclusive
 and collectively exhaustive elementary outcomes.
 \end{example}
-
 \begin{example}[Tossing a Die]
 A standard six-sided die is rolled once. Each face shows a distinct number of pips,
 yielding six possible outcomes, so the sample space is
@@ -468,7 +326,6 @@ yielding six possible outcomes, so the sample space is
 Any event of practical interest --- such as rolling an even number --- corresponds
 to a subset of $\Omega$, for instance $A = \{2, 4, 6\}$.
 \end{example}
-
 \begin{example}[Weather Conditions and Farm Output]
 A farmer operates in a region subject to three mutually exclusive and collectively
 exhaustive seasonal weather regimes: favorable conditions, flooding, and drought.
@@ -485,14 +342,9 @@ yield distribution, in which case $\Omega$ would be enriched to accommodate a
 continuum of possible output realizations.
 \end{example}
 
-##  Sigma-Algebra
+## Sigma-Algebra
 
-Where the sample space $\Omega$ catalogues every possible outcome of a random
-experiment, the $\sigma$-algebra refines the model by specifying precisely which
-\textit{collections} of outcomes are admissible objects of probabilistic reasoning.
-Not every subset of $\Omega$ need be --- or, in uncountable spaces, can be ---
-assigned a probability in a logically consistent way, and the $\sigma$-algebra is
-the mathematical device that enforces this discipline.
+Where the sample space $\Omega$ catalogues every possible outcome of a random experiment, the $\sigma$-algebra refines the model by specifying precisely which \textit{collections} of outcomes are admissible objects of probabilistic reasoning. Not every subset of $\Omega$ need be --- or, in uncountable spaces, can be --- assigned a probability in a logically consistent way, and the $\sigma$-algebra is the mathematical device that enforces this discipline.
 
 \begin{definition}[$\sigma$-Algebra]
 Let $\Omega$ be a sample space. A \textbf{$\sigma$-algebra} (or $\sigma$-field) on
@@ -509,17 +361,7 @@ The pair $(\Omega, \mathcal{F})$ is called a \textbf{measurable space}, and any
 set $A \in \mathcal{F}$ is called a \textbf{measurable event}.
 \end{definition}
 
-Each axiom has a precise logical purpose. The first ensures that the certain event
---- something happens --- is always assignable a probability, namely $P(\Omega) = 1$.
-The second ensures coherence under negation: if one can speak meaningfully about the
-probability of an event $A$ occurring, one must equally be able to speak about the
-probability of $A$ \textit{not} occurring, and that complement must also be a
-measurable event. The third axiom extends this coherence to countably infinite
-sequences of events, ensuring that asking whether \textit{at least one} of a
-sequence of events occurs is always a well-posed question. Taken together, the three
-axioms guarantee that $\mathcal{F}$ is closed under all the set-theoretic operations
---- complementation, countable union, and hence countable intersection by De
-Morgan's laws --- that arise naturally in probabilistic arguments.
+Each axiom has a precise logical purpose. The first ensures that the certain event --- something happens --- is always assignable a probability, namely $P(\Omega) = 1$. The second ensures coherence under negation: if one can speak meaningfully about the probability of an event $A$ occurring, one must equally be able to speak about the probability of $A$ \textit{not} occurring, and that complement must also be a measurable event. The third axiom extends this coherence to countably infinite sequences of events, ensuring that asking whether \textit{at least one} of a sequence of events occurs is always a well-posed question. Taken together, the three axioms guarantee that $\mathcal{F}$ is closed under all the set-theoretic operations --- complementation, countable union, and hence countable intersection by De Morgan's laws --- that arise naturally in probabilistic arguments.
 
 \begin{remark}[Why the Sample Space Alone Is Not Enough]
 One might reasonably ask why $\Omega$ is insufficient on its own and why a
@@ -542,7 +384,6 @@ Borel $\sigma$-algebra $\mathcal{B}(\mathbb{R})$, generated by all open interval
 which contains all intervals, open and closed sets, and every set an econometrician
 is ever likely to encounter.
 \end{remark}
-
 \begin{example}[$\sigma$-Algebra for a Coin Toss]
 Let $\Omega = \{\mathrm{H}, \mathrm{T}\}$. The unique $\sigma$-algebra that
 contains all subsets of $\Omega$ is the power set
@@ -555,7 +396,6 @@ remains in $\mathcal{F}$. In this finite setting the power set is the natural an
 only sensible choice of $\sigma$-algebra, and it permits probabilities to be
 assigned to every conceivable event.
 \end{example}
-
 \begin{example}[$\sigma$-Algebra for a Die Roll]
 Let $\Omega = \{1, 2, 3, 4, 5, 6\}$. The power set $2^{\Omega}$ contains
 $2^{6} = 64$ subsets and constitutes the maximal $\sigma$-algebra on $\Omega$,
@@ -570,7 +410,6 @@ outcome is even or odd, discarding all finer information about the individual fa
 This illustrates that the choice of $\sigma$-algebra encodes the \textit{information
 structure} of the model.
 \end{example}
-
 \begin{example}[$\sigma$-Algebra for Weather States]
 Let the sample space be
 \[
@@ -612,30 +451,15 @@ may define trigger conditions for crop insurance contracts or government relief
 programs.
 \end{example}
 
+ample, \[ P({\text{flood}, \text{drought}}) \] is the probability of an adverse weather outcome. In economic terms, such events may define trigger conditions for crop insurance contracts or government relief programs. \\end{example}
+
 ::: remark
-In a finite sample space, the $\sigma$-algebra generated by $\Omega$ is typically
-taken to be the full power set, ensuring that \textit{all} subsets are measurable.
-This guarantees that any economically meaningful event — whether simple (e.g. “flood”)
-or composite (e.g. “not good weather”) — can be assigned a probability. In more
-general (infinite) settings, however, not every subset of $\Omega$ can be assigned
-a probability in a logically consistent way: such subsets are said to be
-	extit{non-measurable}, and no $\sigma$-algebra can contain them without
-destroying the coherence of the probability measure. The $\sigma$-algebra therefore
-delineates precisely the boundary between sets that are amenable to probabilistic
-measurement and those that are not — the latter being not merely excluded by
-convention but genuinely uncontrollable within any coherent probability framework.
+In a finite sample space, the $\sigma$-algebra generated by $\Omega$ is typically taken to be the full power set, ensuring that \textit{all} subsets are measurable. This guarantees that any economically meaningful event — whether simple (e.g. “flood”) or composite (e.g. “not good weather”) — can be assigned a probability. In more general (infinite) settings, however, not every subset of $\Omega$ can be assigned a probability in a logically consistent way: such subsets are said to be extit{non-measurable}, and no $\sigma$-algebra can contain them without destroying the coherence of the probability measure. The $\sigma$-algebra therefore delineates precisely the boundary between sets that are amenable to probabilistic measurement and those that are not — the latter being not merely excluded by convention but genuinely uncontrollable within any coherent probability framework.
 :::
 
 ## Probability Measure
 
-With the sample space $\Omega$ enumerating all possible outcomes and the
-$\sigma$-algebra $\mathcal{F}$ identifying which events are admissible objects of
-measurement, the final ingredient of a probability space is the probability measure
-$P$ --- the function that completes the triple $(\Omega, \mathcal{F}, P)$ by
-assigning to each measurable event a number that quantifies its likelihood. The
-probability measure is not defined arbitrarily; it must satisfy a set of axioms,
-known as the Kolmogorov axioms, that encode the minimal logical requirements for
-a coherent calculus of chance.
+With the sample space $\Omega$ enumerating all possible outcomes and the $\sigma$-algebra $\mathcal{F}$ identifying which events are admissible objects of measurement, the final ingredient of a probability space is the probability measure $P$ --- the function that completes the triple $(\Omega, \mathcal{F}, P)$ by assigning to each measurable event a number that quantifies its likelihood. The probability measure is not defined arbitrarily; it must satisfy a set of axioms, known as the Kolmogorov axioms, that encode the minimal logical requirements for a coherent calculus of chance.
 
 \begin{definition}[Probability Measure]
 Let $(\Omega, \mathcal{F})$ be a measurable space. A \textbf{probability measure}
@@ -660,25 +484,7 @@ is a function $P: \mathcal{F} \to [0,1]$ satisfying the following three axioms:
 The triple $(\Omega, \mathcal{F}, P)$ is called a \textbf{probability space}.
 \end{definition}
 
-Each axiom distills a fundamental requirement of rational belief about uncertainty.
-Non-negativity reflects the irreducibly non-negative nature of likelihood: no event
-can be less probable than impossible, and impossibility itself is represented by
-$P(\emptyset) = 0$, which follows immediately from the other axioms. Normalization
-anchors the scale: by convention, certainty is assigned the value one, so that all
-probabilities are expressed as fractions of the whole. It is this axiom that gives
-the geometric interpretation its force --- $P(A)$ is literally the proportion of
-the total probability mass, normalized to unity, that is allocated to $A$.
-Countable additivity is the most substantive of the three: it asserts that when
-events are mutually exclusive, their probabilities \textit{add}, and that this
-additivity extends to countably infinite collections of events, not merely finite
-ones. This extension to the countably infinite case is what distinguishes
-$\sigma$-additivity from the weaker requirement of finite additivity, and it is
-precisely what enables the passage from sums to integrals and from discrete to
-continuous probability distributions. Together the three axioms imply all the
-familiar rules of probability --- the complement rule $P(A^{c}) = 1 - P(A)$,
-the addition rule $P(A \cup B) = P(A) + P(B) - P(A \cap B)$, and monotonicity
-$A \subseteq B \Rightarrow P(A) \leq P(B)$ --- as purely logical consequences,
-requiring no further assumptions.
+Each axiom distills a fundamental requirement of rational belief about uncertainty. Non-negativity reflects the irreducibly non-negative nature of likelihood: no event can be less probable than impossible, and impossibility itself is represented by $P(\emptyset) = 0$, which follows immediately from the other axioms. Normalization anchors the scale: by convention, certainty is assigned the value one, so that all probabilities are expressed as fractions of the whole. It is this axiom that gives the geometric interpretation its force --- $P(A)$ is literally the proportion of the total probability mass, normalized to unity, that is allocated to $A$. Countable additivity is the most substantive of the three: it asserts that when events are mutually exclusive, their probabilities \textit{add}, and that this additivity extends to countably infinite collections of events, not merely finite ones. This extension to the countably infinite case is what distinguishes $\sigma$-additivity from the weaker requirement of finite additivity, and it is precisely what enables the passage from sums to integrals and from discrete to continuous probability distributions. Together the three axioms imply all the familiar rules of probability --- the complement rule $P(A^{c}) = 1 - P(A)$, the addition rule $P(A \cup B) = P(A) + P(B) - P(A \cap B)$, and monotonicity $A \subseteq B \Rightarrow P(A) \leq P(B)$ --- as purely logical consequences, requiring no further assumptions.
 
 \begin{example}[Probability Measure for a Coin Toss]
 Let $\Omega = \{\mathrm{H}, \mathrm{T}\}$ and $\mathcal{F} = \{\emptyset,
@@ -696,7 +502,6 @@ $\{\mathrm{H}\}$ and $\{\mathrm{T}\}$ are mutually exclusive,
 $P(\{\mathrm{H}\} \cup \{\mathrm{T}\}) = P(\{\mathrm{H}\}) + P(\{\mathrm{T}\})
 = 1 = P(\Omega)$, as required.
 \end{example}
-
 \begin{example}[Probability Measure for a Die Roll]
 Let $\Omega = \{1, 2, 3, 4, 5, 6\}$ and let $\mathcal{F} = 2^{\Omega}$ be the
 full power set. For a fair die, each elementary outcome is assigned equal
@@ -713,7 +518,6 @@ rolling an even number is $P(\{2,4,6\}) = \tfrac{3}{6} = \tfrac{1}{2}$, and
 the probability of rolling a number greater than four is $P(\{5,6\}) =
 \tfrac{2}{6} = \tfrac{1}{3}$.
 \end{example}
-
 \begin{example}[Probability Measure for Weather States]
 Let $\Omega = \{\text{good},\ \text{flood},\ \text{drought}\}$ and let
 $\mathcal{F} = 2^{\Omega}$ be the full power set. Suppose that historical
@@ -738,11 +542,7 @@ problem, using them to compute expected utilities, optimal insurance coverage,
 and the welfare effects of weather-indexed transfer programs.
 \end{example}
 
-
-The three Kolmogorov axioms are not merely definitional conveniences; they are
-sufficiently powerful to imply a rich set of properties that govern the behaviour
-of any probability measure. The following theorem collects the four most
-fundamental of these derived properties.
+The three Kolmogorov axioms are not merely definitional conveniences; they are sufficiently powerful to imply a rich set of properties that govern the behaviour of any probability measure. The following theorem collects the four most fundamental of these derived properties.
 
 \begin{theorem}[Derived Properties of a Probability Measure]
 Let $(\Omega, \mathcal{F}, P)$ be a probability space. Then the following
@@ -766,7 +566,6 @@ properties hold for all $A, B \in \mathcal{F}$:
           \]
 \end{enumerate}
 \end{theorem}
-
 \begin{proof}
 \textbf{Property 1.} Since $\Omega$ and $\emptyset$ are mutually exclusive and
 $\Omega \cup \emptyset = \Omega$, countable additivity gives
@@ -827,65 +626,33 @@ P(A \cup B) = P(A) + P(B) - P(A \cap B). \quad \square
 \]
 \end{proof}
 
-Each of these four properties illuminates a distinct facet of probabilistic
-reasoning. Property~1 establishes that impossibility is represented by zero
-probability: the empty set $\emptyset$ contains no outcomes, so no probability
-mass can be allocated to it, and this follows as a theorem rather than an
-additional assumption. Property~2 formalises the intuition that certainty is
-conserved: since $A$ and its complement $A^{c}$ together account for all
-possibilities, their probabilities must sum to one, and knowing $P(A)$
-immediately determines $P(A^{c})$. This is one of the most frequently used
-tools in applied probability, since it is often far easier to compute the
-probability of an event \textit{not} occurring and subtract from one than to
-compute its probability directly. 
+Each of these four properties illuminates a distinct facet of probabilistic reasoning. Property\~1 establishes that impossibility is represented by zero probability: the empty set $\emptyset$ contains no outcomes, so no probability mass can be allocated to it, and this follows as a theorem rather than an additional assumption. Property\~2 formalises the intuition that certainty is conserved: since $A$ and its complement $A^{c}$ together account for all possibilities, their probabilities must sum to one, and knowing $P(A)$ immediately determines $P(A^{c})$. This is one of the most frequently used tools in applied probability, since it is often far easier to compute the probability of an event \textit{not} occurring and subtract from one than to compute its probability directly.
 
-Property~3 encodes a basic requirement of
-logical consistency: if every outcome in $A$ is also an outcome in $B$, then
-$B$ is at least as likely as $A$, and the probability measure must respect this
-ordering. In econometric applications, monotonicity underpins the coherence of
-nested hypothesis tests and the nesting of information sets in dynamic models.
-Property~4, the inclusion-exclusion principle, corrects for double-counting: when
-two events overlap, summing their individual probabilities counts the intersection
-twice, and subtracting $P(A \cap B)$ restores the correct total. This property
-generalises to arbitrarily many events and is the foundation of combinatorial
-probability calculations, as well as of the union bound widely used in
-asymptotic theory and statistical learning.
+Property\~3 encodes a basic requirement of logical consistency: if every outcome in $A$ is also an outcome in $B$, then $B$ is at least as likely as $A$, and the probability measure must respect this ordering. In econometric applications, monotonicity underpins the coherence of nested hypothesis tests and the nesting of information sets in dynamic models. Property\~4, the inclusion-exclusion principle, corrects for double-counting: when two events overlap, summing their individual probabilities counts the intersection twice, and subtracting $P(A \cap B)$ restores the correct total. This property generalises to arbitrarily many events and is the foundation of combinatorial probability calculations, as well as of the union bound widely used in asymptotic theory and statistical learning.
 
 ## Continuity Properties of Probability Measures
 
-
-Imagine watching a sequence of events slowly shrink or expand toward some limiting event.
-For instance, picture a nested sequence of intervals on the real line, each one contained
-in the previous, all collapsing toward a single point. Intuitively, the probability of
-landing in any one of those intervals should gradually approach the probability of landing
-exactly at the limiting point. This natural and reassuring behavior---that probabilities
-\emph{follow} their events to the limit---is precisely what the \textbf{Continuity of
-Probability} theorem guarantees. Far from being an abstract technicality, this result is
-the bridge between the combinatorial, finite world where probability is easy to compute
-and the analytic, infinite world where calculus and limits live. It tells us that a
-probability measure, much like a continuous function, does not jump erratically: as sets
-converge, so do their probabilities. This idea can be formally stated in a proposition.
-
+Imagine watching a sequence of events slowly shrink or expand toward some limiting event. For instance, picture a nested sequence of intervals on the real line, each one contained in the previous, all collapsing toward a single point. Intuitively, the probability of landing in any one of those intervals should gradually approach the probability of landing exactly at the limiting point. This natural and reassuring behavior---that probabilities \emph{follow} their events to the limit---is precisely what the \textbf{Continuity of
+Probability} theorem guarantees. Far from being an abstract technicality, this result is the bridge between the combinatorial, finite world where probability is easy to compute and the analytic, infinite world where calculus and limits live. It tells us that a probability measure, much like a continuous function, does not jump erratically: as sets converge, so do their probabilities. This idea can be formally stated in a proposition.
 
 \begin{proposition}[Continuity of Probability]
 Let $(\Omega, \mathcal{F}, P)$ be a probability space.
 
-	extbf{(i) Continuity from below.} If $A_1 \subseteq A_2 \subseteq A_3 \subseteq \cdots$ is an increasing sequence of events in $\mathcal{F}$, then
+    extbf{(i) Continuity from below.} If $A_1 \subseteq A_2 \subseteq A_3 \subseteq \cdots$ is an increasing sequence of events in $\mathcal{F}$, then
 
 $$
 P\left(\bigcup_{n=1}^{\infty} A_n\right) = \lim_{n \to \infty} P(A_n).
 $$
 
-	extbf{(ii) Continuity from above.} If $A_1 \supseteq A_2 \supseteq A_3 \supseteq \cdots$ is a decreasing sequence of events in $\mathcal{F}$, then
+    extbf{(ii) Continuity from above.} If $A_1 \supseteq A_2 \supseteq A_3 \supseteq \cdots$ is a decreasing sequence of events in $\mathcal{F}$, then
 
 $$
 P\left(\bigcap_{n=1}^{\infty} A_n\right) = \lim_{n \to \infty} P(A_n).
 $$
 
 \end{proposition}
-
 \begin{proof}
-	extbf{(i) Continuity from below.}
+    extbf{(i) Continuity from below.}
 Define disjoint sets by "peeling off" successive layers:
 $$
 B_1 := A_1, \qquad B_n := A_n \setminus A_{n-1} \quad \text{for } n \geq 2.
@@ -905,7 +672,7 @@ P\left(\bigcup_{n=1}^{\infty} A_n\right)
 = \lim_{n \to \infty} P(A_n).
 $$
 
-	extbf{(ii) Continuity from above.}
+    extbf{(ii) Continuity from above.}
 Consider the complementary sequence $A_n^c$. Since $A_1 \supseteq A_2 \supseteq \cdots$,
 we have $A_1^c \subseteq A_2^c \subseteq \cdots$, an increasing sequence. By part~(i):
 $$
@@ -921,20 +688,7 @@ and rearranging gives the result.
 
 ### Intuition and Logic
 
-The deep idea here is that a probability measure behaves like a \emph{flow of mass}: every
-outcome $\omega \in \Omega$ carries a tiny parcel of probability, and when we accumulate
-outcomes into a set we collect the corresponding mass. For an increasing sequence of sets,
-each new set merely \emph{adds} more outcomes and hence more mass; the running total $P(A_n)$
-is monotone non-decreasing and bounded above by $1$, so it must converge. The key algebraic
-trick in the proof---decomposing the union into disjoint ``rings'' $B_n$---lets us cash in
-countable additivity, the cornerstone axiom, and turn an infinite union into a convergent
-series. Continuity from above follows almost for free by duality: complementation flips a
-decreasing family into an increasing one, and we recycle the first result. Together, the two
-statements say that the probability measure $P$ is \emph{sequentially continuous} with respect
-to monotone set limits, in perfect analogy with how a continuous real-valued function commutes
-with limits of sequences.
-
-
+The deep idea here is that a probability measure behaves like a \emph{flow of mass}: every outcome $\omega \in \Omega$ carries a tiny parcel of probability, and when we accumulate outcomes into a set we collect the corresponding mass. For an increasing sequence of sets, each new set merely \emph{adds} more outcomes and hence more mass; the running total $P(A_n)$ is monotone non-decreasing and bounded above by $1$, so it must converge. The key algebraic trick in the proof---decomposing the union into disjoint \`\`rings'' $B_n$---lets us cash in countable additivity, the cornerstone axiom, and turn an infinite union into a convergent series. Continuity from above follows almost for free by duality: complementation flips a decreasing family into an increasing one, and we recycle the first result. Together, the two statements say that the probability measure $P$ is \emph{sequentially continuous} with respect to monotone set limits, in perfect analogy with how a continuous real-valued function commutes with limits of sequences.
 
 \begin{remark}[Necessity of the finiteness condition]
 In continuity from above, the hypothesis $P(A_1) < \infty$ is automatically satisfied since
@@ -944,21 +698,18 @@ it, the statement can fail. A classical counterexample in measure theory is $A_n
 [n, \infty)$ on $(\mathbb{R}, \mathcal{B}(\mathbb{R}), \lambda)$ with Lebesgue measure:
 $\lambda(A_n) = \infty$ for all $n$, yet $\bigcap_n A_n = \varnothing$ has measure zero.
 \end{remark}
-
 \begin{remark}[Equivalent formulation via $\sigma$-additivity]
 Continuity from below is in fact \emph{equivalent} to countable additivity given finite
 additivity and the other Kolmogorov axioms. Some axiomatic treatments therefore adopt
 continuity from below as the third axiom in place of $\sigma$-additivity, yielding an
 equivalent but sometimes more geometrically transparent foundation.
 \end{remark}
-
 \begin{remark}[Subadditivity and Borel--Cantelli]
 Continuity of probability underpins many classical results. For instance, the first
 Borel--Cantelli lemma---which states that if $\sum_n P(A_n) < \infty$ then $P(A_n
 \text{ i.o.}) = 0$---relies on writing the limsup event as a decreasing intersection of
 unions and then applying continuity from above to pass the limit through $P$.
 \end{remark}
-
 \begin{remark}[Topological perspective]
 From a functional-analytic viewpoint, the space of probability measures on a metric space
 can itself be equipped with the topology of weak convergence. Continuity of probability
@@ -967,21 +718,10 @@ for monotone set sequences is a special case of the more general principle that 
 ultimately rests on the same $\sigma$-additivity arguments presented above.
 \end{remark}
 
+# Random Variables
 
+Recall that a probability space is a triple $(\Omega, \mathcal{F}, P)$, where $\Omega$ is the \emph{sample space} (the set of all possible outcomes), $\mathcal{F}$ is a $\sigma$-algebra of subsets of $\Omega$ (the collection of events to which we can assign probabilities), and $P : \mathcal{F} \to [0,1]$ is a probability measure satisfying Kolmogorov's axioms. In many applications, we are not directly interested in the raw outcomes $\omega \in \Omega$ but rather in some numerical quantity that depends on the outcome. A \emph{random variable} $X$ is a rule that assigns a number to each outcome---a bridge from the abstract probability space into the real line $\mathbb{R}$, where standard analytical tools become available.
 
-#  Random Variables
-
-Recall that a probability space is a triple $(\Omega, \mathcal{F}, P)$, where $\Omega$ is the
-\emph{sample space} (the set of all possible outcomes), $\mathcal{F}$ is a $\sigma$-algebra of
-subsets of $\Omega$ (the collection of events to which we can assign probabilities), and
-$P : \mathcal{F} \to [0,1]$ is a probability measure satisfying Kolmogorov's axioms. In many
-applications, we are not directly interested in the raw outcomes $\omega \in \Omega$ but rather in
-some numerical quantity that depends on the outcome. A \emph{random variable} $X$ is a rule that
-assigns a number to each outcome---a bridge from the abstract probability space into the real line
-$\mathbb{R}$, where standard analytical tools become available.
- 
-
- 
 \begin{definition}[Random Variable]
 Let $(\Omega, \mathcal{F}, P)$ be a probability space and let $(\mathbb{R}, \mathcal{B}(\mathbb{R}))$
 be the measurable space consisting of the real line equipped with its Borel $\sigma$-algebra. A
@@ -1000,24 +740,9 @@ Equivalently, $X$ is a random variable if and only if
   \qquad \text{for every } x \in \mathbb{R}.
 \]
 \end{definition}
- 
 
- 
-The definition may appear technical at first, but its logic is both natural and necessary. The
-measurability condition says that for any numerical range of interest $B$---for instance, the
-outcome produces a value no greater than~5---the set of raw outcomes $\omega$ that lead to a value
-in $B$ must be an \emph{event}, that is, a member of $\mathcal{F}$. This is precisely the
-requirement needed for the statement $X$ lies in $B$ to have a well-defined probability: we need
-the pre-image $X^{-1}(B)$ to live inside $\mathcal{F}$ so that $P$ can be applied to it. Without
-measurability, the expression $P(X \in B)$ would be meaningless---we would be asking for the
-probability of a set that the probability measure cannot evaluate. In short, a random variable is
-not ``random'' in the colloquial sense of being haphazard; it is a perfectly deterministic function.
-What is random is the input $\omega$, drawn according to $P$. The randomness of the outcome flows
-through the function $X$ to produce a random numerical value.
- 
+The definition may appear technical at first, but its logic is both natural and necessary. The measurability condition says that for any numerical range of interest $B$---for instance, the outcome produces a value no greater than\~5---the set of raw outcomes $\omega$ that lead to a value in $B$ must be an \emph{event}, that is, a member of $\mathcal{F}$. This is precisely the requirement needed for the statement $X$ lies in $B$ to have a well-defined probability: we need the pre-image $X^{-1}(B)$ to live inside $\mathcal{F}$ so that $P$ can be applied to it. Without measurability, the expression $P(X \in B)$ would be meaningless---we would be asking for the probability of a set that the probability measure cannot evaluate. In short, a random variable is not \`\`random'' in the colloquial sense of being haphazard; it is a perfectly deterministic function. What is random is the input $\omega$, drawn according to $P$. The randomness of the outcome flows through the function $X$ to produce a random numerical value.
 
-
- 
 \begin{example}[Tossing a fair coin.]
 Let $\Omega = \{H, T\}$, $\mathcal{F} = 2^{\Omega}$, and $P(H) = P(T) = \tfrac{1}{2}$. Define
 $X : \Omega \to \mathbb{R}$ by $X(H) = 1$ and $X(T) = 0$. Then $X$ is a random variable that
@@ -1025,7 +750,6 @@ encodes ``heads'' as 1 and ``tails'' as 0. Every subset of $\Omega$ is in $\math
 measurability is trivially satisfied. $X$ follows a $\mathrm{Bernoulli}\bigl(\tfrac{1}{2}\bigr)$
 distribution.
 \end{example}
- 
 \begin{example}[Tossing a fair die]
 Let $\Omega = \{1, 2, 3, 4, 5, 6\}$, $\mathcal{F} = 2^{\Omega}$, and $P(\{\omega\}) = \tfrac{1}{6}$
 for each $\omega$. The identity function $X(\omega) = \omega$ is a random variable mapping each face
@@ -1033,7 +757,6 @@ to its numerical value. Again measurability holds trivially. More interesting ra
 same space include $Y(\omega) = \mathbf{1}[\omega \text{ is even}]$ (indicator of an even outcome)
 or $Z(\omega) = \omega^{2}$.
 \end{example}
- 
 \begin{example}[A smallholder farmer in Tanzania]
 Consider a small-scale farmer in a village facing uncertain rainfall during the growing season. Let
 $\Omega$ be the set of all possible weather scenarios over the season (combinations of rainfall
@@ -1045,7 +768,6 @@ to real numbers and the event $\{Y \leq y\}$ is measurable for each $y$, $Y$ is 
 The farmer faces not just a single unknown number but an entire \emph{distribution} of possible
 yields induced by $P$ through $Y$.
 \end{example}
- 
 \begin{example}[A household]
 Consider a household whose monthly consumption expenditure depends on random factors such as income
 shocks, health events, and price fluctuations. Let $\Omega$ be the space of all possible states of
@@ -1056,7 +778,6 @@ $\{C(\omega) \leq c\}$---the event that the household spends no more than $c$---
 $\mathcal{F}$ for $C$ to qualify as a proper random variable, ensuring that we can compute
 $P(C \leq c)$, the probability that consumption falls at or below a given threshold.
 \end{example}
- 
 \begin{example}[A firm]
 A firm produces output whose quantity and price depend on uncertain demand conditions, input costs,
 and productivity shocks. Let $\omega \in \Omega$ represent a realised state of the business
@@ -1072,48 +793,171 @@ profit, profit volatility, and the probability of loss.
 
 ## Random Variables as Measurable Functions
 
+It is worth pausing to unpack what it means, in plain terms, to say that $X$ is a \emph{measurable function}. Measurability is simply a \emph{compatibility} requirement between two structures: the $\sigma$-algebra $\mathcal{F}$ on the domain $\Omega$ (which says which subsets of outcomes are observable events) and the Borel $\sigma$-algebra $\mathcal{B}(\mathbb{R})$ on the codomain $\mathbb{R}$ (which says which subsets of numbers are well-behaved sets). The condition $X^{-1}(B) \in \mathcal{F}$ for all $B \in \mathcal{B}(\mathbb{R})$ says precisely: whenever you identify a "nice" numerical set $B$ on the output side, pulling it back through $X$ gives you a "nice" event on the input side. The function \emph{respects} the observable structure.
 
-It is worth pausing to unpack what it means, in plain terms, to say that $X$ is a
-\emph{measurable function}. Measurability is simply a \emph{compatibility} requirement between two
-structures: the $\sigma$-algebra $\mathcal{F}$ on the domain $\Omega$ (which says which subsets of
-outcomes are observable events) and the Borel $\sigma$-algebra $\mathcal{B}(\mathbb{R})$ on the
-codomain $\mathbb{R}$ (which says which subsets of numbers are well-behaved sets). The condition
-$X^{-1}(B) \in \mathcal{F}$ for all $B \in \mathcal{B}(\mathbb{R})$ says precisely: whenever you
-identify a "nice" numerical set $B$ on the output side, pulling it back through $X$ gives you a
-"nice" event on the input side. The function \emph{respects} the observable structure.
- 
-A useful way to build intuition is to think about what \emph{fails} when measurability is violated.
-If $X^{-1}(B) \notin \mathcal{F}$ for some $B$, it means there is a perfectly sensible numerical
-question---does $X$ land in $B$---for which no probability can be assigned. The probability
-measure $P$ is only defined on $\mathcal{F}$, so if the pre-image falls outside $\mathcal{F}$, the
-question is literally unanswerable within the model. Measurability ensures this never happens: every
-numerical question about $X$ translates back into an event whose probability is defined. In
-practice, all functions encountered in economics and finance---continuous functions, step functions,
-limits of sequences of measurable functions---are automatically measurable with respect to standard
-$\sigma$-algebras, so measurability is rarely a binding constraint in applications. Its importance
-is foundational: it guarantees that the induced distribution
-guarantees that the induced distribution $P_X(B) \equiv P\bigl(X^{-1}(B)\bigr)$,
-known as the \emph{pushforward measure} or \emph{law} of $X$, is itself a well-defined probability
-measure on $(\mathbb{R}, \mathcal{B}(\mathbb{R}))$. In this sense, a random variable does not merely
-``produce'' random numbers---it \emph{transports} the entire probability structure from the abstract
-sample space to the real line.
- 
+A useful way to build intuition is to think about what \emph{fails} when measurability is violated. If $X^{-1}(B) \notin \mathcal{F}$ for some $B$, it means there is a perfectly sensible numerical question---does $X$ land in $B$---for which no probability can be assigned. The probability measure $P$ is only defined on $\mathcal{F}$, so if the pre-image falls outside $\mathcal{F}$, the question is literally unanswerable within the model. Measurability ensures this never happens: every numerical question about $X$ translates back into an event whose probability is defined. In practice, all functions encountered in economics and finance---continuous functions, step functions, limits of sequences of measurable functions---are automatically measurable with respect to standard $\sigma$-algebras, so measurability is rarely a binding constraint in applications. Its importance is foundational: it guarantees that the induced distribution guarantees that the induced distribution $P_X(B) \equiv P\bigl(X^{-1}(B)\bigr)$, known as the \emph{pushforward measure} or \emph{law} of $X$, is itself a well-defined probability measure on $(\mathbb{R}, \mathcal{B}(\mathbb{R}))$. In this sense, a random variable does not merely \`\`produce'' random numbers---it \emph{transports} the entire probability structure from the abstract sample space to the real line.
 
+# Distribution Function
 
-## Distribution Function
+Once we have established that a random variable $X : \Omega \to \mathbb{R}$ is a measurable
+function on the probability space $(\Omega, \mathcal{F}, P)$, a natural and practically important
+question arises: how is the probability \emph{distributed} across the real line by $X$? We know
+from the definition of measurability that for any Borel set $B \in \mathcal{B}(\mathbb{R})$, the
+pre-image $X^{-1}(B)$ is an event in $\mathcal{F}$, so the probability $P(X \in B)$ is always
+well-defined. Yet specifying $P(X \in B)$ for every possible Borel set $B$ would be an unwieldy
+way to describe the probabilistic behaviour of $X$. The \emph{distribution function}---also called
+the \emph{cumulative distribution function} (CDF)---offers an elegant and complete solution: instead
+of tracking all Borel sets simultaneously, it suffices to track a single function of a real
+argument $x$, namely $F(x) = P(X \leq x) = P(\{\omega \in \Omega : X(\omega) \leq x\})$. This
+is possible because the Borel $\sigma$-algebra $\mathcal{B}(\mathbb{R})$ is generated by
+half-lines of the form $(-\infty, x]$, so knowledge of $F(x)$ for all $x \in \mathbb{R}$
+determines $P(X \in B)$ for \emph{every} Borel set $B$---the distribution function encodes the
+full law of $X$. In this sense, $F$ is the concrete, real-line object that fully represents the
+pushforward measure $P_X$, collapsing the entire abstract probability structure into a single,
+computationally tractable function of one variable.
 
-\begin{definition}
-The distribution function is
-$$
-F_X(x)=\Prob(X \le x)
-$$
+\begin{definition}[Distribution Function]
+Let $X$ be a random variable on the probability space $(\Omega, \mathcal{F}, P)$. The
+\textbf{(cumulative) distribution function} of $X$ is the function
+$F : \mathbb{R} \to [0, 1]$ defined by
+\[
+  F(x) \;=\; P(X \leq x) \;=\; P\!\left(\{\,\omega \in \Omega : X(\omega) \leq x\,\}\right),
+  \qquad x \in \mathbb{R}.
+\]
+A function $F : \mathbb{R} \to [0,1]$ is a valid distribution function if and only if it satisfies
+the following three conditions:
+\begin{enumerate}
+  \item \textbf{(Monotonicity)} $F$ is non-decreasing: $x \leq y \implies F(x) \leq F(y)$.
+  \item \textbf{(Right-continuity)} $F$ is right-continuous: $\displaystyle\lim_{t \downarrow x} F(t) = F(x)$
+        for all $x \in \mathbb{R}$.
+  \item \textbf{(Boundary conditions)}
+        $\displaystyle\lim_{x \to -\infty} F(x) = 0$ \quad and \quad
+        $\displaystyle\lim_{x \to +\infty} F(x) = 1$.
+\end{enumerate}
 \end{definition}
 
----
 
-# 4. Distributions
+**Meaning, Logic, and Intuition**
 
-## 4.1 CDF Properties
+
+The distribution function $F(x) = P(X \leq x)$ is, at its core, a device for
+\emph{accumulating} probability as we sweep the real line from left to right. Fix any
+threshold $x \in \mathbb{R}$ and ask: what is the total probability mass that $X$ assigns
+to everything at or below $x$? That is precisely $F(x)$. As $x$ increases from
+$-\infty$ to $+\infty$, the set $\{\omega \in \Omega : X(\omega) \leq x\}$ grows
+monotonically --- it can only gain new outcomes, never lose them --- so $F$ is
+non-decreasing by construction. At the far left, $x \to -\infty$, the event
+$\{X \leq x\}$ becomes the empty set and carries probability zero; at the far right,
+$x \to +\infty$, it becomes all of $\Omega$ and carries probability one. These are not
+arbitrary normalisation conventions but direct consequences of $P$ being a probability
+measure on $(\Omega, \mathcal{F}, P)$. The right-continuity condition is subtler: it
+reflects a convention about how probability mass sitting exactly \emph{at} a point $x$
+is attributed. Because we write $X \leq x$ rather than $X < x$, the value $F(x)$
+includes any atom at $x$, and right-continuity ensures that $F$ does not jump
+\emph{before} reaching that atom as we approach from the right. In short, the three
+defining properties of $F$ are not additional assumptions imposed on top of the
+definition --- they are theorems that follow inevitably from the properties of the
+underlying probability measure $P$ and the measurability of $X$.
+
+The deepest insight in the definition is that $F$ carries \emph{all} the probabilistic
+information about $X$, even though it is only a function of a single real argument.
+This is because the Borel $\sigma$-algebra $\mathcal{B}(\mathbb{R})$ is generated by
+half-lines $(-\infty, x]$, so any probability assigned to any Borel set can be
+recovered from $F$ by taking differences, limits, and countable operations. For
+instance, $P(a < X \leq b) = F(b) - F(a)$, $P(X > x) = 1 - F(x)$, and
+$P(X = x) = F(x) - F(x^{-})$, where $F(x^{-}) = \lim_{t \uparrow x} F(t)$ is the
+left-hand limit. The last expression is particularly revealing: if $F$ is continuous at
+$x$, then $P(X = x) = 0$ and no probability mass is concentrated at that single point
+(as is the case for continuous random variables such as rainfall); if $F$ has a jump
+discontinuity at $x$, then a strictly positive mass $P(X = x) > 0$ is concentrated
+there (as is the case for discrete random variables). The distribution function thus
+unifies discrete and continuous random variables under a single mathematical object,
+with the shape of $F$ --- smooth, stepped, or mixed --- telling us everything about
+the nature of the randomness in $X$.
+
+In applied settings, particularly in development economics and agricultural contexts,
+$F$ is not merely a theoretical object but a direct tool for welfare and risk analysis.
+The value $F(x)$ is the probability that an outcome falls at or below $x$, which can
+be read as a \emph{vulnerability measure}: the fraction of probability mass exposed to
+conditions no better than $x$. Comparing distribution functions across households,
+regions, or time periods allows one to make rigorous probabilistic statements about
+relative well-being and exposure to risk, without reducing the entire distribution to a
+single summary statistic such as the mean.
+
+
+**Examples**
+
+
+\begin{example}[Monthly household consumption expenditure]
+Consider a household in rural Tanzania whose monthly consumption expenditure $C$
+(measured in Tanzanian shillings, TZS) is a random variable on a probability space
+$(\Omega, \mathcal{F}, P)$. Suppose that $C$ is continuously distributed with
+distribution function $F_C$. Then:
+\begin{align*}
+  F_C(50{,}000)  &= P(C \leq 50{,}000),  \\
+  F_C(100{,}000) &= P(C \leq 100{,}000), \\
+  F_C(200{,}000) &= P(C \leq 200{,}000).
+\end{align*}
+The probability that the household's expenditure falls in the interval
+$(50{,}000,\; 100{,}000]$ is
+\[
+  P(50{,}000 < C \leq 100{,}000) \;=\; F_C(100{,}000) - F_C(50{,}000),
+\]
+and the probability of falling below the national poverty line $\bar{c}$ is simply
+$F_C(\bar{c})$. Since $C$ is assumed continuous, $F_C$ has no jumps, so
+$P(C = c) = 0$ for every fixed value $c$ --- no single expenditure level carries
+positive probability mass.
+\end{example}
+
+\begin{example}[Seasonal harvest yield of a smallholder farmer]
+Let $Y$ (in kilograms) denote the maize harvest of a smallholder farmer in the
+Dodoma region, depending on uncertain seasonal rainfall. Suppose $Y$ is a continuous
+random variable with distribution function $F_Y$. If $y^{*}$ denotes a
+\emph{subsistence threshold} --- the minimum yield required for the household to meet
+its food needs without purchasing maize on the market --- then:
+\[
+  P(Y \leq y^{*}) \;=\; F_Y(y^{*})
+\]
+is the probability of a \emph{subsistence failure}: the probability that the farmer's
+harvest falls short of what the family needs. The complementary probability
+\[
+  P(Y > y^{*}) \;=\; 1 - F_Y(y^{*})
+\]
+is the probability of achieving at least subsistence. More generally, for any
+interval $(a, b]$,
+\[
+  P(a < Y \leq b) \;=\; F_Y(b) - F_Y(a),
+\]
+so the entire risk profile of the farmer's harvest --- the probability of any range
+of outcomes --- is encoded in $F_Y$.
+\end{example}
+
+\begin{example}[Discrete rainfall shock and household income]
+Suppose that in a given agricultural season in Tanzania, rainfall can take one of
+three realisations: drought ($\omega_1$), normal ($\omega_2$), or flood ($\omega_3$),
+with probabilities $P(\{\omega_1\}) = 0.3$, $P(\{\omega_2\}) = 0.5$, and
+$P(\{\omega_3\}) = 0.2$. A household's net farm income $X$ (in TZS thousands) under
+each realisation is $X(\omega_1) = 80$, $X(\omega_2) = 200$, and
+$X(\omega_3) = 120$. Then $X$ is a discrete random variable and its distribution
+function is the step function:
+\[
+  F_X(x) \;=\;
+  \begin{cases}
+    0   & \text{if } x < 80,      \\
+    0.3 & \text{if } 80 \leq x < 120, \\
+    0.5 & \text{if } 120 \leq x < 200, \\
+    1   & \text{if } x \geq 200.
+  \end{cases}
+\]
+The jumps of $F_X$ occur exactly at the three possible values of $X$, with jump
+sizes equal to the corresponding probabilities: $F_X(80) - F_X(80^{-}) = 0.3$,
+$F_X(120) - F_X(120^{-}) = 0.2$, and $F_X(200) - F_X(200^{-}) = 0.5$. This
+illustrates clearly that right-continuity means $F_X$ includes the jump
+\emph{at} the point, and that $P(X = x)$ equals the size of the jump at $x$.
+\end{example}
+
+
+## CDF Properties
 
 \begin{theorem}
 Every CDF is non-decreasing, right-continuous, and satisfies:
@@ -1122,7 +966,7 @@ $$
 $$
 \end{theorem}
 
-## 4.2 Independence
+## Independence
 
 \begin{definition}
 Random variables $X,Y$ are independent if
@@ -1131,11 +975,11 @@ $$
 $$
 \end{definition}
 
----
 
-# 5. Expectations
 
-## 5.1 Expected Value
+# Expectations
+
+## Expected Value
 
 \begin{definition}
 For a random variable $X$,
@@ -1144,7 +988,7 @@ $$
 $$
 \end{definition}
 
-## 5.2 Properties
+## Properties
 
 \begin{theorem}
 Expectation is linear:
@@ -1152,12 +996,11 @@ $$
 \E[aX+bY]=a\E[X]+b\E[Y]
 $$
 \end{theorem}
-
 \begin{proof}
 Follows directly from properties of the Lebesgue integral.
 \end{proof}
 
-## 5.3 Jensen’s Inequality
+## Jensen’s Inequality
 
 \begin{theorem}
 If $\phi$ is convex, then
@@ -1166,11 +1009,11 @@ $$
 $$
 \end{theorem}
 
----
+------------------------------------------------------------------------
 
-# 6. Convergence Concepts
+# Convergence Concepts
 
-## 6.1 Almost Sure Convergence
+## Almost Sure Convergence
 
 \begin{definition}
 $X_n \to X$ almost surely if
@@ -1203,7 +1046,7 @@ $$
 Almost sure convergence implies convergence in probability.
 \end{theorem}
 
----
+------------------------------------------------------------------------
 
 ## 6.5 Weak Law of Large Numbers
 
@@ -1223,22 +1066,19 @@ $$
 $$
 \end{theorem}
 
----
+------------------------------------------------------------------------
 
 # 7. Exercises
 
 \begin{exercise}
 Prove that a sigma-algebra is closed under finite unions.
 \end{exercise}
-
 \begin{exercise}
 Show that independence implies zero covariance, but not vice versa.
 \end{exercise}
-
 \begin{exercise}
 Prove Jensen’s inequality for discrete random variables.
 \end{exercise}
-
 \begin{exercise}
 Simulate the Law of Large Numbers in R.
 \end{exercise}
@@ -1268,176 +1108,109 @@ ggplot(df, aes(x = n, y = mean)) +
 
 ## Lebesgue Measure and Lebesgue Integration
 
-This appendix is a self-contained, intuition-first introduction to two ideas that
-underlie modern probability theory: **Lebesgue measure** and the **Lebesgue integral**.
-No prior exposure to real analysis is assumed. The goal is not a complete treatment---
-proofs of the harder theorems are omitted---but rather to give you enough geometric
-and conceptual grounding to read measure-theoretic probability with confidence.
+This appendix is a self-contained, intuition-first introduction to two ideas that underlie modern probability theory: **Lebesgue measure** and the **Lebesgue integral**. No prior exposure to real analysis is assumed. The goal is not a complete treatment--- proofs of the harder theorems are omitted---but rather to give you enough geometric and conceptual grounding to read measure-theoretic probability with confidence.
 
 ### Why Do We Need a New Notion of “Length”?
 
-You already have a perfectly good notion of length: the length of the interval
-$[a,b]$ is $b-a$.  What could go wrong?
+You already have a perfectly good notion of length: the length of the interval $[a,b]$ is $b-a$. What could go wrong?
 
-It turns out that when we try to build a theory of probability on the real line, we
-need to assign a “size” (a probability, or more generally a measure) not just to
-intervals, but to complicated sets formed by taking countably many unions, intersections,
-and complements of intervals.  The naive approach—just add up the lengths of the
-pieces—runs into serious problems once we allow infinitely many operations.
+It turns out that when we try to build a theory of probability on the real line, we need to assign a “size” (a probability, or more generally a measure) not just to intervals, but to complicated sets formed by taking countably many unions, intersections, and complements of intervals. The naive approach—just add up the lengths of the pieces—runs into serious problems once we allow infinitely many operations.
 
 > **Motivating example.**
 >
-> Consider the set $\mathbb{Q} \cap [0,1]$, the rational numbers in $[0,1]$.  This set
-> is *dense* (between any two points there is a rational), so it “looks” as if
-> it should have positive length.  Yet there are only *countably many* rationals,
-> and each single point has length zero.  Intuitively, infinitely many zeros should
-> still sum to zero.  Lebesgue measure will confirm this: $\lambda(\mathbb{Q} \cap
-> [0,1]) = 0$, even though the rationals are dense.  The Riemann integral, by contrast,
-> cannot even “integrate” the indicator function of $\mathbb{Q}$ over $[0,1]$.
+> Consider the set $\mathbb{Q} \cap [0,1]$, the rational numbers in $[0,1]$. This set is *dense* (between any two points there is a rational), so it “looks” as if it should have positive length. Yet there are only *countably many* rationals, and each single point has length zero. Intuitively, infinitely many zeros should still sum to zero. Lebesgue measure will confirm this: $\lambda(\mathbb{Q} \cap
+> [0,1]) = 0$, even though the rationals are dense. The Riemann integral, by contrast, cannot even “integrate” the indicator function of $\mathbb{Q}$ over $[0,1]$.
 
 ### Building Lebesgue Measure Step by Step
 
-Think of Lebesgue measure $\lambda$ as the “correct” generalisation of length from
-intervals to a much larger collection of sets.  We build it in three intuitive steps.
+Think of Lebesgue measure $\lambda$ as the “correct” generalisation of length from intervals to a much larger collection of sets. We build it in three intuitive steps.
 
 #### Step 1 — Start with intervals
 
-For any interval (open, closed, or half-open), declare its measure to equal its
-length:
-$$
-      \lambda\bigl([a,b]\bigr) \;=\; \lambda\bigl((a,b)\bigr) \;=\; b - a.
-$$
+For any interval (open, closed, or half-open), declare its measure to equal its length:
+$$      \lambda\bigl([a,b]\bigr) \;=\; \lambda\bigl((a,b)\bigr) \;=\; b - a.$$
 Single points have measure zero: $\lambda(\{a\}) = a - a = 0$.
 
 #### Step 2 — Cover complicated sets with intervals
 
-For a general set $E \subseteq \mathbb{R}$, we define the *outer measure*
-$\lambda^*(E)$ by trying to cover $E$ with a countable collection of open intervals
-$\{I_1, I_2, \ldots\}$ and asking: what is the smallest total length we can achieve?
+For a general set $E \subseteq \mathbb{R}$, we define the *outer measure* $\lambda^*(E)$ by trying to cover $E$ with a countable collection of open intervals $\{I_1, I_2, \ldots\}$ and asking: what is the smallest total length we can achieve?
 
-$$
-      \lambda^*(E) \;=\; \inf\!\left\{ \sum_{n=1}^{\infty} |I_n| \;\Big|\;
-      E \subseteq \bigcup_{n=1}^{\infty} I_n,\; I_n \text{ open intervals} \right\}.
-$$
+$$      \lambda^*(E) \;=\; \inf\!\left\{ \sum_{n=1}^{\infty} |I_n| \;\Big|\;
+      E \subseteq \bigcup_{n=1}^{\infty} I_n,\; I_n \text{ open intervals} \right\}.$$
 
 > **Geometric picture.**
 >
-> Imagine draping a “net” of open intervals over the set $E$.  Outer measure is the
-> least amount of net you must use, optimised over all possible covers.  For an
-> interval $[a,b]$ the optimum cover is just $(a-\varepsilon, b+\varepsilon)$, and
-> shrinking $\varepsilon\to 0$ recovers $\lambda^*([a,b])=b-a$.  For a single point the
-> cover can be made arbitrarily thin, giving $\lambda^*(\{a\})=0$.
+> Imagine draping a “net” of open intervals over the set $E$. Outer measure is the least amount of net you must use, optimised over all possible covers. For an interval $[a,b]$ the optimum cover is just $(a-\varepsilon, b+\varepsilon)$, and shrinking $\varepsilon\to 0$ recovers $\lambda^*([a,b])=b-a$. For a single point the cover can be made arbitrarily thin, giving $\lambda^*(\{a\})=0$.
 
 #### Step 3 — Identify the “well-behaved” sets (measurable sets)
 
-Not every subset of $\mathbb{R}$ behaves nicely under this covering procedure.
-A set $E$ is called *Lebesgue measurable* if it does not “straddle” any other set in a
-pathological way; the precise condition (Carathéodory's criterion) is:
+Not every subset of $\mathbb{R}$ behaves nicely under this covering procedure. A set $E$ is called *Lebesgue measurable* if it does not “straddle” any other set in a pathological way; the precise condition (Carathéodory's criterion) is:
 
-$$
-      \lambda^*(A) \;=\; \lambda^*(A \cap E) \;+
-      \;\lambda^*(A \cap E^c) \quad \text{for every set } A \subseteq \mathbb{R}.
-$$
+$$      \lambda^*(A) \;=\; \lambda^*(A \cap E) \;+
+      \;\lambda^*(A \cap E^c) \quad \text{for every set } A \subseteq \mathbb{R}.$$
 
-For measurable sets, we simply write $\lambda(E) := \lambda^*(E)$ and call it the
-*Lebesgue measure* of $E$.
+For measurable sets, we simply write $\lambda(E) := \lambda^*(E)$ and call it the *Lebesgue measure* of $E$.
 
-The collection $\mathcal{L}$ of all Lebesgue measurable sets is enormous.  It contains:
-all open sets, all closed sets, all countable unions and intersections thereof (the
-Borel sets), and many more.  In practice, every set you will ever encounter in
-economics or probability is Lebesgue measurable.
+The collection $\mathcal{L}$ of all Lebesgue measurable sets is enormous. It contains: all open sets, all closed sets, all countable unions and intersections thereof (the Borel sets), and many more. In practice, every set you will ever encounter in economics or probability is Lebesgue measurable.
 
-**Definition (Lebesgue Measure)**
-The *Lebesgue measure* on $\mathbb{R}$ is the function
-$$\lambda : \mathcal{L} \to [0,\infty]$$
-satisfying:
+**Definition (Lebesgue Measure)** The *Lebesgue measure* on $\mathbb{R}$ is the function $$\lambda : \mathcal{L} \to [0,\infty]$$ satisfying:
 
-1. $\lambda([a,b]) = b - a$ for all $a \le b$.
-2. Countable additivity: if $E_1, E_2, \ldots$ are pairwise disjoint measurable sets, then
-       $\lambda\!\left(\bigcup_{n=1}^{\infty} E_n\right) = \sum_{n=1}^{\infty} \lambda(E_n)$.
-3. Translation invariance: $\lambda(E + t) = \lambda(E)$ for all $t \in \mathbb{R}$.
+1.  $\lambda([a,b]) = b - a$ for all $a \le b$.
+2.  Countable additivity: if $E_1, E_2, \ldots$ are pairwise disjoint measurable sets, then $\lambda\!\left(\bigcup_{n=1}^{\infty} E_n\right) = \sum_{n=1}^{\infty} \lambda(E_n)$.
+3.  Translation invariance: $\lambda(E + t) = \lambda(E)$ for all $t \in \mathbb{R}$.
 
 ### Key Properties of Lebesgue Measure
 
-**Countable sets have measure zero.**
-If $E = \{x_1, x_2, x_3, \ldots\}$ is a countable set, then by countable additivity,
- $\lambda(E) = \sum_{n=1}^{\infty} \lambda(\{x_n\}) = \sum_{n=1}^{\infty} 0 = 0$.
-In particular, $\lambda(\mathbb{Q}) = 0$: the rational numbers, despite being dense
-in $\mathbb{R}$, occupy no space at all in the sense of Lebesgue measure.
+**Countable sets have measure zero.** If $E = \{x_1, x_2, x_3, \ldots\}$ is a countable set, then by countable additivity, $\lambda(E) = \sum_{n=1}^{\infty} \lambda(\{x_n\}) = \sum_{n=1}^{\infty} 0 = 0$. In particular, $\lambda(\mathbb{Q}) = 0$: the rational numbers, despite being dense in $\mathbb{R}$, occupy no space at all in the sense of Lebesgue measure.
 
 **Measure is monotone.** If $A \subseteq B$ and both are measurable, then $\lambda(A) \le \lambda(B)$.
 
-**Countable subadditivity.** For any sequence of measurable sets (not necessarily disjoint),
- $\lambda\!\left(\bigcup_{n} E_n\right) \le \sum_{n} \lambda(E_n)$.
+**Countable subadditivity.** For any sequence of measurable sets (not necessarily disjoint), $\lambda\!\left(\bigcup_{n} E_n\right) \le \sum_{n} \lambda(E_n)$.
 
-**Continuity of measure.** If $E_1 \subseteq E_2 \subseteq \cdots$ is an increasing sequence with union $E$,
- then $\lambda(E_n) \to \lambda(E)$; if $E_1 \supseteq E_2 \supseteq \cdots$ is decreasing with $\lambda(E_1) < \infty$, then $\lambda(E_n) \to \lambda\!\left(\bigcap_n E_n\right)$.
+**Continuity of measure.** If $E_1 \subseteq E_2 \subseteq \cdots$ is an increasing sequence with union $E$, then $\lambda(E_n) \to \lambda(E)$; if $E_1 \supseteq E_2 \supseteq \cdots$ is decreasing with $\lambda(E_1) < \infty$, then $\lambda(E_n) \to \lambda\!\left(\bigcap_n E_n\right)$.
 
 ### The Lebesgue Integral
 
-The central insight behind Lebesgue integration is to change what we partition.
-Rather than slicing the *domain* (the $x$-axis, as Riemann does), we slice the *range*
-(the $y$-axis) and ask how much of the domain maps into each slice.  Figure~\ref{fig:riemann_vs_lebesgue} illustrates this contrast.
+The central insight behind Lebesgue integration is to change what we partition. Rather than slicing the *domain* (the $x$-axis, as Riemann does), we slice the *range* (the $y$-axis) and ask how much of the domain maps into each slice. Figure\~\ref{fig:riemann_vs_lebesgue} illustrates this contrast.
 
 #### Step 1 — Simple functions
 
-A *simple function* takes only finitely many values.  If $\phi =
-\sum_{i=1}^{n} a_i \,\mathbf{1}_{E_i}$ where the $E_i$ are disjoint measurable
-sets and $a_i \ge 0$, its Lebesgue integral over a measurable set $A$ is defined
-as the natural weighted sum:
+A *simple function* takes only finitely many values. If $\phi =
+\sum_{i=1}^{n} a_i \,\mathbf{1}_{E_i}$ where the $E_i$ are disjoint measurable sets and $a_i \ge 0$, its Lebesgue integral over a measurable set $A$ is defined as the natural weighted sum:
 
-$$
-      \int_A \phi \,d\lambda \;=\; \sum_{i=1}^{n} a_i \,\lambda(E_i \cap A).
-$$
+$$      \int_A \phi \,d\lambda \;=\; \sum_{i=1}^{n} a_i \,\lambda(E_i \cap A).$$
 
 > **Analogy.**
 >
-> Think of a simple function as a salary schedule that pays $a_i$ dollars per hour
-> to employees in group $E_i$.  The integral is the total wage bill: rate \times
-> size-of-group, summed over all groups.  Lebesgue measure plays the role of
-> “group size.”
+> Think of a simple function as a salary schedule that pays $a_i$ dollars per hour to employees in group $E_i$. The integral is the total wage bill: rate \times size-of-group, summed over all groups. Lebesgue measure plays the role of “group size.”
 
 #### Step 2 — Non-negative measurable functions
 
-For a non-negative measurable function $f \ge 0$, we approximate $f$ from below by
-an increasing sequence of simple functions $\phi_1 \le \phi_2 \le \cdots \uparrow f$
-and define:
+For a non-negative measurable function $f \ge 0$, we approximate $f$ from below by an increasing sequence of simple functions $\phi_1 \le \phi_2 \le \cdots \uparrow f$ and define:
 
-$$
-      \int_A f\,d\lambda \;=\; \lim_{n\to\infty} \int_A \phi_n\,d\lambda.
-$$
+$$      \int_A f\,d\lambda \;=\; \lim_{n\to\infty} \int_A \phi_n\,d\lambda.$$
 
 #### Step 3 — General measurable functions
 
-Any measurable function can be split into its positive and negative parts:
- $f = f^+ - f^-$, where $f^+ = \max(f,0)$ and $f^- = \max(-f,0)$.  Both $f^+$ and
- $f^-$ are non-negative, so Step 2 applies to each.  We then define:
+Any measurable function can be split into its positive and negative parts: $f = f^+ - f^-$, where $f^+ = \max(f,0)$ and $f^- = \max(-f,0)$. Both $f^+$ and $f^-$ are non-negative, so Step 2 applies to each. We then define:
 
-$$
-      \int_A f\,d\lambda \;=\; \int_A f^+\,d\lambda \; - \; \int_A f^-\,d\lambda,
-$$
-provided at least one of the two terms is finite.  If both are finite, $f$ is called
-*Lebesgue integrable* and we write $f \in L^1(\lambda)$.
+$$      \int_A f\,d\lambda \;=\; \int_A f^+\,d\lambda \; - \; \int_A f^-\,d\lambda,$$
+provided at least one of the two terms is finite. If both are finite, $f$ is called *Lebesgue integrable* and we write $f \in L^1(\lambda)$.
 
 ### What Makes Lebesgue Integration Better?
 
-The Lebesgue integral agrees with the Riemann integral whenever the Riemann
-integral exists — so nothing is lost.  But the Lebesgue integral handles many
-situations the Riemann integral cannot.  Three properties are especially important
-for probability theory.
+The Lebesgue integral agrees with the Riemann integral whenever the Riemann integral exists — so nothing is lost. But the Lebesgue integral handles many situations the Riemann integral cannot. Three properties are especially important for probability theory.
 
-1. Integrable functions can be wildly discontinuous. The indicator function $\mathbf{1}_{\mathbb{Q}}$ is not Riemann integrable over $[0,1]$. Its Lebesgue integral is $0$.
+1.  Integrable functions can be wildly discontinuous. The indicator function $\mathbf{1}_{\mathbb{Q}}$ is not Riemann integrable over $[0,1]$. Its Lebesgue integral is $0$.
 
-2. “Almost everywhere” is the right notion of equality. We say two functions $f$ and $g$ are equal *almost everywhere* (a.e.) if $\lambda(\{x : f(x) \ne g(x)\}) = 0$.
+2.  “Almost everywhere” is the right notion of equality. We say two functions $f$ and $g$ are equal *almost everywhere* (a.e.) if $\lambda(\{x : f(x) \ne g(x)\}) = 0$.
 
-3. Limit and integral can be swapped under mild conditions (Monotone Convergence, Fatou's Lemma, Dominated Convergence).
+3.  Limit and integral can be swapped under mild conditions (Monotone Convergence, Fatou's Lemma, Dominated Convergence).
 
 ### Connection to Probability
 
-Everything above extends directly to probability spaces.  A *probability measure* $P$ on a measurable space $(\Omega, \mathcal{F})$ is simply a measure with $P(\Omega)=1$.  The Lebesgue integral of a random variable $X$ with respect to $P$ is its expected value:
+Everything above extends directly to probability spaces. A *probability measure* $P$ on a measurable space $(\Omega, \mathcal{F})$ is simply a measure with $P(\Omega)=1$. The Lebesgue integral of a random variable $X$ with respect to $P$ is its expected value:
 
-$$
-      \mathbb{E}[X] \;=\; \int_\Omega X(\omega)\,dP(\omega).
-$$
+$$      \mathbb{E}[X] \;=\; \int_\Omega X(\omega)\,dP(\omega).$$
 
 For a thorough treatment at the graduate level, see Royden and Fitzpatrick *Real Analysis* (4th ed.) and Billingsley *Probability and Measure* (3rd ed.).
