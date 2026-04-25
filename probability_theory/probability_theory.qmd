@@ -41,6 +41,7 @@ format:
                         \usepackage{bm}
                         \newcommand{\E}{\mathbb{E}}
                         \newcommand{\Prob}{\mathbb{P}}
+                        \newcommand{\dP}{\, dP}
 
                         \numberwithin{equation}{section}
 
@@ -978,6 +979,15 @@ $$
 
 
 # Expectations
+
+Expectation is the fundamental concept that captures the \emph{average} or \emph{typical} value of a random variable, taking into account the entire distribution of outcomes. Iit describes the \emph{center of mass} of the probability distribution, providing a single summary statistic that reflects the overall level of the random variable. 
+
+\begin{definition}[Expectation]
+Let $X$ be a random variable on the probability space $(\Omega, \mathcal{F}, P)$. The \textbf{expectation} of $X$, denoted $\E[X]$, is defined as the Lebesgue integral of $X$ with respect to the probability measure $P$:
+$$
+  \E[X] \;=\; \int_{\Omega} X(\omega) \dP(\omega).
+$$
+\end{definition}
 
 ## Expected Value
 
