@@ -3,6 +3,7 @@ title: "Endogeneity, Instrumental Variables, Two-Stage Least Squares, and GMM"
 subtitle: "Identification, Consistent Estimation, and Efficient Inference When Regressors Are Endogenous"
 author: "Eliab Luvanda"
 date: today
+date-format: "MMMM D, YYYY."
 header-includes:
   - '\usepackage{fontspec}'
   - '\setmainfont{TeX Gyre Termes}'
