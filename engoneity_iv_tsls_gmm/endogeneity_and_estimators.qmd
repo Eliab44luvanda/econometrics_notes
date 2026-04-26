@@ -5,22 +5,28 @@ author: "Eliab Luvanda"
 date: today
 header-includes:
   - '\usepackage{fontspec}'
-  - '\setmainfont{TeX Gyre Pagella}'
+  - '\setmainfont{TeX Gyre Termes}'
   - '\usepackage{unicode-math}'
-  - '\setmathfont{TeX Gyre Pagella Math}'
+  - '\setmathfont{STIX Two Math}'
   - '\usepackage{titling}'
-  - '\pretitle{\begin{center}\rmfamily\LARGE}'
-  - '\posttitle{\par\end{center}\vskip 0.5em}'
-  - '\preauthor{\begin{center}\rmfamily\large}'
-  - '\postauthor{\par\end{center}}'
-  - '\predate{\begin{center}\rmfamily\normalsize}'
+  - '\pretitle{\begin{center}\rmfamily\Large\bfseries}'
+  - '\posttitle{\par\end{center}\vskip 0.75em}'
+  - '\preauthor{\begin{center}\rmfamily\normalsize}'
+  - '\postauthor{\par\end{center}\vskip 0.25em}'
+  - '\predate{\begin{center}\rmfamily\small}'
   - '\postdate{\par\end{center}}'
-  - '\linespread{1.05}'
+  - '\usepackage{etoolbox}'
+  - '\apptocmd{\maketitle}{\clearpage}{}{}'
+  - '\linespread{1.12}'
   - '% Micro-typography'
   - '\usepackage{microtype}'
+  - '\setlength{\parindent}{1.5em}'
+  - '\setlength{\parskip}{0pt}'
   - '% Mathematics'
   - '\usepackage{mathtools}'
   - '\usepackage{amsthm}'
+  - '\usepackage{array}'
+  - '\usepackage{tabularx}'
   - '% Bold math alias'
   - "\\newcommand{\\bm}[1]{\\symbf{#1}}"
   - '% Theorem environments'
@@ -35,7 +41,7 @@ header-includes:
   - "\\newtheorem{example}[theorem]{Example}"
   - "\\newtheorem{exercise}{Exercise}[section]"
   - '\theoremstyle{remark}'
-  - "\\newtheorem*{remark}{Remark}"
+  - "\\newtheorem{remark}[theorem]{Remark}"
   - "\\newtheorem*{note}{Note}"
   - "\\newtheorem*{notation}{Notation}"
   - "\\renewcommand{\\qedsymbol}{\\$\\blacksquare\\$}"
@@ -45,21 +51,26 @@ header-includes:
   - "\\setlist[enumerate,2]{label=(\\alph*)}"
   - '% Section headings'
   - '\usepackage{titlesec}'
-  - "\\titleformat{\\section}{\\normalfont\\large\\scshape\\centering}{\\thesection.}{0.5em}{}"
-  - "\\titleformat{\\subsection}{\\normalfont\\normalsize\\bfseries}{\\thesubsection}{0.5em}{}"
-  - "\\titleformat{\\subsubsection}{\\normalfont\\normalsize\\itshape}{\\thesubsubsection}{0.5em}{}"
+  - "\\titleformat{\\section}{\\normalfont\\large\\bfseries\\centering}{\\thesection.}{0.6em}{}"
+  - "\\titleformat{\\subsection}{\\normalfont\\normalsize\\bfseries}{\\thesubsection}{0.6em}{}"
+  - "\\titleformat{\\subsubsection}{\\normalfont\\normalsize\\itshape}{\\thesubsubsection}{0.6em}{}"
+  - "\\titlespacing*{\\section}{0pt}{2.5ex plus 1ex minus .2ex}{1.5ex}"
+  - "\\titlespacing*{\\subsection}{0pt}{2ex plus .8ex minus .2ex}{1ex}"
+  - "\\titlespacing*{\\subsubsection}{0pt}{1.5ex plus .6ex minus .2ex}{0.8ex}"
   - '% Headers/footers'
   - '\usepackage{fancyhdr}'
   - '\pagestyle{fancy}'
   - '\fancyhf{}'
-  - "\\fancyhead[LE]{\\small\\scshape Endogeneity, IV, 2SLS, and GMM}"
-  - "\\fancyhead[RO]{\\small\\scshape\\nouppercase{\\leftmark}}"
-  - "\\fancyfoot[C]{\\small\\thepage}"
-  - "\\renewcommand{\\headrulewidth}{0.4pt}"
+  - "\\fancyhead[LE,RO]{\\small\\thepage}"
+  - "\\fancyhead[LO]{\\small\\nouppercase{\\rightmark}}"
+  - "\\fancyhead[RE]{\\small Endogeneity, IV, 2SLS, and GMM}"
+  - "\\fancyfoot{}"
+  - "\\renewcommand{\\headrulewidth}{0pt}"
   - '% Macros'
   - "\\newcommand{\\bX}{\\symbf{X}}"
   - "\\newcommand{\\bY}{\\symbf{Y}}"
   - "\\newcommand{\\bZ}{\\symbf{Z}}"
+  - "\\newcommand{\\bG}{\\symbf{G}}"
   - "\\newcommand{\\bW}{\\symbf{W}}"
   - "\\newcommand{\\bI}{\\symbf{I}}"
   - "\\newcommand{\\bS}{\\symbf{S}}"
@@ -68,6 +79,7 @@ header-includes:
   - "\\newcommand{\\beps}{\\symbf{\\varepsilon}}"
   - "\\newcommand{\\bu}{\\symbf{\\u}}"
   - "\\newcommand{\\bSigma}{\\symbf{\\Sigma}}"
+  - "\\newcommand{\\bOmega}{\\symbf{\\Omega}}"
   - "\\DeclareMathOperator{\\plim}{plim}"
   - "\\DeclareMathOperator{\\Var}{Var}"
   - "\\DeclareMathOperator{\\Cov}{Cov}"
@@ -98,11 +110,13 @@ execute:
   warning: false
 ---
 
-\section{Introduction and Motivation}
+\clearpage
 
-The empirical study of economic relationships rests, almost without exception, on some version of the regression model. Yet the conditions under which regression yields reliable estimates of structural parameters are considerably more stringent than is often acknowledged in applied work. This section lays out the classical framework, identifies the precise point at which it breaks down, and sketches the remedies that the remainder of these notes develop in full.
+# Introduction and Motivation
 
-\subsection{The Classical Linear Model and Its Assumptions}
+The empirical study of economic relationships rests, almost without exception, on some version of the regression model. Yet the conditions under which regression yields reliable estimates of structural parameters are considerably more stringent than is often acknowledged in applied work. This section lays out the classical framework, identifies the precise point at which it breaks down, and sketches the remedies that the remainder of these notes develop in full; standard treatments include \textcite{Hayashi2000}, \textcite{Wooldridge2010}, and \textcite{Hansen2022}.
+
+## The Classical Linear Model and Its Assumptions
 
 Let $\{(y_i, \bm{x}_i)\}_{i=1}^{n}$ be a sample of $n$ observations, where $y_i \in \mathbb{R}$ is the dependent variable and $\bm{x}_i \in \mathbb{R}^k$ is a vector of regressors, with the convention that its first component equals unity. The \emph{classical
 linear model} (CLM) postulates
@@ -157,21 +171,21 @@ $i \neq j$.
 \end{assumption}
 \begin{remark}
 Assumption~\ref{ass:exogeneity} is the pivot around which the entire
-analysis turns. It is substantially stronger than the \emph{mean
-independence} condition $\E[\varepsilon_i \mid \bm{x}_i] = 0$; the
-latter implies $\Cov(\bm{x}_i, \varepsilon_i) = \bm{0}$, but the
-converse does not hold in general. The analysis below requires only
-the zero-correlation form, $\E[\bm{x}_i \varepsilon_i] = \bm{0}$,
-for consistency of OLS. We invoke the stronger form only where finite-
-sample results are concerned.
+analysis turns. As stated, it is a \emph{mean independence} condition:
+$\E[\varepsilon_i \mid \bm{x}_i] = 0$. This condition implies the
+weaker orthogonality condition $\E[\bm{x}_i \varepsilon_i] = \bm{0}$,
+but the converse does not hold in general. For consistency of OLS, the
+orthogonality condition is the key requirement. Stronger conditional
+mean assumptions are mainly useful for deriving sharper finite-sample
+or conditional results.
 \end{remark}
 
-Under Assumptions\~\ref{ass:linearity}--\ref{ass:exogeneity}, the Gauss--Markov theorem establishes that OLS is the best linear unbiased estimator (BLUE) of $\bbeta_0$. Consistency and asymptotic normality follow from a standard application of the law of large numbers and the central limit theorem.
+Under Assumptions~\ref{ass:linearity}--\ref{ass:spherical}, the Gauss--Markov theorem establishes that OLS is the best linear unbiased estimator (BLUE) of $\bbeta_0$. Consistency and asymptotic normality follow from a standard application of the law of large numbers and the central limit theorem; see \textcite{Wooldridge2010}, \textcite{Hayashi2000}, and \textcite{Hansen2022}.
 
 \begin{theorem}[Consistency and Asymptotic Normality of OLS]
 \label{thm:ols-can}
 Under Assumptions~\ref{ass:linearity}--\ref{ass:exogeneity} and the
-moment condition $\E\!\left[\norm{\bm{x}_i}^2 \varepsilon_i^2\right] 
+moment condition $\E\!\left[\norm{\bm{x}_i}^2 \varepsilon_i^2\right] <
 \infty$,
 
 \begin{enumerate}
@@ -210,29 +224,30 @@ $n^{-1/2}\bX'\beps \dto \N\!\bigl(\bm{0},
 Slutsky) completes the argument.
 \end{proof}
 
-\subsection{Endogeneity: Definition, Sources, and Consequences}
+## Endogeneity: Definition, Sources, and Consequences
 
-The entire edifice of Theorem\~\ref{thm:ols-can} collapses the moment Assumption\~\ref{ass:exogeneity} is violated.
+The entire edifice of Theorem~\ref{thm:ols-can} collapses once
+Assumption~\ref{ass:exogeneity} is violated.
 
 \begin{definition}[Endogeneity]
 \label{def:endogeneity}
 A regressor $x_{ji}$ (the $j$-th component of $\bm{x}_i$) is said to
 be \emph{endogenous} if $\Cov(x_{ji},\varepsilon_i) \neq 0$, or,
 more generally, if $\E[\bm{x}_i\varepsilon_i] \neq \bm{0}$. The
-model \eqref{eq:clm} is then said to suffer from \emph{endogeneity}.
+model \eqref{eq:clm} is then said to suffer from \emph{endogeneity}; compare \textcite{Wooldridge2010}, \textcite{CameronTrivedi2005}, and \textcite{Hansen2022}.
 \end{definition}
 
 Endogeneity is not a single pathology but a family of related problems sharing a common algebraic signature. We distinguish three principal sources.
 
-\subsubsection{Omitted Variable Bias}
+### Omitted Variable Bias
 
 Suppose the true model is $$  y_i \;=\; \bm{x}_i^\top\,\bbeta_0 + \gamma_0 c_i + u_i,
   \qquad \E[u_i \mid \bm{x}_i, c_i] = 0,$$ where $c_i$ is an unobserved confounder correlated with $\bm{x}_i$. If we estimate the misspecified model \eqref{eq:clm} with $\varepsilon_i = \gamma_0 c_i + u_i$, then $\E[\bm{x}_i \varepsilon_i] = \gamma_0 \E[\bm{x}_i c_i] \neq
-\bm{0}$ whenever $\gamma_0 \neq 0$ and $c_i$ is correlated with at least one regressor. This is the \emph{omitted variable bias} (OVB) problem, arguably the most common form of endogeneity in applied economics.
+\bm{0}$ whenever $\gamma_0 \neq 0$ and $c_i$ is correlated with at least one regressor. This is the \emph{omitted variable bias} (OVB) problem, arguably the most common form of endogeneity in applied economics; see \textcite{Wooldridge2010} and \textcite{CameronTrivedi2005}.
 
-\subsubsection{Simultaneity Bias}
+### Simultaneity Bias
 
-In many economic settings, $y_i$ and one or more components of $\bm{x}_i$ are determined jointly by a system of equations. The canonical example is a supply-and-demand system: \begin{align*}
+In many economic settings, $y_i$ and one or more components of $\bm{x}_i$ are determined jointly by a system of equations. \textcite{Hayashi2000} and \textcite{DavidsonMacKinnon2004} discuss the canonical supply-and-demand example: \begin{align*}
   q_i^d &= \alpha_0 + \alpha_1 p_i + \alpha_2 \bm{w}_i' \bm{\delta} + u_i^d
            \quad \text{(demand)}, \\
   q_i^s &= \beta_0  + \beta_1  p_i + \beta_2  \bm{r}_i' \bm{\phi}  + u_i^s
@@ -241,9 +256,9 @@ In many economic settings, $y_i$ and one or more components of $\bm{x}_i$ are de
            \quad \text{(market clearing)}.
 \end{align*} In equilibrium, price $p_i$ is a function of both structural errors $u_i^d$ and $u_i^s$. Regressing quantity on price therefore yields an estimator that is inconsistent for either structural parameter.
 
-\subsubsection{Measurement Error}
+### Measurement Error
 
-Let $x_i^*$ be the true value of a regressor, observed with error: $x_i = x_i^* + v_i$, where $v_i$ is classical measurement error with $\E[v_i] = 0$, $\Cov(x_i^*, v_i) = 0$. Substituting into the true model $y_i = \beta_0 + \beta_1 x_i^* + u_i$ gives
+Let $x_i^*$ be the true value of a regressor, observed with error: $x_i = x_i^* + v_i$, where $v_i$ is classical measurement error with $\E[v_i] = 0$, $\Cov(x_i^*, v_i) = 0$. As \textcite{Wooldridge2010} and \textcite{CameronTrivedi2005} show, substituting into the true model $y_i = \beta_0 + \beta_1 x_i^* + u_i$ gives
 
 $$  y_i \;=\; \beta_0 + \beta_1 x_i + \underbrace{(u_i - \beta_1 v_i)}_{=\,\varepsilon_i}.$$
 
@@ -308,28 +323,29 @@ plausibly affects schooling attainment without directly influencing
 wages --- an application of the IV strategy introduced in
 Section~\ref{sec:iv}.
 \end{example}
-\subsection{A Preview of Solutions}
+## A Preview of Solutions
 \label{sec:preview}
 
 Three broad strategies have been developed to recover consistent estimates of $\bbeta_0$ in the presence of endogeneity. These notes treat the first two in depth and briefly touch on their connections to the third.
 
 \medskip
 
-\noindent\textbf{Instrumental Variables (IV).}\quad The IV approach introduces a vector of \emph{instruments} $\bm{z}_i \in \mathbb{R}^{\ell}$ that satisfy two conditions: \emph{relevance}, $\Cov(\bm{z}_i, \bm{x}_i) \neq \bm{0}$, and \emph{exogeneity}, $\E[\bm{z}_i\varepsilon_i] = \bm{0}$. These two conditions together restore identification. Section\~\ref{sec:iv} develops the IV estimator, establishes its asymptotic properties, and discusses the critical practical issue of \emph{instrument strength}.
+\noindent\textbf{Instrumental Variables (IV).}\quad The IV approach introduces a vector of \emph{instruments} $\bm{z}_i \in \mathbb{R}^{\ell}$ that satisfy two conditions: \emph{relevance}, $\Cov(\bm{z}_i, \bm{x}_i) \neq \bm{0}$, and \emph{exogeneity}, $\E[\bm{z}_i\varepsilon_i] = \bm{0}$. As \textcite{Hayashi2000}, \textcite{Hansen2022}, and \textcite{Wooldridge2010} explain, these two conditions together restore identification. Section~\ref{sec:iv} develops the IV estimator, establishes its asymptotic properties, and discusses the critical practical issue of \emph{instrument strength}.
 
 \medskip
 
-\noindent\textbf{Two-Stage Least Squares (2SLS).}\quad When $\ell > k$ --- i.e. when there are more instruments than endogenous regressors --- the model is \emph{overidentified} and IV is no longer unique. 2SLS provides an optimal way to exploit all available instruments simultaneously. Section\~\ref{sec:tsls} derives the 2SLS estimator, relates it to IV in the just-identified case, and establishes its efficiency within the class of IV estimators under homoskedastic errors.
+\noindent\textbf{Two-Stage Least Squares (2SLS).}\quad When $\ell > k$ --- i.e. when there are more instruments than endogenous regressors --- the model is \emph{overidentified} and IV is no longer unique. \textcite{Amemiya1985}, \textcite{Hayashi2000}, and \textcite{Wooldridge2010} show that 2SLS provides an optimal way to exploit all available instruments simultaneously. Section~\ref{sec:tsls} derives the 2SLS estimator, relates it to IV in the just-identified case, and establishes its efficiency within the class of IV estimators under homoskedastic errors.
 
 \medskip
 
-\noindent\textbf{Generalized Method of Moments (GMM).}\quad GMM nests both IV and 2SLS as special cases. It begins from a set of moment conditions $\E[\bm{g}(\bm{w}_i, \bbeta_0)] = \bm{0}$ and constructs the estimator by minimising a quadratic form in the sample analogue. With an \emph{optimal} weighting matrix, GMM achieves the semiparametric efficiency bound within the class of estimators exploiting the same moment conditions. Crucially, GMM extends to heteroskedastic and autocorrelated errors without altering the estimating equations --- a feature that makes it indispensable in applied work. Section\~\ref{sec:gmm} provides a self-contained treatment.
+\noindent\textbf{Generalized Method of Moments (GMM).}\quad GMM nests both IV and 2SLS as special cases. It begins from a set of moment conditions $\E[\bm{g}(\bm{w}_i, \bbeta_0)] = \bm{0}$ and constructs the estimator by minimising a quadratic form in the sample analogue. With an \emph{optimal} weighting matrix, GMM is asymptotically efficient within the class of GMM estimators based on the same moment conditions. As \textcite{Hayashi2000}, \textcite{Hall2005}, and \textcite{Hansen2022} emphasize, GMM also extends naturally to heteroskedastic and autocorrelated settings by changing the weighting matrix and variance estimation rather than the underlying moment conditions. Section~\ref{sec:gmm} provides a self-contained treatment.
 
 \medskip
 
-\noindent\textbf{Diagnostics.}\quad Identifying endogeneity in a given dataset, assessing instrument validity, and testing overidentifying restrictions are tasks of independent importance. Section\~\ref{sec:testing} covers the Hausman test, the Sargan--Hansen $J$-statistic, and the Stock--Yogo weak-instrument test.
+\noindent\textbf{Diagnostics.}\quad Identifying endogeneity in a given dataset, assessing instrument validity, and testing overidentifying restrictions are tasks of independent importance. Section~\ref{sec:testing} covers the Hausman test, the Sargan--Hansen $J$-statistic, and the Stock--Yogo weak-instrument test.
 
 # Instrumental Variable Estimator
+\label{sec:iv}
 
 To address the endogeneity problem, we can introduce instrumental variables (IVs).
 
@@ -342,27 +358,28 @@ A variable $z_i$ is an \emph{instrument} for the endogenous regressor $x_i$ if i
 \end{enumerate}
 \end{definition}
 
-\noindent The \emph{relevance condition} ensures that the instrument is correlated with the endogenous regressor. This ensures that the instrument can provide information about the variation in $x_i$, to guarantee that the IV estimator is well-defined, and the resulting estimator will be efficient. The stronger the correlation, the more precise the IV estimator will be.
+\noindent The \emph{relevance condition} ensures that the instrument is correlated with the endogenous regressor. This guarantees that the instrument contains identifying information about the endogenous variation in $x_i$ and that the IV estimator is well-defined in the just-identified case. As \textcite{Hayashi2000}, \textcite{Hansen2022}, and \textcite{Wooldridge2010} note, stronger relevance typically yields a more precise estimator, whereas weak relevance can lead to poor finite-sample performance and unreliable inference.
 
-\noindent The \emph{exogeneity condition} ensures that the instrument is not correlated with the error term, which is crucial for the consistency of the IV estimator. If this condition is violated, the IV estimator will be biased and inconsistent.
+\noindent The \emph{exogeneity condition} ensures that the instrument is not correlated with the error term, which is crucial for the consistency of the IV estimator. As \textcite{Hayashi2000}, \textcite{Hansen2022}, and \textcite{Wooldridge2010} make clear, if this condition is violated, the IV estimator will be biased and inconsistent.
 
-Before deriving the IV estimator, let us consider the following liniear regression model with one endogenous regressor, and two exogenous regressors: \begin{equation}
+Before deriving the IV estimator, let us consider the following linear regression model with one endogenous regressor and two exogenous regressors:
+\begin{equation}
   y_i = \beta_1 + \beta_2 x_2 + \bm{x}_i^\top \bgamma + \varepsilon_i,
   \label{eq:ivmodel}
 \end{equation}
 
-where $x_2$ is the endogenous regressor, $\bm{x}_i$ is a vector of exogenous regressors, and $\varepsilon_i$ is the error term. We assume that we have an instrument $z_2$ for $x_2$ that satisfies the relevance and exogeneity conditions. In this spefication, $\beta_1$ is the intercept, $\beta_2$ is the coefficient on the endogenous regressor $x_2$, and $\bgamma$ is a vector of coefficients on the exogenous regressors.
+where $x_2$ is the endogenous regressor, $\bm{x}_i$ is a vector of exogenous regressors, and $\varepsilon_i$ is the error term. We assume that we have an instrument $z_2$ for $x_2$ that satisfies the relevance and exogeneity conditions. In this specification, $\beta_1$ is the intercept, $\beta_2$ is the coefficient on the endogenous regressor $x_2$, and $\bgamma$ is a vector of coefficients on the exogenous regressors.
 
-We can as well write the model in matrix form as follows: 
+We can also write the model in matrix form as follows:
 
 \begin{equation}
   \bm{y} = \bX\bbeta + \beps,
   \label{eq:ivmodel-matrix}
 \end{equation}
 
-where $\bm{y}$ is the $n \times 1$ vector of dependent variable, $\bX$ is the $n \times k$ matrix of regressors (including the intercept, the endogenous regressor, and the exogenous regressors), $\bbeta$ is the $k \times 1$ vector of parameters, and $\beps$ is the $n \times 1$ vector of error terms.
+where $\bm{y}$ is the $n \times 1$ vector of the dependent variable, $\bX$ is the $n \times k$ matrix of regressors (including the intercept, the endogenous regressor, and the exogenous regressors), $\bbeta$ is the $k \times 1$ vector of parameters, and $\beps$ is the $n \times 1$ vector of error terms.
 
-We can partition the matrix of regressors $\bX$ into two parts: $\bX = [\bX_1 \,|\, \bX_2]$, where $\bX_1$ contains the exogenous regressors (including the intercept) and $\bX_2$ contains the endogenous regressor $x_2$. We can define the vector of instruments $\bZ = [\bX_1 \,|\, \bm{z}_2]$, where $\bm{z}_2$ is the $n \times 1$ vector of the instrument for $x_2$. Since $x_2$ is endogenous, $E[\bX'\beps] \neq \bm{0}$, because $E[x_2 \varepsilon_i] \neq 0$. However, since $\bZ$ contains only exogenous variables, we have $E[\bZ'\beps] = \bm{0}$. The IV estimator can derived by exploiting the moment condition $E[\bZ'\beps] = \bm{0}$. Specifically, the IV estimator $\hat{\bbeta}_{\mathrm{IV}}$ is defined as the solution to the following equation:
+We can partition the matrix of regressors $\bX$ into two parts: $\bX = [\bX_1 \,|\, \bX_2]$, where $\bX_1$ contains the exogenous regressors (including the intercept) and $\bX_2$ contains the endogenous regressor $x_2$. We can define the vector of instruments $\bZ = [\bX_1 \,|\, \bm{z}_2]$, where $\bm{z}_2$ is the $n \times 1$ vector of the instrument for $x_2$. Since $x_2$ is endogenous, $E[\bX'\beps] \neq \bm{0}$, because $E[x_2 \varepsilon_i] \neq 0$. However, since $\bZ$ contains only exogenous variables, we have $E[\bZ'\beps] = \bm{0}$. The IV estimator can be derived by exploiting the moment condition $E[\bZ'\beps] = \bm{0}$. Specifically, the IV estimator $\hat{\bbeta}_{\mathrm{IV}}$ is defined as the solution to the following equation:
 
 \begin{equation}
   E[\bZ'(\bm{y} - \bX\hat{\bbeta}_{\mathrm{IV}})] = \bm{0}.
@@ -383,7 +400,7 @@ Using the principle of the method of moments estimation, which states that the s
 
 In the second line, we have multiplied both sides of the equation by $n$ to eliminate the $1/n$ term. In the third line, we have rearranged the equation to isolate $\bZ'\bX\hat{\bbeta}_{\mathrm{IV}}$ on one side. Finally, in the last line, we have solved for $\hat{\bbeta}_{\mathrm{IV}}$ by pre-multiplying both sides of the equation by $(\bZ'\bX)^{-1}$.
 
-The OLS estimator $\hat{\bbeta}_{\mathrm{OLS}} = (\bX'\bX)^{-1}\bX'\bm{y}$ can be written as $\hat{\bbeta}_{\mathrm{OLS}} = (\bZ'\bX)^{-1}\bZ'\bm{y} + \text{bias}$, where the bias term captures the inconsistency of OLS due to endogeneity. The IV estimator $\hat{\bbeta}_{\mathrm{IV}}$ can be seen as a correction to the OLS estimator that removes this bias by using the instruments $\bZ$. The IV estimator is consistent for $\bbeta$ under the conditions that the instruments are valid (i.e., they satisfy the relevance and exogeneity conditions) and that the model is correctly specified.
+Unlike OLS, which uses the orthogonality condition between regressors and errors, the IV estimator replaces that invalid condition with valid moment conditions involving the instruments $\bZ$. In this sense, IV corrects the endogeneity problem by projecting identification onto exogenous variation in the instruments. The IV estimator is consistent for $\bbeta$ when the instruments are valid, the model is correctly specified, and the relevant rank condition holds.
 
 \begin{proposition}[Consistency of the IV Estimator]
 \label{prop:iv-consistency}
@@ -402,30 +419,31 @@ Since $n^{-1}\bZ'\bX \pto \E[\bm{z}_i \bm{x}_i^\top]$, and the limit is non-sing
 \end{proof}
 
 \begin{remark}
-The consistency of the IV estimator relies crucially on the validity of the instruments. If the instruments are weakly correlated with the endogenous regressor (i.e., if the relevance condition is not satisfied, then the IV estimator will be less precise and may even be inconsistent. If the instruments are correlated with the error term (i.e., if the exogeneity condition is not satisfied), then the IV estimator will be biased and inconsistent. Therefore, it is essential to carefully select and validate instruments in applied work.
+The consistency of the IV estimator relies crucially on the validity of the instruments. If the instruments are only weakly correlated with the endogenous regressor, that is, if the relevance condition is not satisfied, then the IV estimator will be less precise and may even be inconsistent. If the instruments are correlated with the error term, that is, if the exogeneity condition is not satisfied, then the IV estimator will be biased and inconsistent. Therefore, it is essential to carefully select and validate instruments in applied work.
 \end{remark}
 
 \begin{remark}
-Normally, we dot we do not prove the unbiasedness of the IV estimator, because it is not unbiased in small samples. However, it is consistent, which means that as the sample size increases, the bias of the IV estimator diminishes and it converges in probability to the true parameter value $\bbeta$.
+Normally, we do not prove the unbiasedness of the IV estimator, because it is not unbiased in small samples. However, it is consistent, which means that as the sample size increases, the bias of the IV estimator diminishes and it converges in probability to the true parameter value $\bbeta$.
 \end{remark}
 
-The IV estimator can be extended to the case of multiple endogenous regressors and multiple instruments. In that case, the estimator is given by $\hat{\bbeta}_{\mathrm{IV}} = (\bZ'\bX)^{-1}\bZ'\bm{y}$, where $\bZ$ is the matrix of instruments that includes all the exogenous regressors and the instruments for the endogenous regressors. The consistency of the IV estimator in this more general setting can be established under similar assumptions as in the single endogenous regressor case. However, the presence of multiple endogenous regressors and multiple instruments introduces additional challenges, such as the need to ensure that the instruments are sufficiently strong and that the model is not overidentified. These issues will be discussed in more detail in the subsequent sections on Two-Stage Least Squares (2SLS) and Generalized Method of Moments (GMM).
+The IV idea extends naturally to models with multiple endogenous regressors and multiple instruments. In the just-identified multivariate case, where the number of instruments equals the number of endogenous regressors, the estimator still takes the form $\hat{\bbeta}_{\mathrm{IV}} = (\bZ'\bX)^{-1}\bZ'\bm{y}$. In the overidentified case, however, there are more instruments than endogenous regressors, and estimation is typically carried out using 2SLS or GMM rather than this simple just-identified formula. These issues are discussed in more detail in the subsequent sections on Two-Stage Least Squares (2SLS) and Generalized Method of Moments (GMM).
 
 \begin{remark}
 In the just-identified case, where the number of instruments equals the number of endogenous regressors, the IV estimator is equivalent to the Two-Stage Least Squares (2SLS) estimator. However, in the overidentified case, where there are more instruments than endogenous regressors, the 2SLS estimator provides a way to combine all the available instruments to achieve greater efficiency.
 \end{remark}
 
 # Two-Stage Least Squares (2SLS) Estimator
+\label{sec:tsls}
 
-The two-stage least squares (2SLS) estimator is a generalization of the IV estimator that allows for multiple endogenous regressors and multiple instruments. Wooldridge (2010) provides a comprehensive treatment of the 2SLS estimator, including its derivation, properties, and applications. The 2SLS estimator is particularly useful in the overidentified case, where there are more instruments than endogenous regressors, as it allows for the efficient use of all available instruments. Following Wooldridge (2010), we can specify the framework for reriving the 2SLS estimator as follows:
+The two-stage least squares (2SLS) estimator is a generalization of the IV estimator that allows for multiple endogenous regressors and multiple instruments. \textcite{Wooldridge2010}, \textcite{Hayashi2000}, and \textcite{Amemiya1985} provide standard treatments of the 2SLS estimator, including its derivation, properties, and applications. The 2SLS estimator is particularly useful in the overidentified case, where there are more instruments than endogenous regressors, as it allows for the efficient use of all available instruments. Following these treatments, we can specify the framework for deriving the 2SLS estimator as follows:
 
-Consider a general linear regression model with $k$ regressors.  Tis model can be presented here as follows:
+Consider a general linear regression model with $k$ regressors. This model can be presented as follows:
 \begin{equation}
   y_i = \beta_1 + \beta_2 x_{2i} + \ldots + \beta_k x_{ki} + \varepsilon_i,
   \label{eq:2slsmodel}
 \end{equation}
 
-where $y_i$ is an $n \times 1$ vector of observations and $\varepsilon_i$ is a $n \times 1$ vector of error terms. The model includes $k$ regressors, including the intercept. Let us assume that $x_2, \ldots, x_{k-1}$ are exogenous regressors, while $x_k$ is an endogenous regressor. In this case, we have one endogenous regressor and $k-1$ exogenous regressors. This implies that $E[x_k \varepsilon_i] \neq 0$, while $E[x_j \varepsilon_i] = 0$ for $j = 2
+where $y_i$ is the dependent variable for observation $i$ and $\varepsilon_i$ is the corresponding error term. The model includes $k$ regressors, including the intercept. Let us assume that $x_2, \ldots, x_{k-1}$ are exogenous regressors, while $x_k$ is an endogenous regressor. In this case, we have one endogenous regressor and $k-1$ exogenous regressors. This implies that $E[x_k \varepsilon_i] \neq 0$, while $E[x_j \varepsilon_i] = 0$ for $j = 2
 ,\ldots, k-1$. 
 
 The $m$ instruments for the endogenous regressor $x_k$ are denoted by $z_{1i}, \ldots, z_{mi}$, and they satisfy the relevance condition $\Cov(z_{ji}, x_k) \neq 0$ for $j = 1, \ldots, m$, and the exogeneity condition $E[z_{ji} \varepsilon_i] = 0$ for $j = 1, \ldots, m$. The matrix of instruments can be denoted as $\bZ = [\bX_1 \,|\, \bm{z}_k]$, where $\bX_1$ contains the exogenous regressors (including the intercept) and $\bm{z}_k$ is the vector of instruments for the endogenous regressor $x_k$. The 2SLS estimator can be derived by first regressing the endogenous regressor $x_k$ on the instruments $\bZ$. This is the first stage of the 2SLS procedure, and it can be written as follows:
@@ -437,14 +455,14 @@ The $m$ instruments for the endogenous regressor $x_k$ are denoted by $z_{1i}, \
 
 where $\bgamma$ is a vector of parameters to be estimated, and $v$ is the error term in the first stage regression. 
 
-In equation \eqref{eq:2slsfirststage}, $x_k$ is regressed on the instruments $\bZ$, which includes the exogenous regressors and the instruments for the endogenous regressor. $x_k$ is a linear combination of the instruments. If we have the knowledge of the parameters $\bgamma$, ignoring the error term $v$, we can generate the exogenous component of $x_k$ as $\hat{x}_k = \bZ\bgamma$. However, since $\bgamma$ is unknown, we can consistently estimate it using OLS, because the instruments are exogenous, i.e., $E[v'\bZ] = 0$. The OLS estimator for $\bgamma$ is given by $\hat{\bgamma} = (\bZ'\bZ)^{-1}\bZ'x_k$. We can then use this estimate to generate the fitted values of $x_k$, which are denoted as $\hat{x}_k = \bZ\hat{\bgamma}$. Substituting $(\bZ'\bZ)^{-1}\bZ'x_k$ for $\hat{\bgamma}$ gives us $\hat{x}_k = \bZ(\bZ'\bZ)^{-1}\bZ'x_k$. This is the predicted value of the endogenous regressor $x_k$ based on the instruments $\bZ$. Now, using the expression for $\hat{x}_k$, we can write the second stage OLS estimator for $\bbeta$ as follows:
+In equation \eqref{eq:2slsfirststage}, $x_k$ is regressed on the instruments $\bZ$, which include the exogenous regressors and the instruments for the endogenous regressor. Thus, $x_k$ is expressed as a linear combination of the instruments. If the parameter vector $\bgamma$ were known, and we ignored the error term $v$, we could recover the exogenous component of $x_k$ as $\hat{x}_k = \bZ\bgamma$. However, since $\bgamma$ is unknown, we can consistently estimate it using OLS because the instruments are exogenous, that is, $E[v'\bZ] = 0$. The OLS estimator for $\bgamma$ is given by $\hat{\bgamma} = (\bZ'\bZ)^{-1}\bZ'x_k$. We can then use this estimate to generate the fitted values of $x_k$, which are denoted by $\hat{x}_k = \bZ\hat{\bgamma}$. Substituting $(\bZ'\bZ)^{-1}\bZ'x_k$ for $\hat{\bgamma}$ gives us $\hat{x}_k = \bZ(\bZ'\bZ)^{-1}\bZ'x_k$. This is the predicted value of the endogenous regressor $x_k$ based on the instruments $\bZ$. Using the expression for $\hat{x}_k$, we can write the second-stage OLS estimator for $\bbeta$ as follows:
 
 \begin{equation}
   \hat{\bbeta}_{\mathrm{2SLS}} = (\hat{\bX}'\hat{\bX})^{-1}\hat{\bX}'\bm{y},
   \label{eq:2slssecondstage}
 \end{equation}
 
-Substutitution of the expression for $\hat{\bX}$ into the second stage regression, with algebraic manipulation, yields the 2SLS estimator in the following form:
+Substitution of the expression for $\hat{\bX}$ into the second stage regression, together with some algebraic manipulation, yields the 2SLS estimator in the following form:
 
 \begin{align*}
   \hat{\bbeta}_{\mathrm{2SLS}} &= (\hat{\bX}'\hat{\bX})^{-1}\hat{\bX}'\bm{y} \\
@@ -452,55 +470,60 @@ Substutitution of the expression for $\hat{\bX}$ into the second stage regressio
     &= \bigl(\bX'\bZ(\bZ'\bZ)^{-1}\bZ'\bX\bigr)^{-1}\bX'\bZ(\bZ'\bZ)^{-1}\bZ'\bm{y}.
 \end{align*}
 
-where $\Proj{Z}$ is the projection matrix onto the space spanned by $z_1$, \ldots, $z_m$, defined as $\Proj{Z} = \bZ(\bZ'\bZ)^{-1}\bZ'$. The 2SLS estimator can be interpreted as the OLS estimator applied to the transformed data, where the endogenous regressor is replaced by its fitted values from the first stage regression. The 2SLS estimator is consistent for $\bbeta$ under the same conditions as the IV estimator, and it is more efficient than the IV estimator when there are multiple instruments available.
+where $\Proj{Z}$ is the projection matrix onto the space spanned by $z_1$, \ldots, $z_m$, defined as $\Proj{Z} = \bZ(\bZ'\bZ)^{-1}\bZ'$. As \textcite{Wooldridge2010}, \textcite{Hayashi2000}, and \textcite{Amemiya1985} explain, the 2SLS estimator can be interpreted as the OLS estimator applied to the transformed data, where the endogenous regressor is replaced by its fitted values from the first stage regression. Under the same conditions used for IV consistency, 2SLS is consistent for $\bbeta$, and with multiple instruments it uses the available moment information more efficiently.
 
 ## Variance-covariance Matrix of the 2SLS Estimator
 
 ### Variance-covariance Matrix under Spherical Errors
-The variance-covariance matrix of the 2SLS estimator, which forms the basis for calculating standard errors and conducting inference, can be derived under the assumption of homoskedasticity. The formula for the variance-covariance matrix of the 2SLS estimator is given by:
+As \textcite{Hayashi2000}, \textcite{Amemiya1985}, and \textcite{Wooldridge2010} show, under homoskedasticity the finite-sample conditional variance of the 2SLS estimator has the familiar projection-matrix form
 
-\begin{align*}
-\Sigma_{\mathrm{2SLS}} = \bZ(\bZ'\bZ)^{-1}\Sigma_{\mathrm{}}\bZ'(\bZ'\bZ)^{-1}\bZ',
-\end{align*}
+\begin{equation*}
+\Var(\hat{\bbeta}_{\mathrm{2SLS}} \mid \bX,\bZ)
+=
+\sigma^2 (\bX'\Proj{Z}\bX)^{-1},
+\end{equation*}
 
-where $\Sigma_{\mathrm{}}$ is the variance-covariance matrix of the error term $\varepsilon_i$. Under homoskedasticity, $\Sigma_{\mathrm{}} = \sigma^2 \bI_n$, where $\sigma^2$ is the variance of the error term and $\bI_n$ is the $n \times n$ identity matrix. In this case, the variance-covariance matrix of the 2SLS estimator simplifies to:
+where $\Proj{Z} = \bZ(\bZ'\bZ)^{-1}\bZ'$ and $\sigma^2 = \Var(\varepsilon_i \mid \bZ)$ under the homoskedastic model. Equivalently, since $\hat{\bbeta}_{\mathrm{2SLS}} = (\bX'\Proj{Z}\bX)^{-1}\bX'\Proj{Z}\bm{y}$, inference under spherical errors is based on the matrix $(\bX'\Proj{Z}\bX)^{-1}$.
 
-\begin{align*}
-\Sigma_{\mathrm{2SLS}} = \sigma^2 \bZ(\bZ'\bZ)^{-1}\bZ'.
-\end{align*}
-
-Wherre $\sigma^2$ can be estimated using the residuals from the second stage regression as follows:
+Here, $\sigma^2$ can be estimated using the residuals from the second stage regression as follows:
 
 \begin{equation*}
   \hat{\sigma}^2 = \frac{1}{n-k} \sum_{i=1}^n (y_i - \hat{y}_i)^2,
 \end{equation*}
 
-where $\hat{y}_i$ is the fitted value of $y_i$ from the second stage regression, and $k$ is the number of parameters estimated in the second stage regression (including the intercept). The standard errors of the 2SLS estimator can then be obtained by taking the square root of the diagonal elements of $\Sigma_{\mathrm{2SLS}}$.
+where $\hat{y}_i$ is the fitted value of $y_i$ from the second stage regression, and $k$ is the number of parameters estimated in the second stage regression (including the intercept). The standard errors of the 2SLS estimator are then obtained from the square roots of the diagonal elements of $\hat{\sigma}^2(\bX'\Proj{Z}\bX)^{-1}$.
 
 ### Variance-covariance Matrix under Heteroskedasticity
 
-In the presence of heteroskedasticity, the variance-covariance matrix of the 2SLS estimator can be estimated using a heteroskedasticity-robust estimator, such as the White estimator. The formula for the heteroskedasticity-robust variance-covariance matrix of the 2SLS estimator is given by:
+In the presence of heteroskedasticity, the homoskedastic formula above is no longer valid. A standard heteroskedasticity-robust covariance estimator, discussed by \textcite{White2000} and \textcite{Hansen2022}, is the sandwich form
 
-\begin{align*}
-\Sigma_{\mathrm{2SLS}} = \bZ(\bZ'\bZ)^{-1}\bZ' \hat{\Sigma} \bZ(\bZ'\bZ)^{-1}\bZ',
-\end{align*}
+\begin{equation*}
+\widehat{\Var}_{\mathrm{rob}}(\hat{\bbeta}_{\mathrm{2SLS}})
+=
+(\bX'\Proj{Z}\bX)^{-1}
+\bX'\bZ(\bZ'\bZ)^{-1}
+\bZ' \hat{\bOmega}\, \bZ
+(\bZ'\bZ)^{-1}\bZ'\bX
+(\bX'\Proj{Z}\bX)^{-1},
+\end{equation*}
 
-where $\hat{\Sigma}$ is a diagonal matrix with the squared residuals from the second stage regression on the diagonal, i.e., $\hat{\Sigma} = \mathrm{diag}(\hat{\varepsilon}_1^2, \ldots, \hat{\varepsilon}_n^2)$, where $\hat{\varepsilon}_i$ is the residual for observation $i$ from the second stage regression.
+where $\hat{\bOmega}$ is an estimator of the covariance matrix of the structural disturbances. In the simplest heteroskedastic but uncorrelated case, one uses $\hat{\bOmega} = \mathrm{diag}(\hat{\varepsilon}_1^2,\ldots,\hat{\varepsilon}_n^2)$, where $\hat{\varepsilon}_i$ is the second-stage residual for observation $i$.
 
 ### Variance-Covariance Matrix under Serial Correlation
 
-With serial correlation, the variance-covariance matrix of the 2SLS estimator can be estimated using a Newey--West estimator, which accounts for both heteroskedasticity and autocorrelation. The formula for the Newey--West variance-covariance matrix of the 2SLS estimator is given by:
+With serial correlation, one replaces $\hat{\bOmega}$ in the robust sandwich formula by a heteroskedasticity-and-autocorrelation-consistent (HAC) estimator, such as the Newey--West estimator; see \textcite{Hayashi2000} and \textcite{Hansen2022}. The resulting covariance estimator is
 
-\begin{align*}
-\Sigma_{\mathrm{2SLS}} = \bZ(\bZ'\bZ)^{-1}\bZ' \hat{\Sigma}_{\mathrm{NW}} \bZ(\bZ'\bZ)^{-1}\bZ',
-\end{align*}
-where $\hat{\Sigma}_{\mathrm{NW}}$ is the Newey--West estimator of the variance-covariance matrix of the error term, which can be computed using the residuals from the second stage regression and a specified lag length.  The Newey--West estimator is given by:
+\begin{equation*}
+\widehat{\Var}_{\mathrm{NW}}(\hat{\bbeta}_{\mathrm{2SLS}})
+=
+(\bX'\Proj{Z}\bX)^{-1}
+\bX'\bZ(\bZ'\bZ)^{-1}
+\bZ' \hat{\bOmega}_{\mathrm{NW}}\, \bZ
+(\bZ'\bZ)^{-1}\bZ'\bX
+(\bX'\Proj{Z}\bX)^{-1},
+\end{equation*}
 
-\begin{align*}
-\hat{\Sigma}_{\mathrm{NW}} = \sum_{t=-L}^L w_t \hat{\Gamma}_t,
-\end{align*}
-
-where $w_t = \frac{\hat{\Gamma}_t}{\sqrt{\sum_{s=-L}^L w_s^2}}$, and $\hat{\Gamma}_t$ is the $t^{th}$ lagged residual from the second stage regression, and $L$ is a specified lag length.
+where $\hat{\bOmega}_{\mathrm{NW}}$ denotes a HAC estimator that incorporates both heteroskedasticity and autocorrelation up to a chosen lag length.
 
 
 
@@ -530,19 +553,19 @@ We can show that $\plim\,\hat{\bbeta}_{\mathrm{2SLS}} - \bbeta = 0$ by showing t
 \end{proof}
 
 \begin{remark}
-The consistency of the 2SLS estimator relies on the same conditions as the IV estimator, including the validity of the instruments. If the instruments are weakly correlated with the endogenous regressor, the 2SLS estimator will be less precise and may even be inconsistent. If the instruments are correlated with the error term, the 2SLS estimator will be biased and inconsistent. Therefore, it is essential to carefully select and validate instruments in applied work when using the 2SLS estimator.
+As \textcite{Wooldridge2010}, \textcite{Hayashi2000}, and \textcite{Hansen2022} emphasize, the consistency of the 2SLS estimator relies on the same conditions as the IV estimator, including the validity of the instruments. If the instruments are weakly correlated with the endogenous regressor, the 2SLS estimator will be less precise and may even be inconsistent. If the instruments are correlated with the error term, the 2SLS estimator will be biased and inconsistent. Therefore, it is essential to carefully select and validate instruments in applied work when using the 2SLS estimator.
 \end{remark}
 
 \begin{remark}
-In the just-identified case, where the number of instruments equals the number of endogenous regressors, the 2SLS estimator is equivalent to the IV estimator. However, in the overidentified case, where there are more instruments than endogenous regressors, the 2SLS estimator provides a way to combine all the available instruments to achieve greater efficiency. 
+As \textcite{Amemiya1985}, \textcite{Hayashi2000}, and \textcite{Wooldridge2010} note, in the just-identified case, where the number of instruments equals the number of endogenous regressors, the 2SLS estimator is equivalent to the IV estimator. However, in the overidentified case, where there are more instruments than endogenous regressors, the 2SLS estimator provides a way to combine all the available instruments to achieve greater efficiency. 
 \end{remark}
 
 ### Asymptotic Normality
-The asymptotic normality of the OLS estimator can be derived from the following theorem:
+The asymptotic normality of the OLS estimator can be derived from the following theorem; see \textcite{Hayashi2000}, \textcite{Wooldridge2010}, and \textcite{Hansen2022}.
 
 \begin{theorem}[Asymptotic Normality of the OLS Estimator]
 \label{thm:ols-asymptotic-normality}
-Under the assumptions of the linear model, random sampling, full rank, and homoskedasticity, the OLS estimator $\hat{\bbeta}_{\mathrm{OLS}}$ is asymptotically normal, i.e.,
+Under the assumptions of the linear model, random sampling, full rank, strict exogeneity, and homoskedasticity, the OLS estimator $\hat{\bbeta}_{\mathrm{OLS}}$ is asymptotically normal, i.e.,
 \begin{equation}
   \sqrt{n}(\hat{\bbeta}_{\mathrm{OLS}} - \bbeta) \dto \N(\bm{0}, \sigma^2 (\E[\bm{x}_i \bm{x}_i^\top])^{-1}),
   \label{eq:ols-asymptotic-normality}
@@ -550,7 +573,7 @@ Under the assumptions of the linear model, random sampling, full rank, and homos
 where $\sigma^2$ is the variance of the error term $\varepsilon_i$.
 \end{theorem}
 
-The asymptotic normality of the 2SLS estimator can be established under similar conditions as the OLS estimator, with the additional requirement that the instruments are valid and sufficiently strong. The asymptotic distribution of the 2SLS estimator is given by:
+As \textcite{Amemiya1985}, \textcite{Hayashi2000}, and \textcite{Wooldridge2010} show, the asymptotic normality of the 2SLS estimator can be established under conditions analogous to those for OLS, together with instrument validity and sufficient strength. The asymptotic distribution of the 2SLS estimator is given by:
 
 \begin{equation}
   \sqrt{n}(\hat{\bbeta}_{\mathrm{2SLS}} - \bbeta) \dto \N(\bm{0}, \bSigma_{\mathrm{2SLS}}),
@@ -559,55 +582,52 @@ The asymptotic normality of the 2SLS estimator can be established under similar 
 
 where $\bSigma_{\mathrm{2SLS}}$ is the asymptotic variance-covariance matrix of the 2SLS estimator, which can be expressed in terms of the variance of the error term and the covariance between the instruments and the regressors. The exact form of $\bSigma_{\mathrm{2SLS}}$ can be derived using the delta method and the properties of the projection matrix $\Proj{Z}$.
 
-The asymptotic normality of the 2SLS estimator implies that it has a multivariate normal distribution with mean $\bbeta = (\beta)$ and covariance matrix $\bSigma_{\mathrm{2SLS}}$. This implies that the 2SLS estimator has a normal distribution with mean $\beta$ and variance given by the diagonal elements of $\bSigma_{\mathrm{2SLS}}$. The asymptotic normality of the 2SLS estimator allows us to construct confidence intervals and perform hypothesis tests about the parameters of interest, just as we would with the OLS estimator, but with the appropriate adjustments for the presence of endogeneity and the use of instruments.
+As \textcite{Hayashi2000}, \textcite{Hansen2022}, and \textcite{Wooldridge2010} explain, asymptotic normality allows one to construct confidence intervals and perform hypothesis tests for the parameters of interest, using the appropriate IV/2SLS variance formula rather than the OLS one.
 
 \begin{remark}
 The asymptotic normality of the 2SLS estimator relies on the validity and strength of the instruments. If the instruments are weak, the asymptotic distribution of the 2SLS estimator may not be well-approximated by a normal distribution, and inference based on the normal approximation may be unreliable. In such cases, alternative methods for inference, such as the Anderson-Rubin test or the Stock-Yogo weak instrument test, may be more appropriate. Therefore, it is important to assess the strength of the instruments and consider alternative inference methods when using the 2SLS estimator in practice.
 \end{remark}
 
 ### Efficiency
-The 2SLS estimator is more efficient than the IV estimator when there are multiple instruments available, as it combines all the available instruments to achieve greater precision. The efficiency of the 2SLS estimator can be established by comparing its asymptotic variance-covariance matrix $\bSigma_{\mathrm{2SLS}}$ to that of the IV estimator $\bSigma_{\mathrm{IV}}$. Under the assumption of homoskedasticity, the 2SLS estimator is the efficient estimator among the class of IV estimators that use the same set of instruments. This means that $\bSigma_{\mathrm{2SLS}} \leq \bSigma_{\mathrm{IV}}$ in the positive semi-definite sense, which implies that the 2SLS estimator has a smaller asymptotic variance than the IV estimator, and therefore is more efficient. 
+As \textcite{Amemiya1985}, \textcite{Hayashi2000}, and \textcite{Wooldridge2010} show, the 2SLS estimator is more efficient than single-equation IV when multiple instruments are available because it combines all admissible instrument information. Under homoskedasticity, 2SLS is efficient within the class of IV estimators based on the same instrument set, in the sense of having weakly smaller asymptotic variance.
 
-The efficiency gain from using the 2SLS estimator over the IV estimator can be substantial, especially when there are multiple instruments that are strongly correlated with the endogenous regressor. However, it is important to note that the efficiency of the 2SLS estimator depends on the validity and strength of the instruments, and if the instruments are weak or invalid, the 2SLS estimator may not be more efficient than the IV estimator, and may even be inconsistent. Therefore, careful consideration of the choice of instruments is crucial when using the 2SLS estimator in practice.
+The efficiency gain from using the 2SLS estimator over the IV estimator can be substantial, especially when there are multiple instruments that are strongly correlated with the endogenous regressor. However, it is important to note that the efficiency of the 2SLS estimator depends on the validity and strength of the instruments, and if the instruments are weak or invalid, the 2SLS estimator may not be more efficient than the IV estimator, and may even be inconsistent. \textcite{Amemiya1985}, \textcite{Hayashi2000}, and \textcite{Wooldridge2010} therefore emphasize careful consideration of the choice of instruments in practice.
 
 ## Testing for Endogeneity
+\label{sec:testing}
 
-Before applying the 2SLS estimator, it is important to test for the presence of endogeneity in the model, since if the regressors are exogenous, the OLS estimator is consistent and more efficient than the 2SLS estimator, and therefore, there is no justification for using the 2SLS estimator. One common test for endogeneity is the Hausman test. 
+Before applying the 2SLS estimator, it is important to test for the presence of endogeneity in the model, since if the regressors are exogenous, the OLS estimator is consistent and more efficient than the 2SLS estimator, and therefore, there is no justification for using the 2SLS estimator. As \textcite{Hansen2022} and \textcite{Wooldridge2010} note, one common test for endogeneity is the Hausman test. 
 
-This test compares the OLS and 2SLS estimators to determine whether there is a significant difference between them, which would indicate the presence of endogeneity. The difference between the OLS and 2SLS estimators can be expressed as $\hat{\bbeta}_{\mathrm{OLS}} - \hat{\bbeta}_{\mathrm{2SLS}}$. Under the null hypothesis of exogeneity, this difference should be close to zero, while under the alternative hypothesis of endogeneity, this difference should be significantly different from zero. The Hausman test statistic is given by:
+As \textcite{Hansen2022} and \textcite{Wooldridge2010} explain, this class of tests compares the OLS and 2SLS estimators to determine whether there is a systematic difference between them. Under the null hypothesis of exogeneity, both estimators are consistent, but OLS is efficient; under the alternative, OLS is inconsistent while IV/2SLS remains consistent if the instruments are valid. A standard Hausman statistic is
 $$
   H = (\hat{\bbeta}_{\mathrm{OLS}} - \hat{\bbeta}_{\mathrm{2SLS}})^\top \left(\Var(\hat{\bbeta}_{\mathrm{OLS}}) - \Var(\hat{\bbeta}_{\mathrm{2SLS}})\right)^{-1} (\hat{\bbeta}_{\mathrm{OLS}} - \hat{\bbeta}_{\mathrm{2SLS}}),
 $$
 
-where $\Var(\hat{\bbeta}_{\mathrm{OLS}})$ and $\Var(\hat{\bbeta}_{\mathrm{2SLS}})$ are the asymptotic variances of the OLS and 2SLS estimators, respectively. Under the null hypothesis of exogeneity, the Hausman test statistic follows a chi-squared distribution with degrees of freedom equal to the number of parameters being tested. If the test statistic exceeds the critical value from the chi-squared distribution, we reject the null hypothesis of exogeneity and conclude that there is evidence of endogeneity in the model. The Wu-Hausman test is a variant of the Hausman test that is robust to heteroskedasticity, and it can be used when the assumption of homoskedasticity is violated. The Wu-Hausman test statistic is given by:
+where $\Var(\hat{\bbeta}_{\mathrm{OLS}})$ and $\Var(\hat{\bbeta}_{\mathrm{2SLS}})$ are the asymptotic variances of the OLS and 2SLS estimators, respectively. Under standard regularity conditions, this statistic is asymptotically chi-squared with degrees of freedom equal to the number of tested coefficients. In practice, robust endogeneity diagnostics are often implemented as Durbin--Wu--Hausman regression-based tests, which remain valid under heteroskedasticity when paired with robust covariance estimation.
 
-$$
-  H_{\mathrm{Wu}} = (\hat{\bbeta}_{\mathrm{OLS}} - \hat{\bbeta}_{\mathrm{2SLS}})^\top \left(\widehat{\Var}(\hat{\bbeta}_{\mathrm{OLS}}) - \widehat{\Var}(\hat{\bbeta}_{\mathrm{2SLS}})\right)^{-1} (\hat{\bbeta}_{\mathrm{OLS}} - \hat{\bbeta}_{\mathrm{2SLS}}),
-$$
-where $\widehat{\Var}(\hat{\bbeta}_{\mathrm{OLS}})$ and $\widehat{\Var}(\hat{\}]bbeta}_{\mathrm{2SLS}})$ are robust estimates of the variances of the OLS and 2SLS estimators, respectively. The Wu-Hausman test statistic also follows a chi-squared distribution under the null hypothesis of exogeneity, and it can be used to test for endogeneity in the presence of heteroskedasticity. 
-
-It is important to note that the Hausman test and the Wu-Hausman test are not definitive tests for endogeneity, as they rely on the assumption that the OLS estimator is consistent under the null hypothesis of exogeneity. If this assumption is violated, the test may not be valid. Therefore, it is important to consider other evidence and diagnostics when assessing the presence of endogeneity in a model. These tests should be used as part of a broader diagnostic process that includes examining the data, considering the theoretical context, and assessing the validity of the instruments.
+As \textcite{Hansen2022} and \textcite{Wooldridge2010} caution, the Hausman and Wu-Hausman tests are not definitive tests for endogeneity, because they rely on the maintained assumption that OLS is consistent under the null. If that assumption fails, the test may not be valid. These diagnostics are therefore best used alongside broader specification and instrument-validity checks.
 
 ## Weak Instruments
-Weak instruments are a type of endogeneity that occurs when an instrument for a regressor is correlated with other variables in the model. This can lead to biased and inconsistent estimates of the parameters of interest, even when the instrument is valid in the sense that it satisfies the relevance and exogeneity conditions. The presence of weak instruments can be particularly problematic in the context of 2SLS estimation, as it can lead to large standard errors and unreliable inference. To address the issue of weak instruments, Stock and Yogo (2005) developed a test for weak instruments, which is based on the first-stage F-statistic from the regression of the endogenous regressor on the instruments. 
+Weak instruments arise when the instruments are only weakly correlated with the endogenous regressors. This is not itself a form of endogeneity; rather, it is a failure of instrument relevance. Weak instruments can make 2SLS estimates imprecise and can also induce substantial finite-sample bias, causing IV estimates to drift toward OLS. As \textcite{Hansen2022} and \textcite{ChausseIV2025} discuss, Stock and Yogo (2005) developed critical values based on first-stage diagnostics to assess instrument strength.
 
-The Stock-Yogo test provides critical values for the first-stage F-statistic that can be used to assess the strength of the instruments. If the first-stage F-statistic is below the critical value, we reject the null hypothesis of strong instruments and conclude that the instruments are weak. In such cases, alternative estimation methods, such as limited information maximum likelihood (LIML) or the Anderson-Rubin test, may be more appropriate for inference. It is important to assess the strength of the instruments when using 2SLS estimation, as weak instruments can lead to unreliable estimates and inference, even when the instruments are valid in terms of relevance and exogeneity.
+As \textcite{Hansen2022} and \textcite{ChausseIV2025} note, the Stock-Yogo test provides critical values for the first-stage $F$-statistic that can be used to assess instrument strength. If the statistic is below the critical value, the instruments are judged weak; in that case, alternatives such as LIML or Anderson-Rubin-style inference may be preferable.
 
 ## Overidentification and the Sargan-Hansen Test
 
-When there are more instruments than endogenous regressors, the model is said to be overidentified. In this case, it is possible to test the validity of the instruments using the Sargan-Hansen test for overidentifying restrictions. The Sargan-Hansen test statistic is given by:
+When there are more instruments than endogenous regressors, the model is said to be overidentified. As \textcite{Hayashi2000}, \textcite{Hall2005}, and \textcite{Hansen2022} explain, in this case it is possible to test the validity of the instruments using the Sargan-Hansen test for overidentifying restrictions. The Sargan-Hansen test statistic is given by:
 $$
-  J = n \cdot \hat{u}'\hat{u},
+  J = n\, g_n(\hat{\bbeta})' \hat{\bW}\, g_n(\hat{\bbeta}),
 $$
 
-where $\hat{u}$ is the vector of residuals from the second stage regression of the 2SLS estimator. 
+where $g_n(\hat{\bbeta}) = n^{-1}\bZ'(\bm{y}-\bX\hat{\bbeta})$ is the vector of sample moment conditions evaluated at the estimator and $\hat{\bW}$ is the weighting matrix used in estimation or testing. In the homoskedastic linear IV case, this reduces to the familiar Sargan form based on the IV residuals. 
 
-Under the null hypothesis that all instruments are valid, the Sargan-Hansen test statistic follows a chi-squared distribution with degrees of freedom equal to the number of overidentifying restrictions, which is the difference between the number of instruments and the number of endogenous regressors. If the test statistic exceeds the critical value from the chi-squared distribution, we reject the null hypothesis and conclude that at least one of the instruments is invalid. The Sargan-Hansen test provides a way to assess the validity of the instruments in an overidentified model, and it is an important diagnostic tool for applied researchers using 2SLS estimation.
+As \textcite{Hayashi2000}, \textcite{Hall2005}, and \textcite{Hansen2022} show, under the null hypothesis that all overidentifying restrictions are valid, the Sargan-Hansen test statistic is asymptotically chi-squared with degrees of freedom equal to the number of overidentifying restrictions, that is, the number of moment conditions minus the number of estimated parameters. If the test statistic exceeds the relevant critical value, the null is rejected, suggesting that at least one instrument or maintained moment restriction is invalid.
 
 
 # Generalized Method of Moments (GMM) Estimator
+\label{sec:gmm}
 
-The generalized method of moments (GMM) estimator generalizes the instrumental variables (IV) estimator by using moment conditions implied by the model’s assumptions. Like IV and 2SLS, GMM relies on valid instruments and can accommodate multiple endogenous regressors, multiple instruments, and both just-identified and overidentified models. Its broader appeal lies in its flexibility: GMM can be applied to linear and nonlinear models, allows for homoskedastic or heteroskedastic errors, and efficiently combines multiple moment conditions to estimate the parameters of interest.
+The generalized method of moments (GMM) estimator generalizes the instrumental variables (IV) estimator by using moment conditions implied by the model’s assumptions. Like IV and 2SLS, GMM relies on valid instruments and can accommodate multiple endogenous regressors, multiple instruments, and both just-identified and overidentified models. As \textcite{Hayashi2000}, \textcite{Hall2005}, and \textcite{Hansen2022} explain, its broader appeal lies in its flexibility: GMM can be applied to linear and nonlinear models, allows for homoskedastic or heteroskedastic errors, and efficiently combines multiple moment conditions to estimate the parameters of interest.
 
 Given the following linear regression model (in matrix form): 
 \begin{equation}
@@ -615,14 +635,14 @@ Given the following linear regression model (in matrix form):
   \label{eq:gmmmodel}
 \end{equation}
 
-where $\bm{y}$ is the $n \times 1$ vector of dependent variable, $\bX$ is the $n \times k$ matrix of regressors (including the intercept, the endogenous regressor, and the exogenous regressors), $\bbeta$ is the $k \times 1$ vector of parameters, and $\beps$ is the $n \times 1$ vector of error terms. Let $\bZ$ be the $n \times m$ matrix of instruments, where $m \geq k$, and assume that the following moment conditions hold:
+where $\bm{y}$ is the $n \times 1$ vector of the dependent variable, $\bX$ is the $n \times k$ matrix of regressors (including the intercept, the endogenous regressor, and the exogenous regressors), $\bbeta$ is the $k \times 1$ vector of parameters, and $\beps$ is the $n \times 1$ vector of error terms. Let $\bZ$ be the $n \times m$ matrix of instruments, where $m \geq k$, and assume that the following moment conditions hold:
 
 \begin{equation}
   E[\bZ'(\bm{y} - \bX\bbeta)] = \bm{0}.
   \label{eq:gmmmoment}
 \end{equation}
 
-The GMM estimator $\hat{\bbeta}_{\mathrm{GMM}}$ is defined as the value of $\bbeta$ that minimizes the quadratic form of the sample moment conditions, weighted by a positive definite weighting matrix $\bW_n$:
+As \textcite{Hayashi2000}, \textcite{Hall2005}, and \textcite{Hansen2022} define it, the GMM estimator $\hat{\bbeta}_{\mathrm{GMM}}$ is the value of $\bbeta$ that minimizes the quadratic form of the sample moment conditions, weighted by a positive definite weighting matrix $\bW_n$:
 
 \begin{equation}
 \beta_{\mathrm{GMM}} = \arg\min_{\bbeta} \left( \frac{1}{n} \sum_{i=1}^n \bm{z}_i (y_i - \bm{x}_i^\top \bbeta) \right)^\top \bW_n \left( \frac{1}{n} \sum_{i=1}^n \bm{z}_i (y_i - \bm{x}_i^\top \bbeta) \right).
@@ -661,7 +681,7 @@ From which the GMM estimator can be derived, step by step, as follows:
 In the second step, we used the fact that the transpose of a product of matrices is the product of their transposes in reverse order. In the third step, we multiplied both sides by $n$ to eliminate the factor of $1/n$. In the fourth step, we rearranged the terms to isolate $\bbeta$ on one side of the equation. In the fifth step, we took the transpose of both sides to facilitate the next step. In the sixth step, we used the fact that the transpose of a product of matrices is the product of their transposes in reverse order again. Finally, in the last step, we solved for $\bbeta$ by pre-multiplying both sides by the inverse of $\bX'\bZ\bW_n\bZ'\bX$.
 
 
-From this derivation, we can see that  the GMM estimator can be expressed as:
+From this derivation, we can see that the GMM estimator can be expressed as:
 
 $$
 \hat{\bbeta}_{\mathrm{GMM}} =
@@ -669,9 +689,9 @@ $$
 $$
 
 
-## The the weighting matrix $\bW_n$ 
+## The Weighting Matrix $\bW_n$
 
-The role of the weighting matrix $\bW_n$ in the GMM objective function is to account for the variance-covariance structure of the moment conditions, weighting them inversely to their variance and accounting for potential correlation. In the first step of GMM estimation, any matrix that satisfies the following conditions can be used as the weighting matrix $\bW_n$: 
+As \textcite{Hall2005}, \textcite{Hayashi2000}, and \textcite{Hansen2022} explain, the role of the weighting matrix $\bW_n$ in the GMM objective function is to account for the variance-covariance structure of the moment conditions, weighting them inversely to their variance and accounting for potential correlation. In the first step of GMM estimation, any matrix that satisfies the following conditions can be used as the weighting matrix $\bW_n$: 
 
 (1) it must be positive definite, which ensures that the quadratic form objective function has a unique minimum; 
 (2) it should converge in probability to a positive definite matrix $\bW$ as the sample size increases, which ensures the consistency of the GMM estimator; and 
@@ -679,27 +699,35 @@ The role of the weighting matrix $\bW_n$ in the GMM objective function is to acc
 
 In most applications, in the first step of GMM estimation, a simple choice for the weighting matrix is the identity matrix $\bW_n = \bI_m$, which gives equal weight to all moment conditions. While this choice yields a consistent estimator, it is generally not asymptotically efficient, as it does not account for the variance-covariance structure of the moment conditions (which may exhibit heteroskedasticity or correlation).
 
-In practice, many matrices satisfy the conditions for $\bW_n$, which implies there are many GMM estimators that are consistent for $\bbeta$. However, these estimators have different asymptotic efficiency properties. The optimal weighting matrix is $\bW_n = \bS_n^{-1}$, where $\bS_n$ is a consistent estimator of the variance-covariance matrix of the moment conditions. This optimal choice produces the asymptotically efficient GMM estimator, which achieves the lowest asymptotic variance among all GMM estimators based on the same set of moment conditions.
+In practice, many matrices satisfy the conditions for $\bW_n$, which implies there are many GMM estimators that are consistent for $\bbeta$. However, these estimators have different asymptotic efficiency properties. As \textcite{Hayashi2000}, \textcite{Hall2005}, and \textcite{Hansen2022} show, the optimal weighting matrix is $\bW_n = \bS_n^{-1}$, where $\bS_n$ is a consistent estimator of the variance-covariance matrix of the moment conditions. This optimal choice produces the asymptotically efficient GMM estimator, which achieves the lowest asymptotic variance among all GMM estimators based on the same set of moment conditions.
 
 
 ## The Optimal Weighting Matrix
 
 \begin{definition}[Optimal Weighting Matrix]
-The optimal weighting matrix $\bW_n$ in the GMM estimation is defined as the inverse of the variance-covariance matrix of the sample moment conditions, i.e., $\bW_n = \bS_n^{-1}$, where $\bS_n$ is a consistent estimator of the variance-covariance matrix of the moment conditions, given by:
+In the linear i.i.d. GMM setting, the optimal weighting matrix is the inverse of the asymptotic covariance matrix of the sample moments. A common heteroskedasticity-robust estimator takes the form $\bW_n = \bS_n^{-1}$, where $\bS_n$ is a consistent estimator of that covariance matrix, for example
 $$
 \bS_n = \frac{1}{n} \sum_{i=1}^n \bm{z}_i \bm{z}_i^\top (y_i - \bm{x}_i^\top \hat{\bbeta}_{\mathrm{GMM}})^2.
 $$
+With serial dependence, $\bS_n$ should instead be replaced by a consistent long-run covariance estimator.
 \end{definition}
 
 \begin{proposition}[Efficiency of the Optimal GMM Estimator]
-The GMM estimator that uses the optimal weighting matrix $\bW_n = \bS_n^{-1}$ is asymptotically efficient among the class of GMM estimators that use the same set of moment conditions. This means that the asymptotic variance of the optimal GMM estimator is less than or equal to the asymptotic variance of any other GMM estimator that uses a different weighting matrix, in the positive semi-definite sense.
+The GMM estimator that uses the optimal weighting matrix $\bW_n = \bS_n^{-1}$ is asymptotically efficient among the class of GMM estimators that use the same set of moment conditions. As \textcite{Hayashi2000}, \textcite{Hall2005}, and \textcite{Hansen2022} show, this means that the asymptotic variance of the optimal GMM estimator is less than or equal to the asymptotic variance of any other GMM estimator that uses a different weighting matrix, in the positive semi-definite sense.
 \end{proposition}
 
 \begin{proof}
-
-The proof follows from the following two facts:
-- The optimal GMM estimator has a smaller asymptotic variance than any other GMM estimator that uses a different weighting matrix. This follows from the fact that the optimal GMM estimator minimizes the asymptotic variance among all GMM estimators based on the same set of moment conditions.
-- The asymptotic variance of the optimal GMM estimator is given by $\bSigma_{\mathrm{GMM}} = (\bX'\bZ\bW_n\bZ'\bX)^{-1}$, where $\bW_n = \bS_n^{-1}$. For any other GMM estimator that uses a different weighting matrix $\bW_n'$, the asymptotic variance is given by $\bSigma_{\mathrm{GMM}}' = (\bX'\bZ\bW_n'\bZ'\bX)^{-1}$. Since $\bW_n$ is the optimal weighting matrix, we have $\bW_n' \geq \bW_n$ in the positive semi-definite sense, which implies that $\bSigma_{\mathrm{GMM}}' \geq \bSigma_{\mathrm{GMM}}$ in the positive semi-definite sense. Therefore, the optimal GMM estimator is asymptotically efficient among the class of GMM estimators that use the same set of moment conditions.
+Let $\mathbf G$ denote the Jacobian of the population moments and let $\boldsymbol\Omega$ denote the asymptotic covariance matrix of $\sqrt{n}\,g_n(\boldsymbol\beta_0)$. For a generic limiting weighting matrix $\mathbf W$, the asymptotic variance of the GMM estimator is
+\[
+\left(\mathbf G'\mathbf W \mathbf G\right)^{-1}
+\mathbf G'\mathbf W \boldsymbol\Omega \mathbf W \mathbf G
+\left(\mathbf G'\mathbf W \mathbf G\right)^{-1}.
+\]
+When $\mathbf W = \boldsymbol\Omega^{-1}$, this simplifies to
+\[
+\left(\mathbf G'\boldsymbol\Omega^{-1}\mathbf G\right)^{-1},
+\]
+which is the smallest variance in the positive semi-definite ordering among GMM estimators based on the same moment conditions. Hence the optimal-weight GMM estimator is asymptotically efficient within that class.
 \end{proof}
 
 \begin{remark}
@@ -708,7 +736,7 @@ The optimal GMM estimator is particularly useful in the presence of heteroskedas
 
 ## Second Step GMM Estimation
 
-In practice, the optimal GMM estimator is often implemented using a two-step procedure. In the first step, a consistent but potentially inefficient GMM estimator is obtained using a simple weighting matrix, such as the identity matrix $\bW_n = \bI_m$. This first-step estimator is used to compute the residuals and construct a consistent estimator of the variance-covariance matrix of the moment conditions, $\bS_n$. In the second step, the optimal weighting matrix $\bW_n = \bS_n^{-1}$ is used to re-estimate the parameters, yielding the efficient GMM estimator. This two-step procedure allows for consistent estimation of the parameters while also achieving efficiency by using the optimal weighting matrix in the second step. The two-step GMM estimator can be expressed as follows:
+In practice, the optimal GMM estimator is often implemented using a two-step procedure. As \textcite{Hall2005}, \textcite{Hayashi2000}, \textcite{Hansen2022}, and \textcite{ChausseGMM2025} explain, the first step uses a consistent but potentially inefficient weighting matrix, such as the identity matrix $\bW_n = \bI_m$, to obtain an initial estimator and construct a consistent estimator of the variance-covariance matrix of the moment conditions, $\bS_n$. In the second step, the optimal weighting matrix $\bW_n = \bS_n^{-1}$ is used to re-estimate the parameters, yielding the efficient GMM estimator. The two-step GMM estimator can be expressed as follows:
 
 \begin{equation}
   \hat{\bbeta}_{\mathrm{GMM}}^{(2)} = \left(\bX'\bZ\bS_n^{-1}\bZ'\bX\right)^{-1}\bX'\bZ\bS_n^{-1}\bZ'\bm{y},
@@ -736,32 +764,680 @@ The optimal weighting matrix $\bW_n$ can be computed using the formula:
 \bW_n = \bS_n^{-1} = \left( \frac{1}{n} \sum_{i=1}^n \bm{z}_i \bm{z}_i^\top (y_i - \bm{x}_i^\top \hat{\bbeta}_{\mathrm{GMM}}^{(1)})^2 \right)^{-1}.
 \end{equation*}
 
+## Properties of the GMM Estimators
 
+### Consistency
 
+As \textcite{Hayashi2000}, \textcite{Hall2005}, and \textcite{Hansen2022} explain, the GMM estimator is consistent under the following conditions:
 
+1. The population moment condition is correctly specified:
 
+   $$
+   E[\mathbf z_i u_i(\boldsymbol\beta_0)] = \mathbf 0,
+   \qquad
+   u_i(\boldsymbol\beta_0)=y_i-\mathbf x_i'\boldsymbol\beta_0 .
+   $$
 
+2. The sample moments satisfy a uniform law of large numbers, so that
 
+   $$
+   g_n(\boldsymbol\beta)
+   =
+   \frac{1}{n}\sum_{i=1}^n \mathbf z_i
+   \{y_i-\mathbf x_i'\boldsymbol\beta\}
+   $$
 
+   converges uniformly in probability to
 
-# Exercises
+   $$
+   g(\boldsymbol\beta)
+   =
+   E[\mathbf z_i\{y_i-\mathbf x_i'\boldsymbol\beta\}].
+   $$
 
-\begin{exercise}
-\label{ex:intro1}
-Consider the bivariate model $y_i = \beta_0 + \beta_1 x_i +
-\varepsilon_i$ with $\Cov(x_i, \varepsilon_i) = \sigma_{x\varepsilon}
-\neq 0$ and $\Var(x_i) = \sigma_x^2$.
+3. The parameter space is compact, or the estimator lies in a compact set with probability approaching one.
+
+4. The weighting matrix satisfies
+
+   $$
+   \mathbf W_n \xrightarrow{p} \mathbf W,
+   $$
+
+   where $\mathbf W$ is symmetric positive definite.
+
+5. The true parameter $\boldsymbol\beta_0$ is identified, meaning that
+
+   $$
+   g(\boldsymbol\beta)=\mathbf 0
+   \quad \text{if and only if} \quad
+   \boldsymbol\beta=\boldsymbol\beta_0 .
+   $$
+
+   In the linear IV/GMM model, this requires an appropriate rank condition, for example
+
+   $$
+   \operatorname{rank}\{E(\mathbf z_i \mathbf x_i')\}=k,
+   $$
+
+   where $k$ is the number of parameters.
+\begin{proposition}[Consistency of the Linear GMM Estimator]
+Let
+\[
+g_n(\boldsymbol\beta)
+=
+\frac{1}{n}\mathbf Z'(\mathbf y-\mathbf X\boldsymbol\beta)
+\]
+and define the GMM estimator by
+\[
+\hat{\boldsymbol\beta}_{\mathrm{GMM}}
+=
+\arg\min_{\boldsymbol\beta\in\mathcal B}
+Q_n(\boldsymbol\beta),
+\qquad
+Q_n(\boldsymbol\beta)
+=
+g_n(\boldsymbol\beta)' \mathbf W_n g_n(\boldsymbol\beta).
+\]
+Suppose that \(g_n(\boldsymbol\beta)\) converges uniformly in probability to
+\(g(\boldsymbol\beta)\), that \(\mathbf W_n \xrightarrow{p}\mathbf W\), where
+\(\mathbf W\) is positive definite, and that the population criterion
+\[
+Q(\boldsymbol\beta)
+=
+g(\boldsymbol\beta)'\mathbf W g(\boldsymbol\beta)
+\]
+has a unique minimum at \(\boldsymbol\beta_0\). Then
+\[
+\hat{\boldsymbol\beta}_{\mathrm{GMM}}
+\xrightarrow{p}
+\boldsymbol\beta_0 .
+\]
+\end{proposition}
+
+\begin{proof}
+By the uniform law of large numbers,
+\[
+\sup_{\boldsymbol\beta\in\mathcal B}
+\|g_n(\boldsymbol\beta)-g(\boldsymbol\beta)\|
+\xrightarrow{p}0.
+\]
+Since \(\mathbf W_n\xrightarrow{p}\mathbf W\), it follows that
+\[
+\sup_{\boldsymbol\beta\in\mathcal B}
+|Q_n(\boldsymbol\beta)-Q(\boldsymbol\beta)|
+\xrightarrow{p}0,
+\]
+where
+\[
+Q(\boldsymbol\beta)
+=
+g(\boldsymbol\beta)'\mathbf W g(\boldsymbol\beta).
+\]
+By correct specification,
+\[
+g(\boldsymbol\beta_0)=\mathbf 0,
+\]
+so that
+\[
+Q(\boldsymbol\beta_0)=0.
+\]
+Because \(\mathbf W\) is positive definite and the parameter is identified,
+\[
+Q(\boldsymbol\beta)>0
+\qquad
+\text{for all } \boldsymbol\beta\neq\boldsymbol\beta_0 .
+\]
+Thus \(Q(\boldsymbol\beta)\) has a unique minimum at \(\boldsymbol\beta_0\).
+Uniform convergence of \(Q_n\) to \(Q\), together with uniqueness of the population minimizer, implies by the extremum estimator consistency theorem that
+\[
+\hat{\boldsymbol\beta}_{\mathrm{GMM}}
+\xrightarrow{p}
+\boldsymbol\beta_0 .
+\]
+\end{proof}
+
+As \textcite{Hayashi2000}, \textcite{Hall2005}, and \textcite{Hansen2022} note, in the linear IV/GMM model one can also prove consistency directly from the closed-form estimator rather than only through the general extremum-estimator argument. This approach exploits the linear structure of the model and the probability limits of the sample moment matrices. The GMM estimator can be written as follows:
+
+\begin{align*}
+  \hat{\bbeta}_{\mathrm{GMM}} &= \left(\bX'\bZ\bW_n\bZ'\bX\right)^{-1}\bX'\bZ\bW_n\bZ'\bm{y} \\
+  &= \bbeta_0 + \left(\bX'\bZ\bW_n\bZ'\bX\right)^{-1}\bX'\bZ\bW_n\bZ'\beps.
+\end{align*}
+
+Since $\bbeta_0$ is a constant vector, we can write its convergence to zero as follows:
+
+\begin{align*}
+  \hat{\bbeta}_{\mathrm{GMM}} - \bbeta_0 &= \left(\bX'\bZ\bW_n\bZ'\bX\right)^{-1}\bX'\bZ\bW_n\bZ'\beps.
+\end{align*}
+
+We can show that $\plim\,(\hat{\bbeta}_{\mathrm{GMM}} - \bbeta_0) = 0$ by showing that the right-hand side converges in probability to zero. We have $n^{-1}\bX'\bZ \pto \E[\bm{x}_i \bm{z}_i^\top]$, $\bW_n \pto \bW$, and $n^{-1}\bZ'\beps \pto \E[\bm{z}_i \varepsilon_i] = \bm{0}$, where the last equality follows from the exogeneity condition of the instruments. Therefore,
+
+\begin{align*}
+  \left(\bX'\bZ\bW_n\bZ'\bX\right)^{-1}\bX'\bZ\bW_n\bZ'\beps
+  &=
+  \left(\frac{1}{n}\bX'\bZ\,\bW_n\,\frac{1}{n}\bZ'\bX\right)^{-1}
+  \left(\frac{1}{n}\bX'\bZ\,\bW_n\,\frac{1}{n}\bZ'\beps\right) \\
+  &\pto
+  \left(\E[\bm{x}_i \bm{z}_i^\top]\bW \E[\bm{z}_i \bm{x}_i^\top]\right)^{-1}
+  \left(\E[\bm{x}_i \bm{z}_i^\top]\bW \bm{0}\right) \\
+  &= \bm{0}.
+\end{align*}
+Thus, we have shown that $\plim\,\hat{\bbeta}_{\mathrm{GMM}} - \bbeta_0 = 0$, which implies that $\hat{\bbeta}_{\mathrm{GMM}}$ is consistent for $\bbeta_0$.
+
+### Asymptotic Normality
+As \textcite{Hayashi2000}, \textcite{Hall2005}, and \textcite{Hansen2022} show, the GMM estimator is asymptotically normal under the following regularity conditions:
 \begin{enumerate}
-  \item Show that $\plim\,\hat{\beta}_{1,\mathrm{OLS}} = \beta_1 +
-        \sigma_{x\varepsilon}/\sigma_x^2$.
-  \item Determine the sign of the asymptotic bias when (a) ability
-        is the omitted variable in the schooling example, and (b)
-        classical measurement error is present.
-  \item Suppose you observe a variable $z_i$ with
-        $\Cov(z_i, x_i) = \sigma_{zx} \neq 0$ and
-        $\Cov(z_i, \varepsilon_i) = 0$. Propose an estimator for
-        $\beta_1$ based on these covariances, and verify that it is
-        consistent.
+  \item The GMM estimator \(\hat{\boldsymbol\beta}_{\mathrm{GMM}}\) is consistent for the true parameter vector \(\boldsymbol\beta_0\).
+  
+  \item The moment conditions are correctly specified:
+  \[
+  E[\mathbf z_i u_i(\boldsymbol\beta_0)] = \mathbf 0.
+  \]
+  
+  \item The sample moments satisfy a central limit theorem:
+  \[
+  \sqrt{n}g_n(\boldsymbol\beta_0)
+  \dto
+  \mathcal N(\mathbf 0,\boldsymbol\Omega),
+  \]
+  where
+  \[
+  g_n(\boldsymbol\beta)
+  =
+  \frac{1}{n}\sum_{i=1}^n \mathbf z_i u_i(\boldsymbol\beta),
+  \]
+  and \(\boldsymbol\Omega\) is the long-run variance matrix of the moment conditions.
+  
+  \item The weighting matrix satisfies
+  \[
+  \mathbf W_n \pto \mathbf W,
+  \]
+  where \(\mathbf W\) is symmetric positive definite.
+  
+  \item The population moment function \(g(\boldsymbol\beta)=E[g_i(\boldsymbol\beta)]\) is continuously differentiable in a neighborhood of \(\boldsymbol\beta_0\), with Jacobian
+  \[
+  \mathbf G
+  =
+  \left.
+  \frac{\partial g(\boldsymbol\beta)}{\partial \boldsymbol\beta'}
+  \right|_{\boldsymbol\beta=\boldsymbol\beta_0}.
+  \]
+  
+  \item The rank condition holds:
+  \[
+  \operatorname{rank}(\mathbf G)=k,
+  \]
+  where \(k\) is the number of parameters.
+\end{enumerate}
+
+Under these conditions,
+
+$$
+\sqrt{n}
+\left(
+\hat{\boldsymbol\beta}_{\mathrm{GMM}}
+-
+\boldsymbol\beta_0
+\right)
+\dto
+\mathcal N
+\left(
+\mathbf 0,
+\boldsymbol\Sigma_{\mathrm{GMM}}
+\right),
+$$
+
+where
+
+$$
+\boldsymbol\Sigma_{\mathrm{GMM}}
+=
+(\mathbf G'\mathbf W\mathbf G)^{-1}
+\mathbf G'\mathbf W
+\boldsymbol\Omega
+\mathbf W\mathbf G
+(\mathbf G'\mathbf W\mathbf G)^{-1}.
+$$
+
+For the linear IV/GMM model,
+
+$$
+u_i(\boldsymbol\beta)=y_i-\mathbf x_i'\boldsymbol\beta,
+$$
+
+so that
+
+$$
+\mathbf G
+=
+E\left[
+\frac{\partial}{\partial\boldsymbol\beta'}
+\mathbf z_i(y_i-\mathbf x_i'\boldsymbol\beta)
+\right]
+=
+-E(\mathbf z_i\mathbf x_i').
+$$
+
+Since the sign disappears in the sandwich variance formula, the asymptotic variance can equivalently be written using
+
+$$
+\mathbf Q_{ZX}=E(\mathbf z_i\mathbf x_i').
+$$
+
+Thus,
+
+$$
+\boldsymbol\Sigma_{\mathrm{GMM}}
+=
+(\mathbf Q_{XZ}\mathbf W\mathbf Q_{ZX})^{-1}
+\mathbf Q_{XZ}\mathbf W
+\boldsymbol\Omega
+\mathbf W\mathbf Q_{ZX}
+(\mathbf Q_{XZ}\mathbf W\mathbf Q_{ZX})^{-1},
+$$
+
+where
+
+$$
+\mathbf Q_{XZ}=E(\mathbf x_i\mathbf z_i')
+\quad\text{and}\quad
+\mathbf Q_{ZX}=E(\mathbf z_i\mathbf x_i').
+$$
+
+This asymptotic normality result provides the basis for large-sample inference in the linear IV/GMM model. It allows one to construct confidence intervals and conduct hypothesis tests for the parameters of interest using the limiting distribution of the GMM estimator. As \textcite{Hayashi2000}, \textcite{Hall2005}, and \textcite{Hansen2022} explain, the choice of weighting matrix affects the asymptotic variance of the estimator. The efficient GMM estimator is obtained when the limiting weighting matrix is chosen as $\mathbf W=\boldsymbol\Omega^{-1}$, where $\boldsymbol\Omega$ is the asymptotic variance of the moment conditions. In practice, $\boldsymbol\Omega$ is replaced by a consistent estimator, often constructed from the sample analog of the moment covariance matrix, with heteroskedasticity- or autocorrelation-robust versions used when appropriate.
+
+### Efficiency
+
+As \textcite{Hayashi2000}, \textcite{Hall2005}, and \textcite{Hansen2022} show, among GMM estimators based on the same set of moment conditions, the asymptotically efficient estimator is obtained by choosing the limiting weighting matrix to be the inverse of the asymptotic variance-covariance matrix of the sample moments. Thus, the efficient weighting matrix is $\mathbf W=\boldsymbol\Omega^{-1}$, where $\boldsymbol\Omega$ denotes the asymptotic variance of $\sqrt{n}g_n(\boldsymbol\beta_0)$. Under this optimal weighting matrix, the general GMM asymptotic variance formula reduces to
+
+$$
+\boldsymbol\Sigma_{\mathrm{GMM}}
+=
+(\mathbf G'\boldsymbol\Omega^{-1}\mathbf G)^{-1}.
+$$
+
+This is the smallest asymptotic variance attainable within the class of GMM estimators using the same moment conditions.
+
+
+## Tests 
+
+### Overidentifying restrictions
+
+The GMM framework provides several specification tests, including tests of overidentifying restrictions, tests of parameter restrictions, and more general tests of model specification. As \textcite{Hall2005}, \textcite{Hansen2022}, and \textcite{Hayashi2000} explain, one of the most widely used specification tests in GMM is the Hansen \(J\)-test, also commonly referred to as the Sargan--Hansen test in the linear IV context. The test examines whether the sample moment conditions are sufficiently close to zero when evaluated at the GMM estimator.
+
+Let
+
+$$
+g_n(\boldsymbol\beta)
+=
+\frac{1}{n}\sum_{i=1}^n g_i(\boldsymbol\beta)
+$$
+
+denote the vector of sample moments, and let $\hat{\boldsymbol\beta}_{\mathrm{GMM}}$ be the GMM estimator. The $J$-statistic is given by
+
+$$
+J
+=
+n\,g_n(\hat{\boldsymbol\beta}_{\mathrm{GMM}})'
+\mathbf W_n
+g_n(\hat{\boldsymbol\beta}_{\mathrm{GMM}}),
+$$
+
+where $\mathbf W_n$ is the weighting matrix used in the final-stage GMM criterion.
+
+Under the null hypothesis that the overidentifying restrictions are valid, and provided that $\mathbf W_n$ consistently estimates the optimal weighting matrix $\boldsymbol\Omega^{-1}$, the statistic has the limiting distribution
+
+$$
+J \dto \chi^2_{q-k},
+$$
+
+where $q$ is the number of moment conditions and $k$ is the number of estimated parameters. Thus, $q-k$ is the number of overidentifying restrictions. In the linear IV model, this is often interpreted as the number of instruments excluded from the structural equation in excess of the number of endogenous regressors, or more generally as the number of instruments minus the number of parameters estimated.
+
+As \textcite{Hall2005}, \textcite{Hansen2022}, and \textcite{Hayashi2000} explain, if the value of $J$ exceeds the relevant critical value from the $\chi^2_{q-k}$ distribution, the null hypothesis is rejected. Rejection suggests that the moment conditions are not jointly compatible with the data and the maintained model. This may indicate that one or more instruments are invalid, but it may also reflect other forms of model misspecification, such as an incorrect functional form, omitted variables, or violations of the maintained error structure. The Hansen $J$-test is therefore an important diagnostic tool in applied GMM estimation, especially in overidentified models.
+
+
+## Other Diagnostic Tests
+
+As \textcite{Hall2005}, \textcite{Hansen2022}, \textcite{ChausseIV2025}, and \textcite{ChausseGMM2025} emphasize, besides the test of overidentifying restrictions, several diagnostic tests are important in IV/GMM estimation. These include tests of endogeneity, such as the Durbin--Wu--Hausman test; tests of instrument relevance and weak identification, such as the first-stage $F$-statistic, the Cragg--Donald statistic, and the Kleibergen--Paap rank tests; tests of underidentification; and Wald tests of parameter restrictions. In dynamic panel GMM, additional diagnostics are essential, including Arellano--Bond tests for serial correlation and Difference-in-Hansen tests for subsets of instruments. Researchers should also examine heteroskedasticity, serial correlation, robustness across alternative instrument sets, and the possibility of instrument proliferation. Together, these tests help assess whether the model is identified, whether the instruments are valid and relevant, and whether inference based on the GMM estimator is reliable.
+
+
+# Synthesis and Summary
+
+This handout has examined the econometric problem of endogeneity and the main estimation strategies used to obtain consistent estimates when ordinary least squares is no longer reliable. The starting point is the classical linear model, in which OLS is consistent and asymptotically normal when the regressors are exogenous, that is, when the regressors are uncorrelated with the structural disturbance. Once this condition fails, OLS converges to the wrong probability limit, and the resulting inconsistency cannot be solved simply by increasing the sample size. Endogeneity is therefore an identification problem rather than merely a sampling problem.
+
+The handout has emphasized three major sources of endogeneity: omitted variables, simultaneity, and measurement error. In each case, the core issue is that one or more regressors contain variation that is systematically related to the error term. For example, omitted ability in a returns-to-schooling equation may make schooling endogenous; simultaneous determination of price and quantity may make price endogenous in demand or supply equations; and classical measurement error may mechanically induce correlation between the observed regressor and the composite error term. These examples show that endogeneity is not a technical nuisance but a central threat to causal interpretation in applied economics.
+
+Instrumental variables provide a way to restore identification by replacing the invalid orthogonality condition between regressors and errors with valid moment conditions involving instruments. A valid instrument must be relevant, meaning that it is sufficiently correlated with the endogenous regressor, and exogenous, meaning that it is uncorrelated with the structural error term. In the just-identified case, the IV estimator is obtained by solving the sample analogue of the instrument-error orthogonality condition. In overidentified models, where there are more instruments than endogenous regressors or parameters to be identified, two-stage least squares provides a systematic way to combine the available instruments by projecting the endogenous regressors onto the instrument space and then estimating the structural equation using the fitted values.
+
+The generalized method of moments extends these ideas by treating IV and 2SLS as special cases of estimation based on moment conditions. GMM estimates the parameter vector by minimizing a quadratic form in the sample moments, with the weighting matrix determining how different moment conditions are combined. Any positive definite weighting matrix satisfying suitable regularity conditions can yield a consistent estimator, but the efficient GMM estimator is obtained by weighting the moments by the inverse of their asymptotic variance-covariance matrix. The handout also stresses that valid inference requires diagnostic testing, including tests for endogeneity, weak instruments, underidentification, overidentifying restrictions, parameter restrictions, heteroskedasticity, serial correlation, and, in dynamic panel settings, serial correlation and instrument proliferation. Together, these tools allow researchers to assess whether the model is identified, whether the instruments are valid and relevant, and whether the resulting IV, 2SLS, or GMM estimates support reliable causal inference.
+
+Table~\ref{tab:iv-2sls-gmm-summary} summarizes the relationship among the simple instrumental variables estimator, the two-stage least squares estimator, and the generalized method of moments estimator. The three estimators share the same basic objective: to obtain consistent estimates when one or more regressors are endogenous by replacing invalid regressor-error orthogonality conditions with valid instrument-based moment conditions. The simple IV estimator is most transparent in the just-identified case, 2SLS extends the IV logic to settings with multiple instruments by projecting endogenous regressors onto the instrument space, and GMM provides the most general framework by estimating parameters from moment conditions using a weighting matrix. The table also highlights that the estimators differ mainly in how they use instruments and moment conditions, how they combine available information, and the assumptions required for consistency and efficient inference.
+
+
+\begin{table}[H]
+\centering
+\caption{Summary of the simple IV, 2SLS, and GMM estimators}
+\label{tab:iv-2sls-gmm-summary}
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.16\textwidth} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X}
+\hline
+\textbf{Estimator} & \textbf{Core idea} & \textbf{Main formula} & \textbf{Key conditions and interpretation} \\
+\hline
+
+\textbf{Simple IV estimator} &
+Uses an external source of exogenous variation to isolate the part of the endogenous regressor that is uncorrelated with the structural error term. It is most transparent in the just-identified case, where the number of instruments equals the number of parameters or endogenous components to be identified. &
+$\hat{\bbeta}_{\mathrm{IV}} = (\bZ'\bX)^{-1}\bZ'\bm{y}$ when $\bZ'\bX$ is square and nonsingular. &
+Requires instrument relevance and exogeneity: $\rank\{E(\bm{z}_i\bm{x}_i')\}=k$ and $E(\bm{z}_i\varepsilon_i)=\bm{0}$. The estimator is consistent but generally not unbiased in finite samples. \\
+
+\textbf{Two-stage least squares (2SLS)} &
+Generalizes IV to settings with multiple instruments. The first stage projects the endogenous regressors onto the instrument space; the second stage estimates the structural equation using the projected regressors. &
+$\hat{\bbeta}_{\mathrm{2SLS}} = (\bX'\Proj{Z}\bX)^{-1}\bX'\Proj{Z}\bm{y}$, where $\Proj{Z} = \bZ(\bZ'\bZ)^{-1}\bZ'$. &
+Requires valid and sufficiently strong instruments. In the just-identified case, 2SLS coincides with the simple IV estimator. In the overidentified case, it combines all instruments and is efficient among IV estimators under homoskedasticity. \\
+
+\textbf{GMM estimator} &
+Uses the sample analogue of population moment conditions and chooses the parameter vector that makes those sample moments as close to zero as possible, according to a weighting matrix. It nests IV and 2SLS as special cases. &
+$\hat{\bbeta}_{\mathrm{GMM}} = \argmin_{\bbeta} g_n(\bbeta)'\bW_n g_n(\bbeta)$, where $g_n(\bbeta)=\frac{1}{n}\bZ'(\bm{y}-\bX\bbeta)$. For the linear model, $\hat{\bbeta}_{\mathrm{GMM}} = (\bX'\bZ\bW_n\bZ'\bX)^{-1}\bX'\bZ\bW_n\bZ'\bm{y}$. &
+Requires correctly specified moment conditions, identification, convergence of the sample moments, and a positive definite limiting weighting matrix. The efficient GMM estimator uses $\bW=\bOmega^{-1}$, where $\bOmega$ is the asymptotic variance-covariance matrix of the moment conditions. \\
+
+\hline
+\end{tabularx}
+\end{table}
+
+
+
+
+
+
+
+# Review Questions and Exercises
+
+\begin{exercise}[Conceptual foundations]
+Explain why endogeneity is an identification problem rather than merely a small-sample problem. In your answer, distinguish between sampling variability and asymptotic bias, and explain why increasing the sample size does not generally solve the problem of endogenous regressors.
+\end{exercise}
+
+\begin{exercise}[OLS under exogeneity]
+Consider the linear model
+\[
+y_i=\bm{x}_i'\bbeta_0+\varepsilon_i.
+\]
+Suppose that
+\[
+\E[\bm{x}_i\varepsilon_i]=\bm{0}
+\qquad\text{and}\qquad
+\E[\bm{x}_i\bm{x}_i']
+\]
+is finite and nonsingular.
+\begin{enumerate}
+  \item Show that
+  \[
+  \hat{\bbeta}_{\mathrm{OLS}}
+  =
+  \bbeta_0+
+  \left(\frac{1}{n}\bX'\bX\right)^{-1}
+  \left(\frac{1}{n}\bX'\beps\right).
+  \]
+  \item Use the law of large numbers and Slutsky's theorem to show that
+  \[
+  \hat{\bbeta}_{\mathrm{OLS}}\pto \bbeta_0.
+  \]
 \end{enumerate}
 \end{exercise}
- consistent for the inverse of the variance-covariance matrix of the moment conditions, wh
+
+\begin{exercise}[OLS inconsistency under endogeneity]
+Suppose the linear model is correctly specified, but
+\[
+\E[\bm{x}_i\varepsilon_i]=\bm{\delta}\neq \bm{0}.
+\]
+Show that
+\[
+\plim\,\hat{\bbeta}_{\mathrm{OLS}}
+=
+\bbeta_0+
+\left\{\E(\bm{x}_i\bm{x}_i')\right\}^{-1}\bm{\delta}.
+\]
+Explain why the second term represents asymptotic bias.
+\end{exercise}
+
+\begin{exercise}[Sources of endogeneity]
+For each of the following cases, explain why the regressor of interest may be endogenous:
+\begin{enumerate}
+  \item estimating the return to schooling when ability is unobserved;
+  \item estimating demand when price and quantity are jointly determined;
+  \item estimating the effect of income on consumption when income is measured with error;
+  \item estimating the effect of class size on learning outcomes when parents sort into schools.
+\end{enumerate}
+For each case, suggest one possible instrument and discuss whether it is likely to satisfy relevance and exogeneity.
+\end{exercise}
+
+\begin{exercise}[Omitted variable bias]
+Suppose the true model is
+\[
+y_i=\beta_0+\beta_1 x_i+\gamma c_i+u_i,
+\qquad
+\E[u_i\mid x_i,c_i]=0,
+\]
+but the researcher estimates
+\[
+y_i=\beta_0+\beta_1 x_i+\varepsilon_i.
+\]
+\begin{enumerate}
+  \item Write the composite error term \(\varepsilon_i\).
+  \item Derive \(\Cov(x_i,\varepsilon_i)\).
+  \item Under what conditions is OLS inconsistent?
+  \item Explain how the sign of the omitted variable bias depends on \(\gamma\) and \(\Cov(x_i,c_i)\).
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[Measurement error]
+Let the true model be
+\[
+y_i=\beta_0+\beta_1 x_i^*+u_i,
+\]
+but suppose that the researcher observes
+\[
+x_i=x_i^*+v_i,
+\]
+where \(v_i\) is classical measurement error satisfying
+\[
+\E[v_i]=0,\qquad \Cov(x_i^*,v_i)=0,\qquad \Cov(u_i,v_i)=0.
+\]
+\begin{enumerate}
+  \item Rewrite the model in terms of the observed regressor \(x_i\).
+  \item Show that the composite error is correlated with \(x_i\).
+  \item Derive the probability limit of the OLS estimator of \(\beta_1\).
+  \item Explain why classical measurement error produces attenuation bias.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[Definition of an instrumental variable]
+Let \(z_i\) be a candidate instrument for an endogenous regressor \(x_i\) in the model
+\[
+y_i=\beta_0+\beta_1 x_i+\varepsilon_i.
+\]
+\begin{enumerate}
+  \item State the relevance condition.
+  \item State the exogeneity condition.
+  \item Explain why relevance alone is not sufficient for consistency.
+  \item Explain why exogeneity alone is not sufficient for identification.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[Simple IV estimator]
+Consider the just-identified model
+\[
+y_i=\beta_0+\beta_1 x_i+\varepsilon_i,
+\]
+with instrument \(z_i\), where
+\[
+\E[z_i\varepsilon_i]=0,
+\qquad
+\Cov(z_i,x_i)\neq 0.
+\]
+Assume the variables have been demeaned so that no intercept is needed.
+\begin{enumerate}
+  \item Derive the population moment condition used to identify \(\beta_1\).
+  \item Show that
+  \[
+  \beta_1
+  =
+  \frac{\E[z_i y_i]}{\E[z_i x_i]}.
+  \]
+  \item Derive the corresponding sample IV estimator.
+  \item Explain why the estimator is inconsistent if \(\E[z_i\varepsilon_i]\neq 0\).
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[Matrix IV estimator]
+Consider the linear model
+\[
+\bm{y}=\bX\bbeta+\beps,
+\]
+with instrument matrix \(\bZ\), where the model is just identified so that \(\bZ'\bX\) is square and nonsingular.
+\begin{enumerate}
+  \item Starting from the sample moment condition
+  \[
+  \frac{1}{n}\bZ'(\bm{y}-\bX\hat{\bbeta}_{\mathrm{IV}})=\bm{0},
+  \]
+  derive
+  \[
+  \hat{\bbeta}_{\mathrm{IV}}
+  =
+  (\bZ'\bX)^{-1}\bZ'\bm{y}.
+  \]
+  \item Show that
+  \[
+  \hat{\bbeta}_{\mathrm{IV}}-\bbeta_0
+  =
+  (\bZ'\bX)^{-1}\bZ'\beps.
+  \]
+  \item State the rank and exogeneity conditions needed for consistency.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[First-stage regression and instrument strength]
+Suppose \(x_i\) is endogenous and \(z_i\) is proposed as an instrument. The first-stage equation is
+\[
+x_i=\pi_0+\pi_1 z_i+\bm{w}_i'\bm{\pi}_2+v_i,
+\]
+where \(\bm{w}_i\) is a vector of included exogenous controls.
+\begin{enumerate}
+  \item What does the coefficient \(\pi_1\) measure?
+  \item Why is testing \(\pi_1=0\) important?
+  \item Explain the meaning of a weak instrument.
+  \item Discuss the consequences of weak instruments for bias, variance, and inference.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[Deriving 2SLS]
+Let \(\bZ\) be the matrix of instruments and define the projection matrix
+\[
+\Proj{Z}=\bZ(\bZ'\bZ)^{-1}\bZ'.
+\]
+The 2SLS estimator is
+\[
+\hat{\bbeta}_{\mathrm{2SLS}}
+=
+(\bX'\Proj{Z}\bX)^{-1}\bX'\Proj{Z}\bm{y}.
+\]
+\begin{enumerate}
+  \item Explain the meaning of the projection matrix \(\Proj{Z}\).
+  \item Show how \(\Proj{Z}\bX\) represents the fitted values from projecting the regressors onto the instrument space.
+  \item Explain why replacing endogenous regressors by their fitted values helps restore consistency.
+  \item Under what condition does 2SLS reduce to the simple IV estimator?
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[Consistency of 2SLS]
+Using
+\[
+\hat{\bbeta}_{\mathrm{2SLS}}
+=
+(\bX'\Proj{Z}\bX)^{-1}\bX'\Proj{Z}\bm{y},
+\]
+and
+\[
+\bm{y}=\bX\bbeta_0+\beps,
+\]
+show that
+\[
+\hat{\bbeta}_{\mathrm{2SLS}}-\bbeta_0
+=
+(\bX'\Proj{Z}\bX)^{-1}\bX'\Proj{Z}\beps.
+\]
+Then express this result in terms of \(\bZ\) and show the probability limit of the right-hand side under instrument exogeneity and the appropriate rank condition.
+\end{exercise}
+
+\begin{exercise}[GMM moment conditions]
+Consider the linear IV/GMM moment condition
+\[
+\E[\bm{z}_i(y_i-\bm{x}_i'\bbeta_0)]=\bm{0}.
+\]
+\begin{enumerate}
+  \item Define the sample moment function \(g_n(\bbeta)\).
+  \item Define the population moment function \(g(\bbeta)\).
+  \item Explain the role of the weighting matrix \(\bW_n\) in the GMM criterion.
+  \item Explain why different positive definite weighting matrices can produce different GMM estimators.
+  \item Explain why all such estimators may be consistent but not equally efficient.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[Closed-form linear GMM estimator]
+Let
+\[
+g_n(\bbeta)=\frac{1}{n}\bZ'(\bm{y}-\bX\bbeta)
+\]
+and define
+\[
+Q_n(\bbeta)=g_n(\bbeta)'\bW_n g_n(\bbeta),
+\]
+where \(\bW_n\) is symmetric positive definite.
+\begin{enumerate}
+  \item Differentiate \(Q_n(\bbeta)\) with respect to \(\bbeta\).
+  \item Set the derivative equal to zero.
+  \item Derive the closed-form linear GMM estimator:
+  \[
+  \hat{\bbeta}_{\mathrm{GMM}}
+  =
+  (\bX'\bZ\bW_n\bZ'\bX)^{-1}
+  \bX'\bZ\bW_n\bZ'\bm{y}.
+  \]
+  \item Explain how this estimator relates to 2SLS when
+  \[
+  \bW_n=(\bZ'\bZ)^{-1}.
+  \]
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[Optimal GMM weighting matrix]
+Let
+\[
+\sqrt{n}g_n(\bbeta_0)\dto \N(\bm{0},\bOmega),
+\]
+where \(\bOmega\) is nonsingular.
+\begin{enumerate}
+  \item State the optimal GMM weighting matrix.
+  \item Show that when \(\bW=\bOmega^{-1}\), the asymptotic variance of the GMM estimator becomes
+  \[
+  \bSigma_{\mathrm{GMM}}
+  =
+  (\bG'\bOmega^{-1}\bG)^{-1}.
+  \]
+  \item Explain in words why moments with larger variance should receive smaller weight.
+  \item Explain why the optimal GMM estimator is efficient only relative to estimators using the same set of moment conditions.
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}[Diagnostic testing in IV/GMM]
+For each of the following tests, state the null hypothesis, the alternative hypothesis, and the practical interpretation of rejection:
+\begin{enumerate}
+  \item Durbin--Wu--Hausman test for endogeneity;
+  \item first-stage \(F\)-test for instrument relevance;
+  \item Kleibergen--Paap underidentification test;
+  \item Stock--Yogo weak-instrument test;
+  \item Hansen \(J\)-test for overidentifying restrictions.
+\end{enumerate}
+Explain why no single diagnostic test is sufficient to establish that an IV/GMM model is credible.
+\end{exercise}
+
+\clearpage
