@@ -22,10 +22,13 @@ header-includes:
   - '\usepackage{microtype}'
   - '\setlength{\parindent}{1.5em}'
   - '\setlength{\parskip}{0pt}'
+  - '\usepackage{fvextra}'
+  - '\DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}'
   - '% Mathematics'
   - '\usepackage{mathtools}'
   - '\usepackage{amsthm}'
   - '\usepackage{array}'
+  - '\usepackage{float}'
   - '\usepackage{tabularx}'
   - '% Bold math alias'
   - "\\newcommand{\\bm}[1]{\\symbf{#1}}"
@@ -101,6 +104,8 @@ biblio-title: Bibliography
 number-sections: true
 toc: true
 toc-depth: 3
+lof: true
+lot: true
 # Use CSL processor (pandoc citeproc) with APA style to ensure alphabetical ordering
 nocite: "@*"
 cite-method: biblatex
@@ -1439,5 +1444,372 @@ For each of the following tests, state the null hypothesis, the alternative hypo
 \end{enumerate}
 Explain why no single diagnostic test is sufficient to establish that an IV/GMM model is credible.
 \end{exercise}
+
+\clearpage
+
+\appendix
+\section{Monte Carlo Simulation: OLS, IV, 2SLS, and GMM under Endogeneity}
+\label{app:monte-carlo-iv-gmm}
+
+## Simulation Results
+
+This appendix uses a Monte Carlo experiment to illustrate the finite-sample behaviour of four estimators discussed in the handout: ordinary least squares (OLS), the simple instrumental variables (IV) estimator, two-stage least squares (2SLS), and generalized method of moments (GMM). The purpose is to show how endogeneity affects the distribution of the OLS estimator and how valid instruments can restore consistency. The simulation focuses on the coefficient of the endogenous regressor, $\beta_2$, because this is the parameter most directly affected by correlation between the regressor and the structural error term.
+
+The data-generating process is based on the linear model
+$$
+y_i=\beta_1+\beta_2 x_{2i}+\beta_3 x_{3i}+\varepsilon_i,
+$$
+where $x_{2i}$ is endogenous and $x_{3i}$ is exogenous. The instruments for $x_{2i}$ are $z_{1i}$ and $z_{2i}$, both of which are constructed to be correlated with $x_{2i}$ but uncorrelated with $\varepsilon_i$. The simulation uses sample size $N=100$ and $R=10{,}000$ replications. In each replication, OLS is estimated without instruments, the simple IV estimator uses only $z_1$, while 2SLS and GMM use both instruments $z_1$ and $z_2$. The empirical distribution of $\hat{\beta}_2$ is then summarized using density plots, means, variances, and biases.
+
+```{r}
+#| label: monte-carlo-setup
+#| echo: false
+#| message: false
+#| warning: false
+#| include: false
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(knitr)
+
+set.seed(12345)
+
+# Monte Carlo design
+N <- 100
+R <- 10000
+
+# True parameters
+beta_1 <- 1.0
+beta_2 <- 1.0
+beta_3 <- 0.5
+
+# Strength of endogeneity
+rho <- 0.60
+
+# Storage
+results <- matrix(NA_real_, nrow = R, ncol = 4)
+colnames(results) <- c("OLS", "Simple IV", "2SLS", "GMM")
+
+# Function for linear GMM estimator
+gmm_linear <- function(y, X, Z) {
+  
+  n <- nrow(X)
+  
+  # First-step GMM using 2SLS weighting matrix
+  W1 <- solve(crossprod(Z) / n)
+  beta_1step <- solve(
+    crossprod(X, Z) %*% W1 %*% crossprod(Z, X),
+    crossprod(X, Z) %*% W1 %*% crossprod(Z, y)
+  )
+  
+  # Residuals from first step
+  uhat <- as.vector(y - X %*% beta_1step)
+  
+  # Robust estimate of moment variance
+  Zu <- Z * uhat
+  S <- crossprod(Zu) / n
+  
+  # Small ridge adjustment for numerical stability
+  S <- S + diag(1e-8, ncol(S))
+  
+  # Second-step optimal weighting matrix
+  W2 <- solve(S)
+  
+  beta_2step <- solve(
+    crossprod(X, Z) %*% W2 %*% crossprod(Z, X),
+    crossprod(X, Z) %*% W2 %*% crossprod(Z, y)
+  )
+  
+  as.vector(beta_2step)
+}
+
+for (r in 1:R) {
+  
+  # Instruments and exogenous regressor
+  z1 <- rnorm(N)
+  z2 <- rnorm(N)
+  x3 <- rnorm(N)
+  
+  # Components generating endogeneity
+  v <- rnorm(N)
+  e <- rnorm(N)
+  
+  # Structural error correlated with v
+  eps <- rho * v + sqrt(1 - rho^2) * e
+  
+  # Endogenous regressor: correlated with instruments and with eps through v
+  x2 <- 0.7 * z1 + 0.7 * z2 + 0.5 * x3 + v
+  
+  # Outcome variable
+  y <- beta_1 + beta_2 * x2 + beta_3 * x3 + eps
+  
+  # Matrices
+  X <- cbind(1, x2, x3)
+  
+  # OLS
+  beta_ols <- solve(crossprod(X), crossprod(X, y))
+  
+  # Simple IV: just identified, using z1 only plus included exogenous variables
+  Z_iv <- cbind(1, z1, x3)
+  beta_iv <- solve(crossprod(Z_iv, X), crossprod(Z_iv, y))
+  
+  # 2SLS: using both instruments plus included exogenous variables
+  Z_all <- cbind(1, z1, z2, x3)
+  Pz <- Z_all %*% solve(crossprod(Z_all)) %*% t(Z_all)
+  beta_2sls <- solve(crossprod(X, Pz %*% X), crossprod(X, Pz %*% y))
+  
+  # Two-step GMM: using all instruments
+  beta_gmm <- gmm_linear(y = y, X = X, Z = Z_all)
+  
+  # Store beta_2 estimates
+  results[r, ] <- c(beta_ols[2], beta_iv[2], beta_2sls[2], beta_gmm[2])
+}
+
+results_df <- as.data.frame(results)
+```
+
+```{r}
+#| label: fig-beta2-density
+#| echo: false
+#| fig-cap: 'Empirical densities of the Monte Carlo distribution of $\hat{\beta}_2$ for OLS, simple IV, 2SLS, and GMM.'
+#| fig-pos: 'H'
+#| fig-width: 8
+#| fig-height: 6
+#| message: false
+#| warning: false
+density_df <- results_df |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "Estimator",
+    values_to = "beta2_hat"
+  )
+
+density_df$Estimator <- factor(
+  density_df$Estimator,
+  levels = c("OLS", "Simple IV", "2SLS", "GMM")
+)
+
+ggplot(density_df, aes(x = beta2_hat)) +
+  geom_density(linewidth = 0.8) +
+  geom_vline(xintercept = beta_2, linetype = "dashed") +
+  facet_wrap(~ Estimator, nrow = 2, ncol = 2, scales = "free_y") +
+  labs(
+    x = expression(hat(beta)[2]),
+    y = "Empirical density"
+  ) +
+  theme_classic()
+```
+The density plots show the central implication of the simulation. Because $x_2$ is constructed to be correlated with the structural disturbance $\varepsilon$, the OLS estimator of $\beta_2$ is centered away from the true value, indicating asymptotic bias caused by endogeneity. By contrast, the simple IV estimator, 2SLS estimator, and GMM estimator are centered much closer to the true value because they use instruments that are correlated with $x_2$ but uncorrelated with the error term. The simple IV estimator uses only one instrument and is therefore typically more dispersed, while 2SLS and GMM use both instruments and tend to produce tighter empirical distributions. In this design, 2SLS and GMM are expected to behave similarly, although GMM uses a second-step weighting matrix that accounts for the estimated variance-covariance structure of the moment conditions.
+
+```{r}
+#| label: tbl-monte-carlo-summary
+#| echo: false
+#| tbl-cap: 'Mean, variance, and bias of the Monte Carlo distribution of $\hat{\beta}_2$.'
+#| tbl-pos: 'H'
+#| message: false
+#| warning: false
+
+summary_table <- density_df |>
+  group_by(Estimator) |>
+  summarise(
+    Mean = mean(beta2_hat),
+    Variance = var(beta2_hat),
+    Bias = mean(beta2_hat) - beta_2,
+    .groups = "drop"
+  )
+
+summary_table |>
+  mutate(
+    Mean = round(Mean, 4),
+    Variance = round(Variance, 4),
+    Bias = round(Bias, 4)
+  ) |>
+  kable(
+    booktabs = TRUE,
+    align = c("l", "r", "r", "r")
+  ) |>
+  identity()
+```
+
+The table summarizes the same lesson numerically. The mean of the OLS estimates is expected to differ substantially from the true value $\beta_2 = 1$, producing a non-negligible bias. This reflects the fact that OLS uses the endogenous variation in $x_2$, including the component correlated with the disturbance term. The simple IV estimator should display much smaller bias because it uses only exogenous variation from $z_1$, although its variance may be larger because it discards the additional information contained in $z_2$. The 2SLS and GMM estimators use both instruments and therefore generally combine low bias with improved precision. The relative performance of 2SLS and GMM depends on the weighting matrix and the variance structure of the moment conditions; in this homoskedastic design, their results are likely to be close, while under heteroskedasticity the efficient GMM estimator may offer clearer efficiency gains.
+
+## R Code
+
+The following code reproduces the Monte Carlo simulation, the density figure, and the summary table reported above.
+
+```{r}
+#| echo: true
+#| eval: false
+# Load the packages used for simulation, reshaping, plotting, and tables.
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(knitr)
+
+set.seed(12345)
+
+# Monte Carlo design
+N <- 100
+R <- 10000
+
+# True parameters
+beta_1 <- 1.0
+beta_2 <- 1.0
+beta_3 <- 0.5
+
+# Strength of endogeneity
+rho <- 0.60
+
+# Storage
+results <- matrix(NA_real_, nrow = R, ncol = 4)
+colnames(results) <- c("OLS", "Simple IV", "2SLS", "GMM")
+
+# Define a simple two-step linear GMM estimator.
+gmm_linear <- function(y, X, Z) {
+  
+  n <- nrow(X)
+  
+  # First-step GMM using 2SLS weighting matrix
+  W1 <- solve(crossprod(Z) / n)
+  beta_1step <- solve(
+    crossprod(X, Z) %*% W1 %*% crossprod(Z, X),
+    crossprod(X, Z) %*% W1 %*% crossprod(Z, y)
+  )
+  
+  # Residuals from first step
+  uhat <- as.vector(y - X %*% beta_1step)
+  
+  # Robust estimate of moment variance
+  Zu <- Z * uhat
+  S <- crossprod(Zu) / n
+  
+  # Small ridge adjustment for numerical stability
+  S <- S + diag(1e-8, ncol(S))
+  
+  # Second-step optimal weighting matrix
+  W2 <- solve(S)
+  
+  beta_2step <- solve(
+    crossprod(X, Z) %*% W2 %*% crossprod(Z, X),
+    crossprod(X, Z) %*% W2 %*% crossprod(Z, y)
+  )
+  
+  as.vector(beta_2step)
+}
+
+for (r in 1:R) {
+  
+  # Instruments and exogenous regressor
+  z1 <- rnorm(N)
+  z2 <- rnorm(N)
+  x3 <- rnorm(N)
+  
+  # Components generating endogeneity
+  v <- rnorm(N)
+  e <- rnorm(N)
+  
+  # Structural error correlated with v
+  eps <- rho * v + sqrt(1 - rho^2) * e
+  
+  # Generate an endogenous regressor using instruments and the latent shock v.
+  x2 <- 0.7 * z1 + 0.7 * z2 + 0.5 * x3 + v
+  
+  # Outcome variable
+  y <- beta_1 + beta_2 * x2 + beta_3 * x3 + eps
+  
+  # Matrices
+  X <- cbind(1, x2, x3)
+  
+  # OLS
+  beta_ols <- solve(crossprod(X), crossprod(X, y))
+  
+  # Simple IV: just identified, using z1 plus included exogenous regressors.
+  Z_iv <- cbind(1, z1, x3)
+  beta_iv <- solve(crossprod(Z_iv, X), crossprod(Z_iv, y))
+  
+  # 2SLS: use both instruments plus included exogenous regressors.
+  Z_all <- cbind(1, z1, z2, x3)
+  Pz <- Z_all %*% solve(crossprod(Z_all)) %*% t(Z_all)
+  beta_2sls <- solve(
+    crossprod(X, Pz %*% X),
+    crossprod(X, Pz %*% y)
+  )
+  
+  # Two-step GMM: use the same full instrument set.
+  beta_gmm <- gmm_linear(y = y, X = X, Z = Z_all)
+  
+  # Store beta_2 estimates
+  results[r, ] <- c(beta_ols[2], beta_iv[2], beta_2sls[2], beta_gmm[2])
+}
+
+results_df <- as.data.frame(results)
+```
+
+```{r}
+#| echo: true
+#| eval: false
+# Reshape the simulation output into long form for plotting.
+density_df <- results_df |>
+  pivot_longer(
+    cols = everything(),
+    names_to = "Estimator",
+    values_to = "beta2_hat"
+  )
+
+density_df$Estimator <- factor(
+  density_df$Estimator,
+  levels = c("OLS", "Simple IV", "2SLS", "GMM")
+)
+
+# Plot the empirical distribution of the target coefficient by estimator.
+ggplot(density_df, aes(x = beta2_hat)) +
+  geom_density(linewidth = 0.8) +
+  geom_vline(xintercept = beta_2, linetype = "dashed") +
+  facet_wrap(~ Estimator, nrow = 2, ncol = 2, scales = "free_y") +
+  labs(
+    x = expression(hat(beta)[2]),
+    y = "Empirical density"
+  ) +
+  theme_classic()
+```
+
+```{r}
+#| echo: true
+#| eval: false
+# Compute Monte Carlo means, variances, and biases by estimator.
+summary_table <- density_df |>
+  group_by(Estimator) |>
+  summarise(
+    Mean = mean(beta2_hat),
+    Variance = var(beta2_hat),
+    Bias = mean(beta2_hat) - beta_2,
+    .groups = "drop"
+  )
+
+summary_table |>
+  mutate(
+    Mean = round(Mean, 4),
+    Variance = round(Variance, 4),
+    Bias = round(Bias, 4)
+  ) |>
+  kable(
+    booktabs = TRUE,
+    align = c("l", "r", "r", "r")
+  )
+```
+
+\clearpage
+
+## Documentation of the R Code
+
+This subsection explains the code presented in Appendix A.2 in the same order in which it is written and executed. The code naturally falls into three parts: the simulation itself, the construction of the density figure, and the construction of the summary table.
+
+The first code block sets up and runs the Monte Carlo experiment. It loads the packages required for plotting, reshaping data, and formatting tables; fixes the random seed for reproducibility; and defines the simulation dimensions $N = 100$ and $R = 10000$. It then specifies the true parameter values $\beta_1$, $\beta_2$, and $\beta_3$, together with the endogeneity parameter $\rho$. Inside the simulation loop, the code generates two instruments $z_1$ and $z_2$, one exogenous regressor $x_3$, and latent shocks $v$ and $e$. The structural disturbance $\varepsilon$ is constructed from $v$ and $e$, so that $\varepsilon$ is correlated with the endogenous regressor $x_2$. After generating the outcome variable $y$, the code estimates the coefficient on $x_2$ using OLS, a simple just-identified IV estimator, 2SLS, and a two-step GMM estimator. The estimate of $\beta_2$ from each method is stored in the results matrix for later comparison.
+
+The second code block turns the simulation output into the figure reported in Appendix A.1. The matrix of simulation results is first converted into a data frame and then reshaped from wide form to long form using `pivot_longer()`. This produces one column for the estimator label and one column for the simulated values of $\hat{\beta}_2$. The estimator labels are then converted into an ordered factor so that the panels appear in a consistent order. Finally, `ggplot()` is used to draw empirical density curves for the four estimators, with a dashed vertical line marking the true value $\beta_2$. The `facet_wrap()` call arranges the four densities in a $2 \times 2$ layout, making it easy to compare the sampling distributions visually.
+
+The third code block constructs the summary table reported in Appendix A.1. It groups the long-form simulation data by estimator and computes three Monte Carlo summaries for $\hat{\beta}_2$: the mean, the variance, and the bias relative to the true coefficient $\beta_2$. The bias is defined as the average estimate minus the true parameter, so it shows whether an estimator is centered on the target. After these quantities are computed, the code rounds them to four decimal places and passes the result to `kable()` with `booktabs` styling, while Quarto supplies the table caption and placement metadata through the chunk options.
+
+
 
 \clearpage
