@@ -6,9 +6,12 @@ date: today
 date-format: "MMMM D, YYYY."
 header-includes:
   - '\usepackage{fontspec}'
-  - '\setmainfont{TeX Gyre Termes}'
+  - '\setmainfont{Latin Modern Roman}'
   - '\usepackage{unicode-math}'
-  - '\setmathfont{STIX Two Math}'
+  - '\setmathfont{Latin Modern Math}'
+  - '\setkomafont{disposition}{\normalfont\bfseries}'
+  - '\setkomafont{sectionentry}{\normalfont\bfseries}'
+  - '\setkomafont{sectionentrypagenumber}{\normalfont\bfseries}'
   - '\usepackage{titling}'
   - '\pretitle{\begin{center}\rmfamily\Large\bfseries}'
   - '\posttitle{\par\end{center}\vskip 0.75em}'
