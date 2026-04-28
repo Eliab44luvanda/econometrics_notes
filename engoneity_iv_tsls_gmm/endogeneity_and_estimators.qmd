@@ -1,6 +1,6 @@
 ---
-title: "Endogeneity, Instrumental Variables, Two-Stage Least Squares, and GMM"
-subtitle: "Identification, Consistent Estimation, and Efficient Inference When Regressors Are Endogenous"
+title: "Endogeneity and Moment-Based Estimation"
+subtitle: "From OLS Failure to IV, 2SLS, GMM, Diagnostics, and Monte Carlo Evidence"
 author: "Eliab Luvanda"
 date: today
 date-format: "MMMM D, YYYY."
@@ -20,6 +20,9 @@ header-includes:
   - '\predate{\begin{center}\rmfamily\small}'
   - '\postdate{\par\end{center}}'
   - '\usepackage{etoolbox}'
+  - '\makeatletter'
+  - "\\renewcommand{\\subtitle}[1]{\\apptocmd{\\@title}{\\par\\vskip 0.35em{\\normalfont\\normalsize #1\\par}}{}{}}"
+  - '\makeatother'
   - '\apptocmd{\maketitle}{\clearpage}{}{}'
   - '\linespread{1.12}'
   - '% Micro-typography'
