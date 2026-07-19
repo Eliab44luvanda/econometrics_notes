@@ -1,3 +1,6 @@
 {
-    "positron.r.useNativePipe": true
+    "positron.r.useNativePipe": true,
+    "copilot-auto-continue.masterEnabled": false,
+    "copilot-auto-continue.smartAIEnabled": false,
+    "copilot-auto-continue.autoContinueEnabled": false
 }

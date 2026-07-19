@@ -20,6 +20,55 @@ execute:
   warning: false
   message: false
 
+header-includes:
+  - \usepackage{amsthm}
+  - \usepackage{tikz}
+  - \usepackage[most]{tcolorbox}
+  - \usepackage{etoolbox}
+  - |
+    \newtcbtheorem[
+      number within=section
+    ]{remarkbox}{Remark}{
+      colback=gray!6,
+      colframe=black!40,
+      fonttitle=\bfseries,
+      boxrule=0.4pt,
+      arc=2pt,
+      left=6pt,
+      right=6pt,
+      top=6pt,
+      bottom=6pt
+    }{remark}
+    \theoremstyle{plain}
+    \newtheorem{theorem}{Theorem}[section]
+    \newtheorem{lemma}[theorem]{Lemma}
+    \theoremstyle{definition}
+    \newtheorem{definition}[theorem]{Definition}
+    \newtheorem{exercise}{Exercise}[section]
+    \theoremstyle{remark}
+    \newtheorem{remark}[theorem]{Remark}
+    \AtEndPreamble{%
+      \usepackage[nameinlink,noabbrev]{cleveref}
+      \crefname{theorem}{Theorem}{Theorems}
+      \crefname{lemma}{Lemma}{Lemmas}
+      \crefname{definition}{Definition}{Definitions}
+      \crefname{remark}{Remark}{Remarks}
+      \crefname{exercise}{Exercise}{Exercises}
+      \Crefname{theorem}{Theorem}{Theorems}
+      \Crefname{lemma}{Lemma}{Lemmas}
+      \Crefname{definition}{Definition}{Definitions}
+      \Crefname{remark}{Remark}{Remarks}
+      \Crefname{exercise}{Exercise}{Exercises}
+    }
+  - \usetikzlibrary{positioning,arrows.meta}
+  - \newcommand{\E}{\mathbb{E}}
+  - \DeclareMathOperator{\Var}{Var}
+  - \DeclareMathOperator{\Cov}{Cov}
+  - \DeclareMathOperator{\tr}{tr}
+  - \DeclareMathOperator{\rank}{rank}
+  - \DeclareMathOperator{\diag}{diag}
+  - \DeclareRobustCommand{\betahat}{\widehat{\symbf{\beta}}}
+
 format:
   pdf:
     pdf-engine: lualatex
