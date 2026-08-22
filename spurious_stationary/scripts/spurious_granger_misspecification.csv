@@ -1,0 +1,21 @@
+"T","specification","method","reject","Nsim","test","mcse"
+100,"Correct dynamic model","Conventional OLS",0.056,1000,"No Granger causality from x to y",0.00727076337120113
+100,"Correct dynamic model","HAC",0.126,1000,"No Granger causality from x to y",0.010493998284734
+100,"Omit lagged y","Conventional OLS",0.298,1000,"No Granger causality from x to y",0.0144636095080032
+100,"Omit lagged y","HAC",0.157,1000,"No Granger causality from x to y",0.0115043904662524
+250,"Correct dynamic model","Conventional OLS",0.063,1000,"No Granger causality from x to y",0.0076831634109916
+250,"Correct dynamic model","HAC",0.104,1000,"No Granger causality from x to y",0.00965318600255895
+250,"Omit lagged y","Conventional OLS",0.332,1000,"No Granger causality from x to y",0.0148921455808087
+250,"Omit lagged y","HAC",0.132,1000,"No Granger causality from x to y",0.0107040179372047
+500,"Correct dynamic model","Conventional OLS",0.048,1000,"No Granger causality from x to y",0.00675988165576883
+500,"Correct dynamic model","HAC",0.076,1000,"No Granger causality from x to y",0.00837997613361757
+500,"Omit lagged y","Conventional OLS",0.33,1000,"No Granger causality from x to y",0.0148694317309035
+500,"Omit lagged y","HAC",0.096,1000,"No Granger causality from x to y",0.00931579304192617
+1000,"Correct dynamic model","Conventional OLS",0.039,1000,"No Granger causality from x to y",0.00612200947402076
+1000,"Correct dynamic model","HAC",0.051,1000,"No Granger causality from x to y",0.00695693898205238
+1000,"Omit lagged y","Conventional OLS",0.297,1000,"No Granger causality from x to y",0.0144496020706454
+1000,"Omit lagged y","HAC",0.058,1000,"No Granger causality from x to y",0.00739161687318817
+2000,"Correct dynamic model","Conventional OLS",0.065,1000,"No Granger causality from x to y",0.0077958322198467
+2000,"Correct dynamic model","HAC",0.074,1000,"No Granger causality from x to y",0.00827792244467173
+2000,"Omit lagged y","Conventional OLS",0.316,1000,"No Granger causality from x to y",0.0147018366199601
+2000,"Omit lagged y","HAC",0.063,1000,"No Granger causality from x to y",0.0076831634109916

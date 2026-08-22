@@ -1,0 +1,385 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+
+\usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+
+
+
+
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+ 
+
+
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+% fallback for those not using the hyperref driver hyperxmp:
+\makeatletter
+\@ifundefined{xmpquote}{\newcommand{\xmpquote}[1]{#1}}{}
+\makeatother
+\hypersetup{
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\author{}
+\date{}
+\begin{document}
+
+
+\section{\texorpdfstring{\texttt{spurious\_stationary\_sim\_refactored.R}:
+What Changed and
+Why}{spurious\_stationary\_sim\_refactored.R: What Changed and Why}}\label{spurious_stationary_sim_refactored.r-what-changed-and-why}
+
+\subsection{Scope}\label{scope}
+
+This note explains the refactor from
+\texttt{scripts/spurious\_stationary\_sim.R} to
+\texttt{scripts/spurious\_stationary\_sim\_refactored.R}. It covers code
+structure only. No simulation logic, formula, or random-number call
+changed, and none of the theoretical content in
+\texttt{spurious\_regression\_stationary.qmd} is affected.
+
+\subsection{Guarantee: behaviour is
+unchanged}\label{guarantee-behaviour-is-unchanged}
+
+Every call that consumes randomness (\texttt{rnorm}, \texttt{draw\_ar1},
+\texttt{draw\_ma2}, and the \texttt{ar\_pair}/\texttt{ma2\_pair} draw
+closures built from them) appears in the refactored script in the same
+order, with the same arguments, as in the original. Nothing was
+reordered, added, or removed from the random-number stream.
+Consequently, run with the same seeds, the refactored script reproduces
+the original's CSV and figure output byte-for-byte. The change is
+confined to eliminating duplicated bookkeeping code that computes no
+randomness itself.
+
+\subsection{The four changes}\label{the-four-changes}
+
+\subsubsection{\texorpdfstring{1. \texttt{ar\_pair\_dgp()} replaces six
+repeated registry
+entries}{1. ar\_pair\_dgp() replaces six repeated registry entries}}\label{ar_pair_dgp-replaces-six-repeated-registry-entries}
+
+The original \texttt{dgp\_registry} list built each of the six
+AR(1)/AR(1) pairs ---\texttt{(0.5,0.5)}, \texttt{(0.8,0.8)},
+\texttt{(0.9,0.9)}, \texttt{(0.95,0.95)}, \texttt{(0.9,0.5)},
+\texttt{(0.8,-0.8)}---by hand, each one a four-line
+\texttt{list(dgp\ =\ ...,\ type\ =\ ...,\ lambda\ =\ lambda\_ar\_pair(...),\ draw\ =\ ar\_pair(...))}
+block that repeated \texttt{phi\_x} and \texttt{phi\_y} twice. The
+refactored script factors this into one constructor:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ar\_pair\_dgp }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(name, phi\_x, phi\_y) \{}
+  \FunctionTok{list}\NormalTok{(}\AttributeTok{dgp =}\NormalTok{ name, }\AttributeTok{type =} \StringTok{"stationary"}\NormalTok{,}
+       \AttributeTok{lambda =} \FunctionTok{lambda\_ar\_pair}\NormalTok{(phi\_x, phi\_y),}
+       \AttributeTok{draw =} \FunctionTok{ar\_pair}\NormalTok{(phi\_x, phi\_y))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+and each registry entry becomes a single line,
+e.g.~\texttt{ar\_pair\_dgp("(0.9,0.5)",\ 0.9,\ 0.5)}.
+\texttt{lambda\_ar\_pair()} and \texttt{ar\_pair()} are still called
+with the same arguments in the same order as before;
+\texttt{ar\_pair\_dgp()} only removes the need to write that pair of
+calls out longhand six times.
+
+\subsubsection{\texorpdfstring{2. \texttt{asymptotic\_rejection()}
+replaces a formula written out
+twice}{2. asymptotic\_rejection() replaces a formula written out twice}}\label{asymptotic_rejection-replaces-a-formula-written-out-twice}
+
+The asymptotic rejection probability implied by a given long-run
+variance ratio,
+
+{[} 2,\Phi!\left(-,z\_\{\alpha/2\}/\sqrt{\lambda}\right), {]}
+
+was written out independently in two places: once to build the
+\texttt{asymptotic} column of \texttt{dgp\_spec}, and again (reformatted
+across two lines) for \texttt{common\_volatility\_asymptotic}. The
+refactored script defines it once:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{asymptotic\_rejection }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(lambda, alpha) \{}
+  \DecValTok{2} \SpecialCharTok{*} \FunctionTok{pnorm}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{qnorm}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ alpha }\SpecialCharTok{/} \DecValTok{2}\NormalTok{) }\SpecialCharTok{/} \FunctionTok{sqrt}\NormalTok{(lambda))}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Both call sites now read
+\texttt{asymptotic\_rejection(dgp\_spec\$lambda,\ alpha)} and
+\texttt{asymptotic\_rejection(common\_volatility\_lambda,\ alpha)}
+respectively. The \texttt{ifelse(is.na(lambda),\ NA\_real\_,\ ...)}
+guard in the original's first call site is unnecessary --- \texttt{NA}
+lambda propagates to \texttt{NA} through arithmetic and \texttt{pnorm()}
+on its own --- so the refactored version relies on that instead of
+guarding explicitly; this is noted in a comment at the definition site.
+
+\subsubsection{\texorpdfstring{3. \texttt{with\_mcse()} replaces six
+repeated Monte Carlo standard-error
+lines}{3. with\_mcse() replaces six repeated Monte Carlo standard-error lines}}\label{with_mcse-replaces-six-repeated-monte-carlo-standard-error-lines}
+
+Six separate result tables (\texttt{res}, \texttt{hac\_res},
+\texttt{common\_volatility\_res}, \texttt{local\_to\_unity\_res},
+\texttt{granger\_res}, \texttt{power\_res}) each had a line of the form
+\texttt{\textless{}table\textgreater{}\$mcse\ \textless{}-\ mcse(\textless{}table\textgreater{}\$\textless{}column\textgreater{},\ \textless{}table\textgreater{}\$Nsim)}
+attaching the Monte Carlo standard error of a reported proportion. Five
+use the \texttt{reject} column; \texttt{power\_res} uses \texttt{power}.
+The refactored script factors the pattern into:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{with\_mcse }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(df, }\AttributeTok{value\_col =} \StringTok{"reject"}\NormalTok{) \{}
+\NormalTok{  df}\SpecialCharTok{$}\NormalTok{mcse }\OtherTok{\textless{}{-}} \FunctionTok{mcse}\NormalTok{(df[[value\_col]], df}\SpecialCharTok{$}\NormalTok{Nsim)}
+\NormalTok{  df}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+and each of the six call sites becomes
+\texttt{res\ \textless{}-\ with\_mcse(res)} (or, for the one table with
+a differently named column,
+\texttt{power\_res\ \textless{}-\ with\_mcse(power\_res,\ "power")}).
+The underlying \texttt{mcse()} function is untouched.
+
+\subsubsection{\texorpdfstring{4. Removed
+\texttt{stationary\_spec}}{4. Removed stationary\_spec}}\label{removed-stationary_spec}
+
+\texttt{stationary\_spec\ \textless{}-\ subset(dgp\_spec,\ type\ ==\ "stationary")}
+was computed immediately after \texttt{dgp\_spec} but never read
+anywhere else in the script. It was deleted.
+
+\subsection{What did not change}\label{what-did-not-change}
+
+\begin{itemize}
+\tightlist
+\item
+  Every DGP definition, sample-size grid, seed, and replication count.
+\item
+  Every simulation function (\texttt{simulate\_dgp},
+  \texttt{simulate\_common\_volatility},
+  \texttt{simulate\_local\_to\_unity}, \texttt{simulate\_granger},
+  \texttt{simulate\_power}) and its internal logic.
+\item
+  \texttt{mcse()}, \texttt{lambda\_ar\_pair()}, \texttt{ar\_pair()},
+  \texttt{draw\_ar1()}, \texttt{draw\_ma2()}, and every other existing
+  helper.
+\item
+  All file output: CSV paths, plot code, and figure output.
+\end{itemize}
+
+\subsection{Validation performed}\label{validation-performed}
+
+Both scripts were run end to end in quick mode
+(\texttt{SPURIOUS\_QUICK=1}, same seeds) to separate output directories,
+and all nine CSV outputs (\texttt{spurious\_common\_volatility.csv},
+\texttt{spurious\_comparison\_table.csv},
+\texttt{spurious\_granger\_misspecification.csv},
+\texttt{spurious\_hac\_comparison\_table.csv},
+\texttt{spurious\_hac\_rejection\_frequency\_series.csv},
+\texttt{spurious\_local\_power\_critical\_values.csv},
+\texttt{spurious\_local\_power.csv},
+\texttt{spurious\_local\_to\_unity.csv},
+\texttt{spurious\_rejection\_frequency\_series.csv}) were confirmed
+byte-identical between the two runs. This is consistent with the
+behaviour-preserving guarantee above; it was not re-checked under the
+full (non-quick) 2,000-replication run, but the random-number call
+sequence is identical between the two scripts regardless of replication
+count, so the same equivalence is expected to hold there too.
+
+\subsection{Outcome}\label{outcome}
+
+The refactor is purely a readability and maintainability change: three
+call sites of duplicated logic (registry construction, the asymptotic
+rejection formula, and Monte Carlo standard-error attachment) are now
+each expressed once, and one dead variable was removed. The simulation
+design, its outputs, and the theoretical document it supports are
+unaffected.
+
+
+
+
+\end{document}

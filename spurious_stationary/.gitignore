@@ -1,0 +1,4 @@
+# Knitr caches and transient render artefacts
+*_cache/
+*.log
+render.log

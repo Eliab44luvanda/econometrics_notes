@@ -1,0 +1,1402 @@
+---
+title: "Is Spurious Regression a Problem in Stationary Time Series?"
+subtitle: "A Theoretical Framework and Monte Carlo Evidence"
+author: "Eliab Luvanda"
+date: today
+lang: en
+bibliography: references.bib
+
+# Print every entry in references.bib, including background reading that is not
+# cited at a specific point in the text, so that the list below is a
+# bibliography rather than a bare reference list.
+nocite: |
+  @*
+
+abstract: |
+  Regression between independent random walks is spurious: the OLS slope is inconsistent, and has a
+  nondegenerate limit and the conventional $t$-ratio diverges. Stationarity removes that
+  inconsistency, and it is tempting to conclude that conventional inference is then safe.
+  This handout shows why that conclusion is wrong, and exactly how wrong. Under 
+  stationarity, ergodicity and weak dependence, OLS is consistent for the population
+  projection slope, but the conventional $t$-ratio converges to $N(0,\lambda)$, where
+  $\lambda$ is the ratio of the long-run variance of the regression score to the product of
+  the two variances the conventional formula uses. The test over-rejects, under-rejects, or
+  is correctly sized according to whether $\lambda$ exceeds, falls below, or equals one.
+  We decompose $\lambda$ into a contemporaneous and a serial component, which unifies three
+  otherwise separate cases: independent AR(1) pairs, general independent linear processes,
+  and dependent series with common volatility and a zero projection slope. Monte Carlo
+  evidence covers nine data-generating processes, including a design in which both series
+  are visibly serially correlated yet the conventional test is exactly correctly sized.
+  Further experiments examine HAC inference, size-adjusted local power, local-to-unity
+  sequences, and distributed-lag tests under omitted dynamics.
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    classoption:
+      - twoside
+    fontsize: 11pt
+    papersize: a4
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    colorlinks: true
+    fig-pos: "htbp"
+
+geometry:
+  - inner=1.2in
+  - outer=1.0in
+  - top=1.1in
+  - bottom=1.2in
+  - headsep=0.3in
+
+mainfont: "TeX Gyre Termes"
+sansfont: "TeX Gyre Heros"
+monofont: "Inconsolata"
+mathfont: "TeX Gyre Termes Math"
+
+header-includes:
+  - \usepackage{amsmath, amssymb, amsthm, mathtools}
+  - \usepackage{bm}
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{setspace}
+  - \usepackage{framed}
+  - \singlespacing
+  - |
+    \theoremstyle{plain}
+    \newtheorem{theorem}{Theorem}
+    \newtheorem{proposition}[theorem]{Proposition}
+    \newtheorem{lemma}[theorem]{Lemma}
+  - |
+    \theoremstyle{definition}
+    \newtheorem{assumption}[theorem]{Assumption}
+    \newtheorem{exercise}{Exercise}
+  - |
+    \theoremstyle{remark}
+    \newtheorem{remark}[theorem]{Remark}
+  - |
+    % Explanatory environments. These are unnumbered and set in a smaller sans
+    % head so they are visually distinct from the formal results they follow:
+    % "Logic" gives the skeleton of the argument, "Intuition" gives the plain-
+    % language meaning. Neither is required to follow the formal development.
+    \newtheoremstyle{explain}
+      {8pt}{8pt}{\small}{}{\bfseries\sffamily}{.}{.5em}{}
+    \theoremstyle{explain}
+    \newtheorem*{logic}{Logic of the argument}
+    \newtheorem*{intuition}{Intuition}
+  - \renewcommand{\qedsymbol}{$\blacksquare$}
+  - |
+    \newcommand{\E}{\mathbb{E}}
+    \newcommand{\Var}{\mathrm{Var}}
+    \newcommand{\Cov}{\mathrm{Cov}}
+    \newcommand{\LRV}{\mathrm{LRV}}
+  - \usepackage{fancyhdr}
+  - |
+    \pagestyle{fancy}
+    \fancyhf{}
+    \fancyhead[LE,RO]{\thepage}
+    \fancyhead[LO]{Spurious Regression in Stationary Time Series}
+    \fancyhead[RE]{Econometrics}
+
+execute:
+  echo: false
+  warning: true
+  message: false
+---
+
+```{r simulation-data, include=FALSE, cache=TRUE, cache.extra=tools::md5sum("scripts/spurious_stationary_sim.R")}
+source("scripts/spurious_stationary_sim.R")
+```
+
+# Objectives and Intended Audience {#sec:objectives}
+
+## Purpose
+
+The question in the title is one that almost every empirical economist has met in an informal
+form: *my series are stationary, so am I safe?* The usual answer given in coursework is that
+spurious regression is a unit-root problem, that differencing or cointegration analysis
+disposes of it, and that stationary data may therefore be regressed in the ordinary way. That
+answer is incomplete in a way that matters for published work.
+
+The objective of this handout is to replace it with a precise one. Specifically, the handout
+aims to establish three things: that stationarity secures the *estimate* but says nothing about
+the *standard error*; that whether conventional inference is trustworthy is settled by a single
+quantity, $\lambda$, which can be computed for any given data-generating process; and that
+$\lambda$ can go wrong in two independent ways, only one of which is detected by the diagnostics
+most researchers actually run. A test for serial correlation is not sufficient, and the handout
+constructs explicit counterexamples in both directions --- data that are visibly serially
+correlated yet require no correction at all, and data with no serial correlation whatsoever that
+reject a true null more than twice as often as they should.
+
+The treatment is deliberately self-contained. Every claim is stated as a formal result with its
+assumptions written out, explained again in words, and then verified by simulation whose code is
+supplied and modifiable. Nothing is asserted that is not either proved or demonstrated
+numerically.
+
+## Two audiences
+
+This handout is written for two overlapping groups, who will use it differently.
+
+**Readers building towards econometric theory and teaching.** For staff members undertaking
+doctoral work with a view to specialising in econometric theory, and to teaching the subject at
+MA and PhD level, the material is intended as a compact case study in how asymptotic arguments
+are actually constructed and where they fail. The topic is well chosen for that purpose: it is
+elementary enough to be worked through completely, yet it involves a genuine limit theorem, a
+non-trivial variance calculation, a distinction between pointwise and uniform approximation, and
+a place where an intuitively appealing claim turns out to be false. Readers in this group should
+work through the proofs, attempt the exercises, and modify the simulation code --- deriving
+$\lambda$ for a process of their own choosing and confirming it numerically is the single most
+useful thing they can do with this handout.
+
+Those preparing to teach may also find the *structure* of the handout worth borrowing
+independently of its content. Each formal result is followed by a **Logic of the argument** block
+giving the skeleton of the proof, and an **Intuition** block giving its meaning in ordinary
+language. Separating the three registers --- what is claimed, why it is true, what it means ---
+lets students who cannot yet follow the algebra still follow the economics, and lets those who
+can follow the algebra see what it is for. The device is reusable in any technical course.
+
+**Readers applying econometrics in their own empirical research.** For academic staff whose
+concern is the credibility of applied work, the objective is narrower and more immediate: to be
+able to look at a regression on time-series data and judge whether the reported standard errors
+mean what they appear to mean. The practical content is concentrated in the Intuition blocks,
+in the results of Section \ref{sec:conventional} onwards, and in the final discussion. Readers
+in this group may skip every proof without loss. What they should not skip is the decomposition
+in Section \ref{sec:decomposition}, because it supplies the two questions that ought to be asked
+of any time-series regression, and Section \ref{sec:nearunit}, because it explains why passing a
+unit-root test is weaker reassurance than it appears.
+
+## What a reader should be able to do afterwards
+
+On completing the handout, a reader should be able to:
+
+1. state precisely what stationarity does and does not guarantee about OLS inference, and
+   explain why the random-walk case is a different problem in kind rather than a more severe
+   version of the same one;
+2. compute $\lambda$ for a given pair of processes, and recognise from the autocorrelation
+   structure alone whether conventional inference will over-reject, under-reject, or be correct;
+3. distinguish the two independent sources of failure --- contemporaneous and serial --- and
+   identify which diagnostics detect which;
+4. choose sensibly among conventional, HC and HAC standard errors, and say what each does not
+   fix;
+5. explain why a process that is technically stationary may still be badly approximated by
+   stationary asymptotics, and why this makes near-unit-root diagnostics complementary to robust
+   inference rather than redundant;
+6. separate a specification failure from a covariance-estimation failure in a distributed-lag or
+   Granger-causality setting, and know that only the second can be repaired by a robust
+   covariance matrix; and
+7. reproduce and extend the accompanying Monte Carlo evidence.
+
+## Prerequisites and technical level
+
+The handout assumes familiarity with ordinary least squares, the notions of consistency and
+asymptotic normality, and the idea of an autocorrelation function. It does not assume
+measure-theoretic probability, and no result below requires it. Where a limit theorem is needed
+it is stated as an assumption in verifiable form and attributed, rather than proved from
+primitives; the mathematics that is carried out in full is confined to variance calculations
+that require no more than algebra and the summation of a geometric series.
+
+Readers who prefer to see the argument before the formalism may read the Intuition blocks in
+Section \ref{sec:theory} in sequence, ignoring everything between them, and will obtain a
+complete if informal account of the entire result.
+
+# Introduction
+
+The problem is older than it is usually made to appear. Yule [-@yule1926nonsense] coined the
+term *nonsense-correlation* and, in what is essentially the first Monte Carlo study in
+econometrics, drew repeated samples to trace the distribution of the correlation coefficient
+across three classes of series. For independent random series it concentrated near zero, as
+expected. For *conjunct* series --- serially correlated, but with differences that were not
+--- the distribution was noticeably more dispersed. For conjunct series whose differences were
+also conjunct, which is essentially the integrated case, it became U-shaped, with most of its
+mass near $\pm1$: his motivating example, a correlation of $0.95$ between the Church of England
+marriage rate and the standardised mortality rate in England and Wales over 1866--1911, was no
+accident of that particular pair of series but the typical outcome for such data.
+
+Both of Yule's pathological classes reappear below. The U-shaped case anticipates, in
+simulation, the nondegenerate limit distribution later derived analytically; the intermediate
+*conjunct* case is the subject of this handout, and Yule's observation that mere serial
+correlation widens the sampling distribution is precisely the phenomenon quantified in Section
+\ref{sec:decomposition} by the ratio $\lambda$.
+
+Granger and Newbold [-@granger1974spurious] returned to the question and showed that a
+regression between two independent random walks can produce a high $R^2$, a low
+Durbin--Watson statistic, and apparently significant coefficients even though the series are
+unrelated. Phillips [-@phillips1986understanding] then established the nonstandard asymptotic
+theory: the OLS slope has a nondegenerate Brownian-functional limit rather than converging to
+zero, while its conventional $t$-ratio diverges and the probability of a false rejection
+approaches one. Yule's U-shaped histogram and Phillips's limiting functional are, sixty years
+apart, descriptions of the same object.
+
+It is tempting to infer that stationarity makes conventional regression inference harmless.
+That inference is too broad. For jointly stationary series with a zero population projection
+slope, OLS is consistent for zero under standard regularity conditions, but the conventional
+OLS standard error need not estimate the slope's long-run sampling variance. Full independence
+is sufficient but unnecessary: cross-lag dependence, common volatility, and other nonlinear
+dependence can coexist with a zero contemporaneous projection. The resulting test may
+over-reject, under-reject, or have correct asymptotic size. Which case occurs is determined by
+the long-run variance of the regression score, not by serial correlation alone.
+
+This handout develops that distinction and evaluates it by Monte Carlo simulation. The
+experiment includes equal positive AR coefficients, unequal positive coefficients, an
+opposite-sign pair, an i.i.d. benchmark, an AR/MA design in which both series are serially
+correlated yet the conventional test is exactly correctly sized, dependent series with common
+stochastic volatility, local-to-unity sequences, and independent random walks. It compares
+conventional OLS inference with heteroskedasticity-consistent (HC) and
+heteroskedasticity-and-autocorrelation-consistent (HAC) standard errors
+[@white1980heteroskedasticity; @neweywest1987], measures what HAC costs in size-adjusted local
+power, and uses distributed-lag tests to examine Granger noncausality and the consequences of
+omitting the dependent variable's dynamics.
+
+The results here are not new. The stationary over-rejection phenomenon was documented by
+Granger, Hyung and Jeon [-@ghj2001spurious], and Ventosa-Santaulària [-@ventosa2009spurious]
+surveys the wider spurious-regression literature. The purpose of this handout is to assemble
+the argument in one place, with the assumptions stated explicitly and the simulation code
+available for inspection and modification.
+
+The principal conclusions are:
+
+1. Under suitable stationarity, ergodicity, and weak-dependence conditions, OLS consistently
+   estimates the population projection slope; under a zero-projection null it converges to zero.
+2. The conventional $t$-ratio converges to $N(0,\lambda)$, where $\lambda$ is a long-run variance
+   ratio. Values above, below, and equal to one imply over-rejection, under-rejection, and
+   correct asymptotic size, respectively.
+3. $\lambda$ decomposes into a contemporaneous component $\kappa$ and a serial component.
+   Both must be accounted for: a serially uncorrelated score does *not* by itself deliver
+   correct size, and a serially correlated score does not by itself destroy it.
+4. For independent AR(1) series, $\lambda$ depends on the product $\phi_x\phi_y$. Equal positive
+   persistence produces over-rejection, whereas opposite-sign persistence can produce severe
+   under-rejection.
+5. HAC inference is asymptotically valid under additional conditions ensuring consistent
+   long-run variance estimation, although highly persistent processes can exhibit substantial
+   finite-sample distortion. Once critical values are size-adjusted, HAC costs remarkably
+   little power.
+6. Stationary asymptotics are not uniform near the unit-root boundary, and dynamic
+   misspecification can generate false distributed-lag and Granger-causality findings even when
+   the candidate predictor is generated independently.
+
+# The Classical Random-Walk Benchmark
+
+Consider two independent random walks,
+$$
+x_t=x_{t-1}+\varepsilon_t, \qquad y_t=y_{t-1}+\eta_t,
+$$
+with independent zero-mean i.i.d. innovations of finite variance, and regress $y_t$ on an
+intercept and $x_t$. Let
+$\bar W_j=\int_0^1W_j(r)\,dr$. Functional central limit theory gives
+$$
+\hat\beta \Rightarrow
+\frac{\int_0^1\{W_x(r)-\bar W_x\}\{W_y(r)-\bar W_y\}\,dr}
+     {\int_0^1\{W_x(r)-\bar W_x\}^2\,dr}.
+$$
+Thus $\hat\beta=O_p(1)$ and does not converge to the true value zero. The conventional standard
+error is $O_p(T^{-1/2})$, so the absolute $t$-ratio diverges at rate $T^{1/2}$ and
+$$
+\Pr(|t|>1.96)\longrightarrow1.
+$$
+This random-walk benchmark is the classical Granger--Newbold form of spurious regression. The
+analysis below contrasts it with fixed-parameter, short-memory stationary processes; it does
+not claim that unit roots are the only possible source of nonstandard regression asymptotics.
+
+\begin{intuition}
+A random walk wanders. Over any finite stretch it drifts up or down and traces out something
+that looks like a trend, even though nothing is pushing it in either direction. Regressing one
+random walk on another is therefore not really estimating a relationship between two variables;
+it is comparing the shape of one wandering path with the shape of another. Whether the two
+happen to drift the same way is a matter of luck in the particular pair of paths you drew.
+
+Collecting more data does not settle the matter, because each new observation adds another step
+of wandering rather than another independent piece of evidence about a fixed relationship. That
+is why $\hat\beta$ never converges: there is nothing for it to converge to. The $t$-statistic
+grows without bound because the formula behind it counts every observation as fresh evidence,
+so with $T=1000$ it believes it has a thousand times more information than it really does.
+\end{intuition}
+
+# Stationary Regression Theory {#sec:theory}
+
+## Setup and regularity conditions
+
+Consider the population linear projection
+$$
+y_t=\alpha_0+\beta_0x_t+u_t, \qquad t=1,\ldots,T,
+$$
+where
+$$
+\beta_0=\frac{\Cov(x_t,y_t)}{\Var(x_t)},
+$$
+and test $H_0:\beta_0=0$. Write $\mu_x=\E x_t$, $\mu_y=\E y_t$,
+$\sigma_x^2=\Var(x_t)>0$, $\sigma_u^2 = \Var(u_t)$, and define the **regression score**
+$$
+w_t=(x_t-\mu_x)u_t.
+$$
+
+\begin{assumption}[Stationarity, moments, and projection orthogonality]\label{as:stat}
+The joint process $\{(x_t,y_t)\}$ is strictly stationary and ergodic, has finite moments of
+order $4+\delta$ for some $\delta>0$, and satisfies the population projection condition
+$\E[(x_t-\mu_x)u_t]=0$. Under $H_0$, $u_t=y_t-\mu_y$.
+\end{assumption}
+
+\begin{assumption}[Weak dependence and central limit theorem]\label{as:clt}
+The joint process is sufficiently weakly dependent that
+$$
+T^{-1/2}\sum_{t=1}^T w_t\Rightarrow N(0,\Omega), \qquad
+\Omega=\sum_{k=-\infty}^{\infty}\Cov(w_t,w_{t+k})\in(0,\infty),
+$$
+and the autocovariances required below are absolutely summable.
+\end{assumption}
+
+Standard strong-mixing conditions with suitable moment and mixing-rate restrictions are
+sufficient for Assumption \ref{as:clt} [@davidson1994stochastic; @davidson2000econometric].
+
+\begin{assumption}[HAC consistency]\label{as:hac}
+For HAC inference, a positive-semidefinite kernel and a bandwidth $L_T$ are used under
+conditions ensuring uniform consistency of the sample autocovariances, with
+$L_T\to\infty$ and $L_T/T\to0$. These conditions imply
+$\widehat{\LRV}(w)\xrightarrow{p}\Omega$.
+\end{assumption}
+
+Primitive conditions for Assumption \ref{as:hac} are given by @andrews1991heteroskedasticity.
+Note that it is additional to the score central limit theorem: a CLT alone does not
+guarantee that a particular HAC estimator consistently estimates $\Omega$.
+
+\begin{intuition}[what the three assumptions are each for]
+Read the three assumptions as a division of labour, each buying one thing.
+
+Assumption \ref{as:stat} says the process does not change its character over time and that
+averages taken from it settle down as the sample grows. This is what makes the \emph{estimate}
+reliable. The moment condition is bookkeeping: we will be averaging products of four random
+quantities, so those products need to have a finite average in the first place.
+
+Assumption \ref{as:clt} says that a particular average --- the average of the score $w_t$ ---
+is not just settling down but is approximately normally distributed, with a spread measured by
+$\Omega$. This is what makes \emph{testing} possible at all, since every critical value we use
+comes from a normal distribution. The quantity $\Omega$ is the true spread of that average.
+
+Assumption \ref{as:hac} says we can \emph{estimate} $\Omega$ from the data. This is a genuinely
+separate requirement and it is the one most often assumed away. Knowing that a quantity has a
+normal distribution with some spread is not the same as being able to measure that spread from
+a finite sample. Assumption \ref{as:clt} gives us the first; only Assumption \ref{as:hac} gives
+us the second.
+\end{intuition}
+
+## Consistency and the conventional test
+
+\begin{proposition}[Consistency]\label{prop:consistent}
+Under Assumption \ref{as:stat},
+$$
+\hat\beta\xrightarrow{p}\beta_0,
+$$
+and hence $\hat\beta\xrightarrow{p}0$ under $H_0$.
+\end{proposition}
+
+\begin{proof}
+The OLS slope is the ratio of the sample covariance of $x_t$ and $y_t$ to the sample variance
+of $x_t$. By ergodicity, these quantities converge to $\Cov(x_t,y_t)$ and
+$\sigma_x^2>0$, respectively. Their ratio is $\beta_0$; under the null it is zero.
+\end{proof}
+
+\begin{intuition}
+The estimated slope is built from two averages: an average measuring how $x$ and $y$ move
+together, and an average measuring how much $x$ moves on its own. If both averages settle down
+to the right numbers, then so does their ratio, and that is the whole proof.
+
+Notice how little is being asked. Nothing here rules out serial correlation; the data may be
+strongly dependent from one period to the next. Dependence makes the averages settle down more
+slowly, so you need a longer sample to get close, but it does not stop them settling. This is
+exactly what fails for random walks: their averages never settle at all, which is why the
+random-walk case is a different problem in kind rather than a more severe version of the same
+one.
+
+The practical message is a narrow one, and it is easy to over-read. Stationarity protects the
+\emph{number} you report as your estimate. It says nothing whatsoever about the standard error
+printed next to it, which is the subject of the rest of this section.
+\end{intuition}
+
+\begin{proposition}[Slope and conventional $t$-ratio]\label{prop:tstat}
+Under Assumptions \ref{as:stat}--\ref{as:clt} and $H_0$,
+$$
+\sqrt{T}\hat\beta\Rightarrow N\!\left(0,\frac{\Omega}{\sigma_x^4}\right)
+$$
+and the conventional OLS $t$-ratio satisfies
+$$
+t_{OLS}\Rightarrow N(0,\lambda), \qquad
+\lambda=\frac{\Omega}{\sigma_x^2\sigma_u^2}
+=\frac{\LRV\{(x_t-\mu_x)u_t\}}{\Var(x_t)\Var(u_t)}.
+$$
+\end{proposition}
+
+\begin{proof}
+Demeaning changes the scaled score numerator by $o_p(1)$, while
+$T^{-1}\sum_t(x_t-\bar x)^2\xrightarrow{p}\sigma_x^2$. Assumption \ref{as:clt} and Slutsky's
+theorem give the slope limit. The conventional standard error obeys
+$$
+T\,\mathrm{se}_{OLS}(\hat\beta)^2\xrightarrow{p}\frac{\sigma_u^2}{\sigma_x^2},
+$$
+which yields the stated $t$-ratio limit.
+\end{proof}
+
+For a two-sided nominal 5% test,
+$$
+\Pr(|t_{OLS}|>1.96)\longrightarrow
+2\Phi\!\left(-\frac{1.96}{\sqrt\lambda}\right).
+$$
+Therefore $\lambda>1$ implies asymptotic over-rejection, $\lambda<1$ implies asymptotic
+under-rejection, and $\lambda=1$ implies correct asymptotic size.
+
+An equivalent and often more useful statement: the *size-adjusted* two-sided critical value for
+the conventional statistic converges to $1.96\sqrt\lambda$. Section \ref{sec:power} verifies
+this directly in simulation, which is a sharper test of Proposition \ref{prop:tstat} than any
+tail rejection probability.
+
+\begin{logic}
+A $t$-statistic is an estimate divided by an estimate of its own spread. Proposition
+\ref{prop:tstat} works out each piece separately and then compares them.
+
+The \emph{true} spread of the slope estimate is governed by $\Omega$, the spread of the summed
+score. The \emph{assumed} spread, the one the conventional formula computes, is
+$\sigma_x^2\sigma_u^2$ --- the variance of the regressor multiplied by the variance of the
+error, as if the two could be handled separately and as if time-ordering were irrelevant.
+
+If those two quantities agree, the $t$-statistic has the standard normal distribution we all
+assume it has. If they disagree, the statistic is still normal and still centred at zero, but
+its spread is wrong by the factor $\lambda$, the ratio of truth to assumption. Everything else
+in this handout is an investigation of when that ratio is not one.
+\end{logic}
+
+\begin{intuition}
+The conventional standard error assumes that every observation is a fresh piece of information.
+When the data are dependent, that is false, and the formula misprices the evidence.
+
+Suppose consecutive observations tend to repeat each other. Then a sample of 200 does not carry
+200 independent pieces of information --- perhaps it carries the equivalent of 50. The
+conventional formula still divides as though there were 200, producing a standard error that is
+too small, a $t$-statistic that is too large, and rejections far more often than 5\% of the
+time. In this reading $\lambda$ is a penalty for dependence, and $T/\lambda$ is the
+\emph{effective} sample size: with $\lambda=4$, a sample of 200 is worth about 50.
+
+The reverse is equally possible and much less well known. If consecutive observations tend to
+offset each other, the sample carries \emph{more} information than its length suggests, the
+conventional standard error is too large, and the test rejects too rarely. Such a test is not
+"safe" --- it will miss relationships that are really there. Section \ref{sec:conventional}
+reports a case that rejects essentially never.
+
+So $\lambda>1$ means "you have less evidence than you think", $\lambda<1$ means "you have more",
+and $\lambda=1$ means the conventional formula happens to be right. Note that a $t$-statistic
+of 2.5 is not evidence of anything by itself: with $\lambda=4$ the honest cutoff is
+$1.96\times2=3.92$, so the same number that looks convincing under one $\lambda$ is
+unremarkable under another.
+\end{intuition}
+
+## What makes $\lambda$ differ from one {#sec:decomposition}
+
+The following decomposition is the organising device for everything that follows. It is
+elementary, but it prevents a mistake that is easy to make.
+
+\begin{lemma}[Contemporaneous and serial components]\label{lem:decomp}
+Under Assumptions \ref{as:stat}--\ref{as:clt},
+$$
+\lambda=\underbrace{\frac{\E[(x_t-\mu_x)^2u_t^2]}{\sigma_x^2\sigma_u^2}}_{\displaystyle \kappa}
+\;+\;\underbrace{\frac{2}{\sigma_x^2\sigma_u^2}\sum_{k=1}^{\infty}\Cov(w_t,w_{t+k})}_{\displaystyle \text{serial component}} .
+$$
+\end{lemma}
+
+\begin{proof}
+$\E w_t=0$ by Assumption \ref{as:stat}, so $\Cov(w_t,w_t)=\E[(x_t-\mu_x)^2u_t^2]$. Split
+$\Omega=\sum_k\Cov(w_t,w_{t+k})$ into its lag-zero term and the symmetric sum over $k\ne0$,
+then divide by $\sigma_x^2\sigma_u^2$.
+\end{proof}
+
+The quantity $\kappa$ measures contemporaneous dependence between the squared regressor
+deviation and the squared error: $\kappa=1$ when $\E[(x_t-\mu_x)^2u_t^2]$ factorises, and
+$\kappa\ne1$ under conditional heteroskedasticity. The serial component measures the
+autocovariance of the score.
+
+\begin{logic}
+$\Omega$ is a sum of terms, one for each possible gap between two time periods. The lemma does
+nothing more than split that sum into the single term with no gap and everything else, then
+divide through so that each part is expressed relative to what the conventional formula
+assumes.
+\end{logic}
+
+\begin{intuition}
+This is the most useful thing in the handout, so it is worth stating in words.
+
+There are exactly two ways the conventional standard error can be wrong, and they have nothing
+to do with each other.
+
+The first is a failure \emph{at a single point in time}, measured by $\kappa$. The conventional
+formula multiplies the typical size of the regressor by the typical size of the error, treating
+them as unrelated. Suppose instead that periods with unusually large $x$ tend to be the same
+periods with unusually large errors. Then the products $x_tu_t$ have occasional very large
+values, the sum of them is far more volatile than the formula expects, and $\kappa$ exceeds
+one. Nothing about the ordering of the data is involved --- shuffle the observations into random
+order and this problem survives untouched.
+
+The second is a failure \emph{across time}, measured by the serial component. Here each product
+$x_tu_t$ may be perfectly well behaved on its own, but consecutive products tend to have the
+same sign, so they accumulate instead of cancelling. Shuffle the data and this problem
+disappears entirely.
+
+The mistake this handout is written to prevent is checking only the second. A researcher who
+tests for serial correlation, finds none, and concludes the conventional standard error is safe
+has checked one of the two terms and ignored the other. Section \ref{sec:volatility} gives a
+process where the serial term is exactly zero and the test still rejects two and a half times
+too often.
+
+A useful mental image: $\kappa$ asks whether the trouble is visible in a scatter plot, and the
+serial term asks whether it is visible in a time plot. You have to look at both.
+\end{intuition}
+
+\begin{remark}[The condition for correct size]\label{rem:size}
+Correct asymptotic size requires $\lambda=1$, that is, $\Omega=\sigma_x^2\sigma_u^2$. This
+needs \emph{both} components to be accounted for. In particular:
+\begin{itemize}
+\item A serially uncorrelated score is \textbf{not} sufficient. If the serial component
+      vanishes then $\lambda=\kappa$, and $\kappa=1$ only under score conditional
+      homoskedasticity. Section \ref{sec:volatility} constructs a process whose score is
+      exactly serially uncorrelated with $\kappa=e^{v_h}>1$.
+\item A serially correlated score is \textbf{not} fatal. Positive and negative autocovariances
+      can cancel, leaving $\lambda=1$ with both series visibly autocorrelated. Section
+      \ref{sec:lambda-one} constructs such a case and Section \ref{sec:conventional} confirms
+      by simulation that it is correctly sized.
+\end{itemize}
+A sufficient condition for $\lambda=1$ is that $w_t$ be serially uncorrelated \emph{and}
+$u_t$ be independent of $x_t$ --- for example, $u_t$ i.i.d. and independent of the regressor.
+\end{remark}
+
+\begin{remark}[Exact Gaussian benchmark]\label{rem:exact}
+If the regression errors are i.i.d. Gaussian and independent of the complete regressor matrix,
+the usual $t$-statistic has an exact Student-$t$ distribution conditional on the regressors.
+The i.i.d. Gaussian Monte Carlo DGP below satisfies these stronger conditions. Without them,
+$\lambda=1$ is an asymptotic statement and does not imply exact finite-sample size.
+\end{remark}
+
+## Independent AR(1) processes with unequal coefficients
+
+\begin{proposition}[General AR(1) example]\label{prop:ar1}
+Let
+$$
+x_t=\phi_xx_{t-1}+\varepsilon_t, \qquad
+y_t=\phi_yy_{t-1}+\eta_t,
+$$
+where $|\phi_x|<1$, $|\phi_y|<1$, and $\{\varepsilon_t\}$ and $\{\eta_t\}$ are mutually
+independent i.i.d. sequences with zero mean and finite fourth moments. Then $\kappa=1$ and
+$$
+\lambda=\frac{1+\phi_x\phi_y}{1-\phi_x\phi_y}.
+$$
+\end{proposition}
+
+\begin{proof}
+Independence of the two processes gives
+$$
+\Cov(w_t,w_{t+k})
+=\gamma_x(k)\gamma_y(k)
+=(\phi_x\phi_y)^{|k|}\sigma_x^2\sigma_y^2 .
+$$
+At $k=0$ this is $\sigma_x^2\sigma_y^2$, so $\kappa=1$ by Lemma \ref{lem:decomp}. Summing over
+all lags,
+$$
+\Omega=\sigma_x^2\sigma_y^2
+\left\{1+2\sum_{k=1}^{\infty}(\phi_x\phi_y)^k\right\}
+=\sigma_x^2\sigma_y^2\frac{1+\phi_x\phi_y}{1-\phi_x\phi_y}. \qedhere
+$$
+\end{proof}
+
+Note that Gaussianity is not required: mutual independence of the two innovation *processes*
+plus finite fourth moments is enough. Equal positive coefficients reproduce the familiar
+over-rejection result. Unequal positive coefficients show that the relevant quantity is their
+product. Opposite signs make that product negative and can cause substantial under-rejection,
+despite serial correlation in both series.
+
+\begin{intuition}[why the \emph{product} of the two coefficients is what matters]
+The score is the product $x_ty_t$. For that product to carry information from one period to the
+next, \emph{both} series must carry information from one period to the next. If either series
+forgets its past immediately, the product forgets too.
+
+This has a consequence worth memorising: a regression whose regressor is serially uncorrelated
+is safe no matter how badly autocorrelated the error is. Set $\phi_x=0$ and $\lambda=1$ for
+every value of $\phi_y$. Textbook warnings about autocorrelated errors are really warnings about
+autocorrelated errors \emph{together with} a persistent regressor.
+
+The sign works the same way. If both series are positively autocorrelated, then a large $x$ this
+period tends to be followed by a large $x$ next period, and likewise for $y$, so consecutive
+products line up and reinforce one another: $\lambda$ rises and the test over-rejects. If one
+series is positively and the other negatively autocorrelated, consecutive products tend to
+\emph{flip} sign, so they cancel; with $(0.8,-0.8)$ the cancellation overshoots so far that
+$\lambda$ falls to about $0.22$ and the test almost never rejects.
+
+The numbers escalate sharply. Moving from $\phi=0.5$ to $\phi=0.95$ in both series raises
+$\lambda$ from $1.7$ to $19.5$, which means an effective sample size roughly twenty times
+smaller than the nominal one. Persistence of $0.95$ is entirely ordinary in macroeconomic and
+financial data.
+\end{intuition}
+
+## Independent linear processes
+
+The AR(1) calculation extends naturally. Let
+$$
+x_t=\sum_{j=0}^{\infty}a_j\varepsilon_{t-j}, \qquad
+y_t=\sum_{j=0}^{\infty}b_j\eta_{t-j},
+$$
+where the coefficient sequences are absolutely summable and the two innovation sequences are
+mutually independent. If $\gamma_x(k)$ and $\gamma_y(k)$ denote their autocovariances and
+$\rho_x(k),\rho_y(k)$ the corresponding autocorrelations, then independence implies $\kappa=1$
+and
+$$
+\Omega=\sum_{k=-\infty}^{\infty}\gamma_x(k)\gamma_y(k),
+\qquad
+\lambda=\sum_{k=-\infty}^{\infty}\rho_x(k)\rho_y(k).
+$$
+This formula covers short-memory ARMA processes, unequal lag structures, seasonal dependence,
+and negative autocorrelation. It also shows why the *sign pattern* of the two autocorrelation
+functions, rather than persistence in either series separately, governs conventional size.
+
+\begin{intuition}
+Each series has an autocorrelation function: a list of numbers recording how strongly it
+resembles itself one period back, two periods back, and so on. The formula says: line the two
+lists up side by side, multiply them lag by lag, and add everything up. That total is $\lambda$.
+
+Read this way, $\lambda$ measures the \emph{alignment} of the two autocorrelation functions,
+not the size of either. Two series can each be strongly autocorrelated and still produce
+$\lambda=1$, provided their patterns fail to line up --- where one has a positive correlation
+the other has a negative one, and the contributions cancel. Equally, two mildly autocorrelated
+series that happen to share the same pattern will produce $\lambda>1$.
+
+So the question to ask about a regression is not "are my series persistent?" but "do my series
+resemble themselves over time \emph{in the same way}?". Section \ref{sec:lambda-one} builds a
+pair that deliberately fails to line up, and the conventional test on that pair is exactly
+correct.
+\end{intuition}
+
+## A correctly sized test with serially correlated data {#sec:lambda-one}
+
+The formula above makes the "not necessary" half of Remark \ref{rem:size} constructive. Take
+$x_t$ to be AR(1) with coefficient $\phi$, so $\rho_x(k)=\phi^{|k|}$, and $y_t$ to be an
+invertible MA(2),
+$$
+y_t=\eta_t+\theta_1\eta_{t-1}+\theta_2\eta_{t-2},
+$$
+whose autocorrelations vanish beyond lag two. Then
+$$
+\lambda=1+2\left\{\phi\rho_y(1)+\phi^2\rho_y(2)\right\},
+$$
+so $\lambda=1$ exactly whenever $\rho_y(1)+\phi\rho_y(2)=0$, which reduces to
+$$
+\theta_1(1+\theta_2)+\phi\theta_2=0
+\qquad\Longleftrightarrow\qquad
+\theta_1=-\frac{\phi\theta_2}{1+\theta_2}.
+$$
+The simulation uses $\phi=`r lambda1_phi`$ and $\theta_2=`r lambda1_theta2`$, hence
+$\theta_1=`r sprintf("%.4f", lambda1_theta1)`$. The implied autocorrelations are
+$\rho_x(1)=`r sprintf("%.3f", lambda1_phi)`$, $\rho_y(1)=`r sprintf("%.3f", ma2_acf(lambda1_theta1, lambda1_theta2, 1))`$
+and $\rho_y(2)=`r sprintf("%.3f", ma2_acf(lambda1_theta1, lambda1_theta2, 2))`$: both series are
+plainly serially correlated, and the MA roots have modulus $\sqrt2>1$ so the process is
+invertible. Yet the two contributions cancel exactly and the conventional test is correctly
+sized. This is the cleanest available demonstration that serial correlation is not the
+diagnostic --- the sign pattern is.
+
+\begin{intuition}
+We are building $y$ so that its autocorrelation pattern deliberately fails to line up with
+$x$'s.
+
+The regressor $x$ is a simple persistent series: it resembles itself with correlation $0.5$ one
+period back and $0.25$ two periods back, both positive. We then choose $y$ so that it resembles
+itself \emph{negatively} one period back and \emph{positively} two periods back. When the two
+lists are multiplied lag by lag, the negative contribution at lag one and the positive
+contribution at lag two are equal and opposite, and they cancel to nothing.
+
+The result is a pair of series that would fail any test for serial correlation you ran on them
+individually --- a Durbin--Watson statistic on either would look alarming --- yet the ordinary
+$t$-test on the regression between them is exactly right, with no correction of any kind
+needed. A student who had learned "autocorrelation means your standard errors are wrong" would
+apply a correction here and make the answer worse rather than better.
+
+The cancellation is of course exact only because we engineered it. Real data will not oblige.
+The point is not that this configuration is common but that it is possible, which is enough to
+show that the presence of serial correlation cannot by itself tell you what to do.
+\end{intuition}
+
+## Dependence without a contemporaneous projection {#sec:volatility}
+
+Full independence is stronger than the null $\beta_0=0$. For example, let
+$$
+x_t=s_t\varepsilon_t, \qquad y_t=s_t\eta_t,
+$$
+where $s_t>0$ is a common persistent stochastic scale and the two innovations are mutually
+independent, serially independent, and independent of $s_t$. Then
+$\Cov(x_t,y_t)=0$, but the series are dependent through their common volatility. The score
+$w_t=s_t^2\varepsilon_t\eta_t$ has $\Cov(w_t,w_{t+k})=0$ for every $k\ne0$, so the serial
+component of Lemma \ref{lem:decomp} vanishes identically. If $h_t=\log s_t^2$ is Gaussian with
+variance $v_h$, then
+$$
+\lambda=\kappa=\frac{\E(s_t^4)}{\E(s_t^2)^2}=e^{v_h}>1.
+$$
+This is the promised counterexample to "serially uncorrelated score implies correct size". The
+distortion is entirely contemporaneous heteroskedasticity. An HC standard error is sufficient
+asymptotically; HAC is also valid but can be less precise in small samples.
+
+\begin{intuition}
+Think of $s_t$ as the general level of turbulence in the market at time $t$. Both series are
+calm in calm periods and wild in wild periods, but which \emph{direction} each moves is decided
+independently by its own coin flip. So the two variables are genuinely unrelated in the sense
+the null cares about --- knowing $x$ tells you nothing about the direction of $y$ --- while
+being obviously related in another sense, since knowing that $x$ was wild tells you $y$ was wild
+too.
+
+Now consider the products $x_ty_t$ that the standard error is built from. In calm periods they
+are all tiny. In wild periods both factors are large at once, so the product is enormous. The
+sum is therefore dominated by a handful of turbulent episodes, which makes it far more volatile
+than a formula assuming steady conditions would predict. That formula multiplies the average
+size of $x$ by the average size of $y$ and never notices that the large values arrive
+\emph{together}. Here the mismatch is a factor of about $1.65$, and the test rejects roughly
+$12.7\%$ of the time instead of $5\%$.
+
+The decisive feature is what happens if you shuffle the observations into random order. Serial
+correlation would be destroyed by shuffling; this problem would not, because it lives entirely
+in the pairing of $x$ and $y$ within each period. That is why the correct remedy is HC, which
+looks at each period's product on its own, rather than HAC, which is designed to detect
+relationships across periods that here do not exist.
+
+The pattern is not exotic. Volatility clustering of exactly this kind is among the most robust
+regularities in financial and macroeconomic data.
+\end{intuition}
+
+## Near-unit roots and non-uniformity {#sec:nearunit}
+
+Fixed-parameter stationary theory holds $|\phi|<1$ constant as $T$ grows. It need not approximate
+sequences such as
+$$
+\phi_T=1-\frac{c}{T}, \qquad c>0,
+$$
+which approach the unit-root boundary with the sample size. Local-to-unity asymptotics
+[@phillips1987towards; @chanwei1987] are nonstandard: $\hat\beta$ again has a nondegenerate
+limit --- now a functional of independent Ornstein--Uhlenbeck processes rather than Brownian
+motions --- and the $t$-ratio again diverges at rate $T^{1/2}$, so the rejection probability
+tends to one exactly as in the unit-root case. The fixed-$\phi$ plateau formula is therefore
+not uniform over such sequences. Consequently, classifying a fitted process as technically
+stationary does not guarantee that ordinary stationary or HAC approximations are accurate in
+realistic samples. This non-uniformity is the source of well-known difficulties in predictive
+regression [@cavanagh1995inference; @elliott1998impact; @stambaugh1999predictive].
+
+\begin{intuition}[what "non-uniform" means, and why it is not a technicality]
+Asymptotic theory is a way of producing approximations, not a description of what actually
+happens as you collect data. When we say "let $T\to\infty$ with $\phi$ fixed at $0.99$", we are
+choosing to approximate our situation by one in which the sample is enormous relative to how
+close $\phi$ sits to one. Whether that is a good approximation depends on our actual sample.
+
+For $\phi=0.99$ and $T=200$, it is a poor one. Such a series has barely had time to revert
+towards its mean even once, so within the sample it behaves for all practical purposes like a
+random walk. The local-to-unity device is a different approximation, built to describe exactly
+this situation: it lets $\phi$ approach one as $T$ grows so that the two stay in a realistic
+relationship to each other.
+
+"Non-uniform" is the precise statement of the difficulty. For \emph{every} fixed $\phi$ below
+one, the ordinary stationary theory is eventually correct --- that much is true and is not in
+dispute. But "eventually" arrives later and later as $\phi$ approaches one, and there is no
+single sample size that is large enough for all $\phi<1$ at once. So the reassurance "my series
+is stationary, therefore stationary theory applies" is empty unless you also ask \emph{how}
+stationary, relative to how much data you have.
+
+The practical upshot is that a unit-root test which fails to reject is not a licence to proceed.
+An estimated $\hat\phi$ of $0.97$ in 150 observations should be treated as a warning, not a
+clearance, whichever side of the critical value it falls.
+\end{intuition}
+
+## HAC inference
+
+Using the Bartlett kernel, define
+$$
+\widehat{\LRV}(w)=\hat\gamma_0+
+2\sum_{k=1}^{L_T}\left(1-\frac{k}{L_T+1}\right)\hat\gamma_k,
+\qquad
+\hat\gamma_k=T^{-1}\sum_{t=k+1}^T\hat w_t\hat w_{t-k},
+$$
+where $\hat w_t=(x_t-\bar x)\hat u_t$.
+
+\begin{proposition}[HAC validity]\label{prop:hac}
+Under Assumptions \ref{as:stat}--\ref{as:hac},
+$$
+t_{HAC}=\frac{\hat\beta}{\mathrm{se}_{HAC}(\hat\beta)}
+\Rightarrow N(0,1).
+$$
+\end{proposition}
+
+The proof is standard and is omitted [@neweywest1987; @andrews1991heteroskedasticity].
+
+This result is asymptotic, and three caveats matter in practice. First, when persistence is
+high a finite sample may contain too little information to estimate the long autocovariance
+tail accurately, so bandwidth choice is consequential even though any valid bandwidth sequence
+delivers consistency. Second, prewhitening [@andrewsmonahan1992] often improves matters
+substantially in exactly the persistent cases where the plain estimator struggles. Third, the
+$N(0,1)$ limit ignores the sampling variability of $\widehat{\LRV}$; fixed-$b$ asymptotics
+[@kiefervogelsang2005] retains it and delivers larger, better-calibrated critical values. The
+small-sample HAC over-rejection documented in Section \ref{sec:hac} is the canonical motivation
+for that literature; @lazarus2018har give practical recommendations.
+
+\begin{logic}
+Only one piece of the conventional $t$-statistic is broken. The estimate in the numerator is
+fine, by Proposition \ref{prop:consistent}. The denominator is wrong because it uses
+$\sigma_x^2\sigma_u^2$ where it should use $\Omega$. So replace it: estimate $\Omega$ directly
+from the data and divide by that instead. If the estimate is any good, the resulting statistic
+has the standard normal distribution the conventional one was supposed to have.
+\end{logic}
+
+\begin{intuition}[why the bandwidth is a genuine dilemma]
+To estimate $\Omega$ we must estimate how strongly the score resembles itself one period back,
+two periods back, and so on --- and then add all of those up. In principle the list is infinite;
+in practice we can only use a finite number of terms, and $L_T$ is how many we use.
+
+Both directions fail, which is what makes this awkward. Use too few lags and you miss the tail
+of the list, understate $\Omega$, and remain oversized --- you have corrected part of the problem
+and declared victory. Use too many and each individual term is estimated from very little data:
+the correlation at lag 40 in a sample of 200 rests on 160 overlapping pairs and is mostly noise.
+Adding up many noisy numbers gives a noisy total, and a standard error that is itself
+unreliable produces unreliable tests. There is no setting that avoids both errors; the bandwidth
+rule is a compromise.
+
+This is why HAC is not a switch you flip. When $\phi=0.95$ the score's memory is so long that no
+bandwidth a sample of even 5000 can support captures the whole tail, which is exactly what the
+HAC comparison in Section \ref{sec:hac} shows: HAC still rejects about twice as often as it
+should. It is also why
+HAC can be \emph{worse} than doing nothing at very small $T$ --- at $T=50$ even the
+independent-data benchmark, where there is nothing whatever to correct, over-rejects under HAC
+simply because the correction itself is estimated noisily.
+\end{intuition}
+
+## Distributed lags, Granger causality, and omitted dynamics {#sec:dlgranger}
+
+A distributed-lag regression asks whether past values of $x_t$ contain predictive information
+for $y_t$. In the dynamic model
+$$
+y_t=\alpha+\sum_{j=1}^{p}\rho_jy_{t-j}
+    +\sum_{j=1}^{q}\beta_jx_{t-j}+e_t,
+$$
+$x$ does not Granger-cause $y$ relative to the stated information set when
+$H_0:\beta_1=\cdots=\beta_q=0$ [@granger1969investigating]. This is a predictive definition,
+not a claim about structural causality.
+
+Correct specification matters as much as the covariance estimator. If relevant lags of $y_t$
+are omitted, their persistence enters the regression error. Persistent $x$ lags multiplied by
+that serially correlated error produce a dependent score vector, so the conventional joint
+Wald test can falsely detect predictive content.
+
+It is worth being precise about *which* failure this is, because two distinct problems are
+easily conflated. Omitting a relevant regressor biases the remaining coefficients only if the
+omitted variable is correlated with the included ones. In the experiment of Section
+\ref{sec:granger} the two series are generated independently, so the omitted $y_{t-1}$ is
+orthogonal to $x_{t-1}$ and $x_{t-2}$: the population projection coefficients on the $x$ lags
+remain exactly zero, there is no bias, and the entire distortion is a failure of the
+conventional covariance estimator. That is why HAC repairs most of it. In applications where
+the omitted dynamics *are* correlated with the included regressors, the coefficients are biased
+as well, and no covariance estimator can help. Including an adequate dynamic specification
+remains the first line of defence; robust covariance estimation is not a substitute for
+specifying the conditional mean.
+
+\begin{intuition}[two different failures that look alike in the output]
+Leaving a variable out of a regression can go wrong in two quite separate ways, and students
+routinely merge them into one.
+
+The first is \emph{bias}: the estimate itself moves to the wrong place. This happens only when
+the omitted variable is correlated with the variables you kept, so that the regression credits
+the missing variable's influence to whichever included variable resembles it. No standard error
+can repair this, because the number being tested is already wrong.
+
+The second is a \emph{mismeasured standard error}: the estimate is fine, but the uncertainty
+attached to it is not. This is what happens when you omit something uncorrelated with your
+regressors. Its influence goes into the error term, which becomes persistent, and persistent
+errors combined with a persistent regressor inflate $\lambda$ exactly as in Section
+\ref{sec:decomposition}.
+
+The experiment in Section \ref{sec:granger} is deliberately of the second kind: $x$ and $y$ are
+built independently, so dropping $y_{t-1}$ cannot bias anything. Everything you see there ---
+a test rejecting a true null about a third of the time --- comes purely from a mismeasured
+standard error, which is why HAC repairs most of it. Do not read the experiment as showing that
+HAC fixes omitted-variable bias. It does not, and in applications where the omitted dynamics
+\emph{are} correlated with your regressors you have both problems and HAC addresses only one.
+
+The useful diagnostic question is therefore: is the thing I left out correlated with the things
+I kept? If no, you have a standard-error problem and a robust covariance estimator is the right
+tool. If yes, you have a specification problem and no covariance estimator will save you.
+\end{intuition}
+
+\begin{theorem}[Summary of the stationary case]\label{thm:answer}
+For fixed-parameter, short-memory stationary series satisfying Assumptions
+\ref{as:stat}--\ref{as:clt}, OLS is consistent for the population projection slope. Under
+$H_0:\beta_0=0$, conventional inference is governed by $\lambda=\kappa+{}$serial component.
+The test over-rejects when $\lambda>1$, under-rejects when $\lambda<1$, and has correct
+asymptotic size when $\lambda=1$. Under the additional HAC-consistency conditions in
+Assumption \ref{as:hac}, HAC inference has correct asymptotic size. Thus stationarity prevents
+the random-walk inconsistency considered here, but does not by itself validate conventional OLS
+standard errors.
+\end{theorem}
+
+\begin{framed}
+\noindent\textbf{What to take away.} Stationarity buys you consistency of $\hat\beta$, and
+nothing else. Whether the conventional $t$-test is trustworthy is a separate question, answered
+by a single number $\lambda$, which has two independent sources of trouble: contemporaneous
+heteroskedasticity of the score ($\kappa\ne1$) and serial correlation of the score. Neither
+serial correlation in the data nor its absence tells you what $\lambda$ is. Diagnose the score,
+not the series.
+\end{framed}
+
+# Monte Carlo Design
+
+The simulation uses independent Gaussian innovations and nine DGPs:
+
+1. an i.i.d. Gaussian benchmark;
+2. equal positive AR coefficients $(\phi_x,\phi_y)=(0.5,0.5)$, $(0.8,0.8)$,
+   $(0.9,0.9)$, and $(0.95,0.95)$;
+3. unequal positive coefficients $(0.9,0.5)$;
+4. opposite-sign coefficients $(0.8,-0.8)$;
+5. the AR/MA pair of Section \ref{sec:lambda-one}, for which $\lambda=1$ exactly despite
+   serial correlation in both series; and
+6. independent random walks as a nonstationary benchmark.
+
+For every stationary AR(1) process, the pre-sample state is drawn independently from its
+invariant distribution $N\{0,1/(1-\phi^2)\}$; the MA(2) process is stationary from its first
+observation. Every retained observation is therefore drawn from the stationary process. One
+trajectory of length `r Tmax` is generated in each replication, and nested prefixes are
+evaluated on the grid
+$$
+T\in\{50,100,150,\ldots,`r Tmax`\}.
+$$
+Nesting correlates adjacent estimates and produces a smoother comparison across $T$; it does
+not eliminate Monte Carlo sampling variation.
+
+The experiment uses $N=`r Nsim_main`$ replications per DGP. The maximum Monte Carlo standard
+error of a rejection proportion is $\sqrt{0.25/`r Nsim_main`}\approx`r max_mcse(Nsim_main)`$
+percentage points, and reported proportions should be read with that in mind. The conventional
+statistic is evaluated over the complete grid. HAC statistics are evaluated at
+$T\in\{`r paste(selected_T, collapse=",")`\}$ using a Bartlett kernel and
+$L_T=\lfloor2T^{1/3}\rfloor$, which satisfies $L_T\to\infty$ and $L_T/T\to0$. This rate is the
+MSE-optimal one for the Bartlett kernel and is deliberately more generous than the
+Newey--West rule of thumb $4(T/100)^{2/9}$, because the scores generated by persistent AR(1)
+pairs have a long autocovariance tail; Section \ref{sec:hac} shows that even this bandwidth is
+not generous enough at $\phi=0.95$.
+
+The standalone script `scripts/spurious_stationary_sim.R` is the single computational source
+for the document. It generates all data, figures, and CSV tables, and every numerical value
+quoted in the text below is read from its output at render time rather than transcribed by
+hand. A single Bartlett estimator, implemented in that script, is used for every HAC number
+reported here, so the tables are mutually comparable.
+
+Four supplementary experiments broaden the design:
+
+1. **Common stochastic volatility.** A persistent Gaussian log-volatility with autoregressive
+   coefficient 0.95 and stationary variance `r common_volatility_variance` multiplies
+   independent Gaussian innovations in both series. The projection slope is zero, but the
+   series are dependent and the theoretical variance ratio is
+   $e^{`r common_volatility_variance`}\approx`r sprintf("%.2f", common_volatility_lambda)`$.
+   Conventional, HC0, and HAC inference are compared using `r Nsim_vol` replications.
+2. **Local-to-unity sequences.** At each selected $T$, independent AR(1) series use
+   $\phi_T=1-`r local_to_unity_c`/T$. Because the DGP changes with $T$, this is a
+   triangular-array experiment rather than a nested fixed-parameter trajectory. The pre-sample
+   value is drawn from the invariant distribution, so this is the *stationary-start* design;
+   a zero-start design gives materially different finite-sample rejection frequencies, and the
+   initialisation is a modelling choice rather than a technicality. Conventional and HAC tests
+   use `r Nsim_l2u` replications.
+3. **Distributed-lag Granger tests.** Independent AR(1) series with
+   $(\phi_x,\phi_y)=(0.8,0.8)$ are used to test jointly whether two lags of $x$ predict $y$.
+   The correctly specified regression includes $y_{t-1}$; the misspecified regression omits it.
+   Conventional and HAC Wald tests are compared over `r Nsim_gr` replications at
+   $T\in\{`r paste(granger_sample_sizes, collapse=",")`\}$.
+4. **Size-adjusted local power.** Under $y_t=(b/\sqrt T)x_t+v_t$ with $x$ and $v$ independent
+   AR(1) processes with $\phi=`r power_phi`$, conventional and HAC tests are compared at
+   $T\in\{`r paste(power_sample_sizes, collapse=",")`\}$ over `r Nsim_pow` replications.
+   Critical values are size-adjusted: each test is compared with the empirical 95th percentile
+   of its own $|t|$ under $b=0$. Size adjustment is what makes the comparison meaningful, since
+   an oversized test mechanically has more raw power and a raw power curve would merely restate
+   the size distortion.
+
+# Results
+
+## Conventional inference {#sec:conventional}
+
+@fig-conventional shows conventional rejection frequencies. Equal positive persistence
+generates plateaus above 5%, and the plateau rises with $\phi_x\phi_y$. The unequal positive
+case $(0.9,0.5)$ also over-rejects, but less severely than $(0.9,0.9)$. The opposite-sign case
+$(0.8,-0.8)$ under-rejects sharply and approaches its theoretical rejection probability near
+zero. The random-walk rejection frequency continues toward one rather than settling at a
+stationary plateau, reaching `r rp("I(1)", 5000)` at $T=`r 5000`$.
+
+Most instructive is the AR/MA design. Both of its series are serially correlated --- the AR
+component has $\rho_x(1)=`r sprintf("%.2f", lambda1_phi)`$ --- yet its rejection frequency sits
+on the nominal line, at `r rp("AR/MA lambda=1", 5000)` at $T=5000$. Serial correlation alone is
+therefore not a diagnosis; it is the sign pattern of the two autocorrelation functions, through
+$\lambda$, that matters.
+
+```{r}
+#| label: fig-conventional
+#| fig-cap: "Conventional OLS rejection frequencies. Labels report the two AR coefficients where applicable; 'AR/MA lambda=1' is the AR(1)/MA(2) design for which lambda equals one exactly. The dashed line is the nominal 5% level. Note the logarithmic sample-size axis."
+#| fig-width: 6.0
+#| fig-height: 4.4
+#| out-width: 100%
+p1
+```
+
+```{r tbl-conventional}
+# Build the wide table keyed on dgp only: lambda and asymptotic are NA for the
+# I(1) row, and NA values in reshape's idvar are unreliable.
+show_T <- c(50, 500, 5000)
+conv_wide <- reshape(
+  subset(comparison_table, T %in% show_T, select = c("dgp", "T", "reject")),
+  idvar = "dgp", timevar = "T", direction = "wide"
+)
+conv_wide <- conv_wide[match(dgp_levels, as.character(conv_wide$dgp)), ]
+bench <- dgp_spec[match(dgp_levels, dgp_spec$dgp), ]
+fmt_lambda <- ifelse(is.na(bench$lambda), "---", sprintf("%.2f", bench$lambda))
+fmt_asy <- ifelse(
+  is.na(bench$asymptotic), "---",
+  ifelse(bench$asymptotic < 0.001,
+         sprintf("%.1e", bench$asymptotic),
+         sprintf("%.3f", bench$asymptotic)))
+conv_wide <- data.frame(
+  DGP = dgp_levels, lambda = fmt_lambda, Asymptotic = fmt_asy,
+  conv_wide[, paste0("reject.", show_T), drop = FALSE],
+  check.names = FALSE, stringsAsFactors = FALSE
+)
+names(conv_wide) <- c("DGP", "$\\lambda$", "Asymptotic",
+                      "$T=50$", "$T=500$", "$T=5000$")
+knitr::kable(conv_wide, booktabs = TRUE, row.names = FALSE, escape = FALSE,
+      align = c("l", "r", "r", "r", "r", "r"),
+      digits = 3,
+      caption = paste0("Conventional rejection frequencies and stationary asymptotic ",
+                       "benchmarks. Entries are proportions; the maximum Monte Carlo ",
+                       "standard error is ", max_mcse(Nsim_main),
+                       " percentage points. The I(1) row has no stationary benchmark."))
+```
+
+@tbl-conventional confirms the theoretical classification. At $T=5000$, the conventional
+rejection rates are `r rp("(0.5,0.5)", 5000)` for $(0.5,0.5)$, `r rp("(0.8,0.8)", 5000)` for
+$(0.8,0.8)$, `r rp("(0.9,0.9)", 5000)` for $(0.9,0.9)$, and `r rp("(0.95,0.95)", 5000)` for
+$(0.95,0.95)$, against asymptotic benchmarks of `r asy_of("(0.5,0.5)")`,
+`r asy_of("(0.8,0.8)")`, `r asy_of("(0.9,0.9)")` and `r asy_of("(0.95,0.95)")` respectively.
+The unequal positive case $(0.9,0.5)$ rejects `r rp("(0.9,0.5)", 5000)` of the time. For
+$(0.8,-0.8)$ the theoretical rejection probability is `r asy_of("(0.8,-0.8)", 4)`, so among
+`r Nsim_main` replications one expects essentially none; the simulated frequency at $T=5000$ is
+`r rp("(0.8,-0.8)", 5000)`. The i.i.d. and AR/MA frequencies fluctuate around the exact 5%
+benchmark rather than equalling 5% mechanically at every sample size.
+
+## HAC inference {#sec:hac}
+
+@fig-hac compares conventional and HAC rejection frequencies for the stationary DGPs. At
+moderate and large $T$, HAC inference moves rejection rates toward 5% in every serially
+correlated case, including both the over-rejecting and the under-rejecting ones. At $T=50$,
+however, the correction is dominated by long-run variance estimation noise and can be worse
+than no correction at all: for $(0.5,0.5)$ the conventional test rejects
+`r rp("(0.5,0.5)", 50)` while HAC rejects `r rp("(0.5,0.5)", 50, "HAC")`, and even the i.i.d.
+benchmark, where there is nothing to correct, rejects `r rp("iid", 50, "HAC")` under HAC.
+Convergence is slowest for $(0.95,0.95)$, whose HAC rejection rate is still
+`r rp("(0.95,0.95)", 5000, "HAC")` at $T=5000$. This is a finite-sample bandwidth and long-run
+variance estimation problem, not evidence against Proposition \ref{prop:hac}.
+
+```{r}
+#| label: fig-hac
+#| fig-cap: "Conventional and Bartlett-HAC rejection frequencies for the stationary DGPs at selected sample sizes. The dotted line is the nominal 5% level. The bandwidth is floor(2 T^(1/3))."
+#| fig-width: 6.0
+#| fig-height: 4.6
+#| out-width: 100%
+p2
+```
+
+```{r tbl-hac}
+hac_end <- subset(hac_comparison_table, T %in% c(50, 5000),
+                  select = c(dgp, T, reject_conventional, reject_hac))
+hac_end <- reshape(hac_end, idvar = "dgp", timevar = "T", direction = "wide")
+hac_end <- hac_end[match(setdiff(dgp_levels, "I(1)"), hac_end$dgp), ]
+names(hac_end) <- c("DGP", "OLS $T=50$", "HAC $T=50$",
+                    "OLS $T=5000$", "HAC $T=5000$")
+knitr::kable(hac_end, booktabs = TRUE, row.names = FALSE, escape = FALSE,
+      align = c("l", "r", "r", "r", "r"), digits = 3,
+      caption = paste0("Conventional and HAC rejection frequencies at the endpoints. ",
+                       "Entries are proportions; maximum Monte Carlo standard error ",
+                       max_mcse(Nsim_main), " percentage points."))
+```
+
+The HAC results caution against describing robust inference as an automatic finite-sample cure.
+At small $T$, estimating a long-run variance is itself noisy. By $T=5000$ the HAC frequencies
+are close to 5% for every stationary DGP except the most persistent equal-coefficient case.
+Prewhitening or fixed-$b$ critical values would be the natural next step for that case.
+
+## Size-adjusted local power {#sec:power}
+
+Robust inference is often described as trading size for power. @fig-power quantifies the trade
+for the $(0.8,0.8)$ design, and the answer is milder than the folklore suggests. Once each test
+is compared with its own size-adjusted critical value, the two power curves are close: at
+$T=`r power_sample_sizes[1]`$ and $b=4$ the conventional test has size-adjusted power
+`r pw("Conventional OLS", power_sample_sizes[1], 4)` against
+`r pw("HAC", power_sample_sizes[1], 4)` for HAC, and at $T=`r power_sample_sizes[2]`$ the
+figures are `r pw("Conventional OLS", power_sample_sizes[2], 4)` and
+`r pw("HAC", power_sample_sizes[2], 4)`. The cost of HAC, properly measured, is the modest loss
+from estimating the long-run variance rather than knowing it --- not the dramatic sacrifice
+that raw power comparisons suggest.
+
+The size-adjusted critical values are themselves worth reporting, because they test
+Proposition \ref{prop:tstat} directly. For the $(0.8,0.8)$ design, $\lambda=`r sprintf("%.3f", power_lambda)`$,
+so the conventional two-sided 5% critical value should converge to
+$1.96\sqrt\lambda=`r sprintf("%.2f", qnorm(0.975) * sqrt(power_lambda))`$ rather than to 1.96.
+The simulated values are `r pw_cv("Conventional OLS", power_sample_sizes[1])` at
+$T=`r power_sample_sizes[1]`$ and `r pw_cv("Conventional OLS", power_sample_sizes[2])` at
+$T=`r power_sample_sizes[2]`$, and they do not shrink with $T$ --- the distortion is a feature
+of the limit distribution, not a small-sample artefact. The corresponding HAC critical values,
+`r pw_cv("HAC", power_sample_sizes[1])` and `r pw_cv("HAC", power_sample_sizes[2])`, do decline
+toward 1.96, as Proposition \ref{prop:hac} requires.
+
+```{r}
+#| label: fig-power
+#| fig-cap: "Size-adjusted local power against the alternative slope b / sqrt(T), for independent AR(1) series with phi = 0.8. Each test uses its own empirical 95th percentile under b = 0 as critical value, so all curves pass through 5% at b = 0 by construction."
+#| fig-width: 6.0
+#| fig-height: 3.8
+#| out-width: 100%
+p6
+```
+
+## Dependent zero-projection series and common volatility
+
+@fig-common-volatility relaxes full independence. Although $x_t$ and $y_t$ share the same
+stochastic scale, their population projection slope is zero because their innovations are
+independent, and their score is exactly serially uncorrelated. The conventional rejection
+frequency reaches `r cv_rej("Conventional OLS", 5000)` at $T=5000$, against the
+`r pc(common_volatility_asymptotic)` asymptotic value implied by
+$\lambda=\kappa=e^{`r common_volatility_variance`}$. HC0 rejects `r cv_rej("HC0", 5000)` and
+HAC `r cv_rej("HAC", 5000)` at the same sample size. This is the counterexample of Remark
+\ref{rem:size} in action: a size distortion generated entirely by contemporaneous
+second-moment dependence, with no serial autocovariance in the score whatsoever. HC suffices;
+HAC also works but pays for estimating autocovariances that are zero.
+
+```{r}
+#| label: fig-common-volatility
+#| fig-cap: "Rejection frequencies for dependent zero-projection series sharing a persistent stochastic volatility. The dotted line is the nominal 5% level."
+#| fig-width: 5.6
+#| fig-height: 3.8
+#| out-width: 90%
+p3
+```
+
+## Local-to-unity sequences
+
+@fig-local-unity shows that fixed-parameter stationary conclusions are not uniform near the
+unit-root boundary. As $T$ rises, $\phi_T=1-`r local_to_unity_c`/T$ moves closer to one.
+Conventional rejection rises from `r l2u_rej("Conventional OLS", 50)` at $T=50$ to
+`r l2u_rej("Conventional OLS", 5000)` at $T=5000$ rather than approaching a fixed stationary
+plateau, and HAC deteriorates along the same sequence, from `r l2u_rej("HAC", 50)` to
+`r l2u_rej("HAC", 5000)`. Each finite-$T$ DGP is stationary, yet the sequence behaves
+increasingly like the unit-root benchmark: at $T=5000$ the local-to-unity conventional
+rejection frequency of `r l2u_rej("Conventional OLS", 5000)` is close to the I(1) benchmark's
+`r rp("I(1)", 5000)`. As noted in Section \ref{sec:nearunit}, the theoretical rejection
+probability tends to
+one along this sequence, exactly as under a unit root. A unit-root or near-unit-root diagnostic
+is therefore complementary to robust covariance estimation, not substitutable for it.
+
+```{r}
+#| label: fig-local-unity
+#| fig-cap: "Rejection frequencies for local-to-unity AR(1) sequences with phi_T = 1 - c/T. Each finite-sample DGP is stationary, but the parameter approaches unity with T."
+#| fig-width: 5.6
+#| fig-height: 3.8
+#| out-width: 90%
+p4
+```
+
+## Distributed-lag and Granger-causality tests {#sec:granger}
+
+The null in @fig-granger is that two lags of $x$ jointly have no predictive content for $y$.
+Because the two AR processes are generated independently, this null is true --- and, as
+explained in Section \ref{sec:dlgranger}, it is true in *both* specifications, since the
+omitted $y_{t-1}$ is
+orthogonal to the included $x$ lags. There is no coefficient bias anywhere in this experiment.
+
+When the model includes $y_{t-1}$, the conventional joint Wald rejection frequency is
+`r gr_rej("Correct dynamic model", "Conventional OLS", 100)` at $T=100$ and
+`r gr_rej("Correct dynamic model", "Conventional OLS", 2000)` at $T=2000$. HAC is more distorted
+in the smallest samples, at `r gr_rej("Correct dynamic model", "HAC", 100)` at $T=100$, but
+declines toward nominal size.
+
+When $y_{t-1}$ is omitted, the conventional test rejects
+`r gr_rej("Omit lagged y", "Conventional OLS", 100)` at $T=100$ and
+`r gr_rej("Omit lagged y", "Conventional OLS", 2000)` at $T=2000$, creating persistent false
+evidence of Granger causality that does not diminish with sample size. HAC reduces this to
+`r gr_rej("Omit lagged y", "HAC", 2000)` at $T=2000$. Readers should check whether that figure
+has settled or is still declining across the last two sample sizes in the plot: convergence to
+nominal size is guaranteed asymptotically but can be slow when the induced error is as
+persistent as it is here.
+
+The comparison separates two remedies. Including $y$'s dynamics correctly specifies the
+conditional mean; HAC addresses the covariance of the remaining score. Here only the second
+problem is present, and HAC accordingly does most of the work. In applications where the
+omitted dynamics are correlated with the regressors, the first problem is present too and HAC
+cannot help. Applied work generally needs both.
+
+```{r}
+#| label: fig-granger
+#| fig-cap: "Joint Wald tests of no Granger causality from x to y. The correct dynamic model includes lagged y; the misspecified model omits it. The dotted line is the nominal 5% level."
+#| fig-width: 6.0
+#| fig-height: 3.8
+#| out-width: 100%
+p5
+```
+
+```{r tbl-extensions}
+pick <- function(df, value_col, ...) {
+  conds <- list(...)
+  keep <- rep(TRUE, nrow(df))
+  for (nm in names(conds)) keep <- keep & df[[nm]] == conds[[nm]]
+  v <- df[[value_col]][keep]
+  if (length(v) != 1L) stop("tbl-extensions: ambiguous selection")
+  v
+}
+extension_table <- data.frame(
+  Experiment = c("Common volatility, $T=5000$",
+                 "Local-to-unity, $T=5000$",
+                 "Granger, correct dynamics, $T=2000$",
+                 "Granger, omitted dynamics, $T=2000$"),
+  Conventional = c(
+    pick(common_volatility_res, "reject", method = "Conventional OLS", T = 5000),
+    pick(local_to_unity_res,   "reject", method = "Conventional OLS", T = 5000),
+    pick(granger_res, "reject", method = "Conventional OLS",
+         specification = "Correct dynamic model", T = 2000),
+    pick(granger_res, "reject", method = "Conventional OLS",
+         specification = "Omit lagged y", T = 2000)),
+  HC0 = c(pick(common_volatility_res, "reject", method = "HC0", T = 5000),
+          NA, NA, NA),
+  HAC = c(
+    pick(common_volatility_res, "reject", method = "HAC", T = 5000),
+    pick(local_to_unity_res,   "reject", method = "HAC", T = 5000),
+    pick(granger_res, "reject", method = "HAC",
+         specification = "Correct dynamic model", T = 2000),
+    pick(granger_res, "reject", method = "HAC",
+         specification = "Omit lagged y", T = 2000)),
+  check.names = FALSE
+)
+old_na <- getOption("knitr.kable.NA")
+options(knitr.kable.NA = "---")
+knitr::kable(extension_table, booktabs = TRUE, row.names = FALSE, escape = FALSE,
+             digits = 3, align = c("l", "r", "r", "r"),
+             caption = "Selected rejection frequencies from the scope-extension experiments. HC0 is reported only where contemporaneous heteroskedasticity is the operative distortion.")
+options(knitr.kable.NA = old_na)
+```
+
+# Discussion and Conclusion
+
+The theory and simulation together support a more precise answer than the assertion that
+spurious regression either disappears or necessarily persists under stationarity.
+
+First, joint short-memory stationarity and projection orthogonality make OLS consistent for the
+population projection slope under the stated assumptions. Full independence is unnecessary.
+The common-volatility experiment shows that dependent series can have a zero slope while still
+invalidating the conventional homoskedastic standard error. This sharply distinguishes the
+stationary setup from the independent random-walk regression, in which the slope has a
+nondegenerate limit and the conventional $t$-ratio diverges.
+
+Second, consistency of the coefficient does not validate its conventional standard error. The
+limiting conventional test depends on $\lambda$, which by Lemma \ref{lem:decomp} has two
+independent sources: a contemporaneous component $\kappa$ and a serial component. Correct
+asymptotic size requires the two together to sum to one. Neither the presence nor the absence
+of serial correlation settles the matter, as the AR/MA design and the common-volatility design
+demonstrate from opposite directions. The equal-positive AR(1) case is economically important,
+but it is an example rather than a universal law.
+
+Third, increasing the sample size removes transient finite-sample effects but does not eliminate
+a non-nominal conventional plateau. The size-adjusted critical values in Section
+\ref{sec:power} make this concrete: they converge to $1.96\sqrt\lambda$, not to 1.96, and they
+do not shrink as $T$ grows.
+
+Fourth, HAC inference is the appropriate asymptotic remedy when its additional consistency
+conditions hold. The simulation confirms movement toward nominal size and shows that the power
+cost, correctly measured against size-adjusted critical values, is modest. It also shows that
+high persistence makes convergence slow and bandwidth choice consequential, and that at very
+small $T$ the correction can be worse than no correction. Prewhitening and fixed-$b$ critical
+values are the standard responses.
+
+Fifth, fixed-parameter stationary asymptotics can be misleading near the unit-root boundary.
+The local-to-unity experiment produces rejection probabilities tending toward one even though
+every finite-sample autoregressive coefficient is below one. Stationarity is therefore not a
+uniform guarantee over empirically plausible parameter sequences.
+
+Finally, robust inference cannot replace dynamic specification. Distributed-lag and
+Granger-causality tests require an information set rich enough to capture the dependent
+variable's own dynamics. Omitting those dynamics leaves serial dependence in the error and can
+create persistent false predictive relationships. In the design used here that failure is
+purely one of covariance estimation and HAC largely repairs it; when the omitted dynamics are
+correlated with the regressors, the coefficients are biased too and no covariance estimator can
+help.
+
+The practical conclusion is conditional but clear: short-memory stationarity and projection
+orthogonality protect slope consistency, not conventional inference. Researchers should
+diagnose dependence and heteroskedasticity in the regression score, assess proximity to the
+unit-root boundary, specify relevant dynamics, and use a defensible covariance estimator rather
+than assume that either stationarity or a large sample makes the usual OLS $t$-ratio or
+Granger-causality Wald test reliable.
+
+# Exercises {.unnumbered}
+
+\begin{exercise}[The product, not the persistence]
+Two independent AR(1) series have $\phi_x=0.9$ and $\phi_y=-0.9$. Compute $\lambda$ and the
+asymptotic rejection probability of a nominal 5\% two-sided $t$-test. Compare with
+$\phi_y=+0.9$. Explain in one sentence why persistence in each series separately is not the
+relevant statistic.
+\end{exercise}
+
+\begin{exercise}[Constructing correct size]
+Using $\lambda=\sum_k\rho_x(k)\rho_y(k)$, find a value of $\theta_2$ such that an AR(1)
+regressor with $\phi=0.7$ paired with an invertible MA(2) yields $\lambda=1$. Verify
+invertibility. Then modify \texttt{lambda1\_phi} and \texttt{lambda1\_theta2} in the
+simulation script and confirm the rejection frequency numerically.
+\end{exercise}
+
+\begin{exercise}[Where does the distortion come from?]
+For the common-volatility design of Section \ref{sec:volatility}, verify that
+$\Cov(w_t,w_{t+k})=0$ for all $k\neq0$, and that $\kappa=\E(s_t^4)/\{\E(s_t^2)\}^2$. Explain
+why HC0 is sufficient here and what would change if the innovations $\varepsilon_t$ were
+themselves serially correlated.
+\end{exercise}
+
+\begin{exercise}[Reading a size-adjusted critical value]
+Section \ref{sec:power} reports a size-adjusted conventional critical value near
+$1.96\sqrt\lambda$ that does not shrink with $T$. Explain why this is a sharper check on
+Proposition \ref{prop:tstat} than the rejection frequency, and what you would expect to see if
+Proposition \ref{prop:tstat} were false.
+\end{exercise}
+
+\begin{exercise}[Bandwidth sensitivity]
+Replace \texttt{hac\_bandwidth} in the simulation script with the Newey--West rule of thumb
+$\lfloor4(T/100)^{2/9}\rfloor$ and re-run the HAC comparison. At $T=5000$ this changes the
+bandwidth from 34 to 9. Predict, before running, whether the $(0.95,0.95)$ distortion will get
+better or worse, and explain the result you obtain.
+\end{exercise}
+
+\begin{exercise}[Diagnosis in practice]
+You estimate a regression on quarterly data with $T=120$ and obtain a $t$-statistic of 2.6.
+List the diagnostics you would run, in order, before reporting this as evidence of a
+relationship. For each, state what result would change your conclusion.
+\end{exercise}
+
+# Bibliography {.unnumbered}
+
+The list below includes both the works cited in the text and general background reading.
+Students meeting this material for the first time will find @hamilton1994time the most useful
+single reference for the underlying time-series asymptotics, and @engle1982autoregressive the
+origin of the conditional-heteroskedasticity models that motivate the common-volatility design
+of Section \ref{sec:volatility}.
+
+::: {#refs}
+:::
+
+# Computational Appendix {.unnumbered}
+
+The complete, executable simulation is maintained in
+`scripts/spurious_stationary_sim.R`. It depends only on `ggplot2` and `scales`; the Bartlett
+HAC estimator used throughout is implemented in the script itself so that a single estimator
+produces every robust number reported above. Running
+
+```{.bash}
+Rscript scripts/spurious_stationary_sim.R
+```
+
+recreates all figures, the CSV result files, and a `sessionInfo.txt` recording the package
+versions used. Setting `SPURIOUS_QUICK=1` in the environment runs a fast, noisier pass suitable
+for drafting; `SPURIOUS_OUTPUT_DIR` redirects the output location. Each experiment is seeded
+independently, so changing the replication count of one does not silently alter the results of
+another. The Quarto document sources that same script, so the handout and the standalone
+computation share one implementation, and every number in the text is read from the simulation
+output at render time.

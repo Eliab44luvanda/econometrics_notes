@@ -1,0 +1,19 @@
+"T","method","reject","Nsim","dgp","mcse"
+50,"Conventional OLS",0.08,2000,"Common stochastic volatility",0.00606630035524124
+50,"HC0",0.0685,2000,"Common stochastic volatility",0.00564835152942874
+50,"HAC",0.119,2000,"Common stochastic volatility",0.00724013121428058
+200,"Conventional OLS",0.1055,2000,"Common stochastic volatility",0.00686912476229687
+200,"HC0",0.0605,2000,"Common stochastic volatility",0.0053310294503032
+200,"HAC",0.09,2000,"Common stochastic volatility",0.00639921870231046
+500,"Conventional OLS",0.114,2000,"Common stochastic volatility",0.00710647591989166
+500,"HC0",0.0535,2000,"Common stochastic volatility",0.00503178646208283
+500,"HAC",0.068,2000,"Common stochastic volatility",0.00562920953598283
+1000,"Conventional OLS",0.121,2000,"Common stochastic volatility",0.00729242757934558
+1000,"HC0",0.051,2000,"Common stochastic volatility",0.00491929873051027
+1000,"HAC",0.0625,2000,"Common stochastic volatility",0.00541265877365274
+2000,"Conventional OLS",0.134,2000,"Common stochastic volatility",0.00761721733968514
+2000,"HC0",0.0615,2000,"Common stochastic volatility",0.00537204569973116
+2000,"HAC",0.067,2000,"Common stochastic volatility",0.00559066185706129
+5000,"Conventional OLS",0.1385,2000,"Common stochastic volatility",0.00772391578151911
+5000,"HC0",0.0565,2000,"Common stochastic volatility",0.00516273909857936
+5000,"HAC",0.0605,2000,"Common stochastic volatility",0.0053310294503032

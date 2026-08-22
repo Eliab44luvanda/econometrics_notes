@@ -1,0 +1,13 @@
+"T","phi","method","reject","Nsim","dgp","mcse"
+50,0.9,"Conventional OLS",0.479,1000,"Local-to-unity",0.015797436500901
+50,0.9,"HAC",0.337,1000,"Local-to-unity",0.0149476085043729
+200,0.975,"Conventional OLS",0.708,1000,"Local-to-unity",0.0143783170086071
+200,0.975,"HAC",0.405,1000,"Local-to-unity",0.0155233694795943
+500,0.99,"Conventional OLS",0.828,1000,"Local-to-unity",0.0119338174948337
+500,0.99,"HAC",0.478,1000,"Local-to-unity",0.0157960754619621
+1000,0.995,"Conventional OLS",0.891,1000,"Local-to-unity",0.00985489725973843
+1000,0.995,"HAC",0.57,1000,"Local-to-unity",0.0156556698994326
+2000,0.9975,"Conventional OLS",0.917,1000,"Local-to-unity",0.00872416185085994
+2000,0.9975,"HAC",0.638,1000,"Local-to-unity",0.0151972365909069
+5000,0.999,"Conventional OLS",0.943,1000,"Local-to-unity",0.00733150734842434
+5000,0.999,"HAC",0.714,1000,"Local-to-unity",0.0142899965010493

@@ -1,12 +1,11 @@
 ---
-title: "Probability Theory for Econometrics: A Measure-Theoretic Approach"
-subtitle: "From Probability Spaces and Random Variables to Asymptotic Theory"
+title: "Probability Theory: The Language of Econometrics"
+subtitle: "A Capacity-Building Handout, from Measure-Theoretic Foundations to Asymptotic Theory"
 author: "Eliab Luvanda"
-date: today
+date: "today"
 date-format: "MMMM D, YYYY"
 bibliography: references.bib
 reference-section-title: "Bibliography"
-nocite: "@*"
 
 format:
       pdf:
@@ -68,6 +67,10 @@ format:
 
                         \usepackage{tikz}
                         \usetikzlibrary{arrows.meta, patterns, positioning, decorations.pathreplacing}
+                        % Wrap long code lines instead of letting them overflow the right margin
+                        \usepackage{fvextra}
+                        \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,breaksymbolleft={},commandchars=\\\{\}}
+                        \fvset{breaklines=true,breakanywhere=true}
                         % Front-matter uses roman numerals; main text resets to arabic at page 1
                         \AtBeginDocument{\pagenumbering{roman}}
 
@@ -95,6 +98,63 @@ crossref:
 \cleardoublepage
 \pagenumbering{arabic}
 \setcounter{page}{1}
+```
+
+# Objective {.unnumbered}
+
+The objective of this handout is to build capacity in econometric theory among
+staff and graduate students in the School of Economics, University of Dar es
+Salaam. Probability is the language in which econometric assumptions, estimator
+properties, and inferential claims are expressed; mastering that language makes
+the logic of econometrics substantially more transparent.
+
+My aim throughout is therefore not to present probability theory for its own sake, but to develop precisely those ideas --- probability spaces, random variables, expectation, the moment inequalities, the modes of convergence, and the limit theorems --- upon which the asymptotic theory of econometrics rests, and to keep their econometric purpose in view at every stage. The intended reader is a member of staff or a graduate student who has some acquaintance with intermediate statistics and calculus, but who need not possess a strong background in real analysis or measure theory.
+
+This handout is based on the sketchy notes that I have accumulated over the years and used to teach probability theory and statistical inference in the MA and PhD courses of the School of Economics, University of Dar es Salaam. In preparing it, I have tried as much as possible to include examples set in the context of Tanzania --- drawing on household consumption, agricultural yields, rainfall shocks, and related settings --- in order to motivate the understanding of the concepts and to root abstract ideas in problems that are familiar to the reader.
+
+The exposition is measure-theoretic in its foundations yet deliberately accessible in its manner. Each principal result is accompanied by a discussion of its logic and intuition and by a remark on its relevance to econometric practice, so that the reader sees not only \emph{that} a result holds but \emph{why} it matters for empirical work. An appendix offers an informal, diagram-based introduction to Lebesgue measure and integration for those who wish to glimpse the underlying machinery, and a dedicated section employs Monte Carlo simulation in \textsf{R} to render the law of large numbers and the central limit theorem concrete rather than merely formal.
+
+The Introduction gives the subjective interpretation somewhat more space because
+it provides the foundation for Bayesian econometrics, which is often less visible
+than classical and frequentist methods in the standard curriculum. The aim is not
+to rank interpretations of probability, but to prepare readers for Bayesian work
+in macroeconomics, forecasting, state-space models, and hierarchical analysis.
+
+To support continued learning beyond the handout, the accompanying materials
+include the standalone \textsf{R} script used for the Monte Carlo simulations
+and a documented explanation of the code. Readers are encouraged to use these
+resources to modify the simulation settings, distributions, sample sizes, and
+number of replications, rerun the experiments, and continue exploring the law of
+large numbers and the central limit theorem independently.
+
+In the interest of transparency, I disclose the assistance of Anthropic's Claude AI agent in preparing this handout and in writing, testing, debugging, and refactoring the \textsf{R} code used to run the Monte Carlo simulations. The selection and framing of the material, the judgements of emphasis and exposition, and any errors that remain are my own.
+
+## How to Use This Handout {.unnumbered}
+
+The handout assumes familiarity with calculus, elementary statistics, and basic
+matrix algebra. It is organised as a cumulative sequence:
+
+1. **Foundations (Sections 1--3):** interpretations of probability, probability
+   spaces, events, and random variables.
+2. **Distributions and moments (Sections 4--6):** distribution functions,
+   independence, expectation, and moment inequalities.
+3. **Asymptotic tools (Section 7):** modes of convergence, mapping results,
+   laws of large numbers, and central limit theorems.
+4. **Computation and foundations (Section 8 and the appendices):** Monte Carlo
+   illustrations, an informal guide to Lebesgue integration, and reproducible
+   \textsf{R} code.
+
+On completing the handout, the reader should be able to formulate a probability
+model, distinguish the principal modes of stochastic convergence, state the
+assumptions behind the main LLNs and CLTs, and explain how those results establish
+consistency and asymptotic normality in econometric applications. Readers seeking
+an econometrics-first treatment may use @hansen2022probability and
+@bieren2004introduction alongside Sections 6--8; readers seeking fuller
+measure-theoretic foundations may consult @billingsley1995probability,
+@durrett2019probability, or @pollard2002users.
+
+```{=latex}
+\clearpage
 ```
 
 # Introduction
@@ -133,10 +193,14 @@ drought-resistant seed varieties, and whether to participate in a weather-indexe
 insurance scheme --- is formally an optimisation over expected utility:
 $$
 \max_{c,\ q} \;\;
-0.55\, u(y_{g} - c) + 0.20\, u(y_{f} - c) + 0.25\, u(y_{d} + q - c - \pi q),
+0.55\, u(y_{g} - c - \pi q)
++ 0.20\, u(y_{f} - c - \pi q)
++ 0.25\, u(y_{d} + q - c - \pi q),
 $$
 where $c$ denotes input expenditure, $q$ is the quantity of insurance purchased,
-and $\pi$ is the insurance premium per unit. Without an explicit probability space
+and $\pi$ is the insurance premium per unit. The premium $\pi q$ is paid ex ante
+and therefore reduces resources in every state, while the indemnity $q$ is paid
+only in the drought state. Without an explicit probability space
 $(\Omega, \mathcal{F}, \Prob)$, this expected-utility formulation cannot be stated
 precisely, let alone solved or estimated from household survey data.
 \end{example}
@@ -194,7 +258,7 @@ In economics, uncertainty is central to decision-making, from consumption choice
 
 ## Probability Theory as the Foundation of Econometric Theory
 
-Econometrics is, at its foundational level, an application of probability theory to the empirical analysis of economic relationships. This insight was stated with remarkable clarity and force by Trygve Haavelmo in his landmark 1944 monograph \textit{The Probability Approach in Econometrics}, for which he was awarded the Nobel Memorial Prize in Economic Sciences in 1989. Haavelmo's central argument was that economic models should not be treated as deterministic algebraic relationships fitted to data by minimising discrepancies, but should instead be conceived from the outset as \textit{probability models} --- complete specifications of the joint probability distribution of all variables entering the analysis.
+Econometrics is, at its foundational level, an application of probability theory to the empirical analysis of economic relationships. This insight was stated with remarkable clarity and force by Trygve Haavelmo in his landmark 1944 monograph \textit{The Probability Approach in Econometrics}, for which he was awarded the Nobel Memorial Prize in Economic Sciences in 1989. Haavelmo's central argument was that economic models should not be treated as deterministic algebraic relationships fitted to data by minimising discrepancies, but should instead be conceived from the outset as \textit{probability models} --- complete specifications of the joint probability distribution of all variables entering the analysis. Modern probability-based treatments of econometrics develop this same connection systematically [see @bieren2004introduction; @hansen2022probability].
 
 On this view, the observed data are not a fixed object to be described but a single realisation drawn from a well-defined probability space $(\Omega, \mathcal{F}, \Prob)$, and the task of econometrics is to use that realisation to learn about the probability measure $\Prob$ that generated it. Without an explicit probabilistic framework, the concepts of estimation, consistency, efficiency, and statistical inference are simply undefined, and the applied researcher has no principled basis for distinguishing signal from noise or for quantifying the uncertainty that surrounds any empirical conclusion.
 
@@ -765,6 +829,7 @@ This natural and reassuring behavior---that probabilities \emph{follow} their ev
 Probability} theorem guarantees. Far from being an abstract technicality, this result is the bridge between the combinatorial, finite world where probability is easy to compute and the analytic, infinite world where calculus and limits live. It tells us that a probability measure, much like a continuous function, does not jump erratically: as sets converge, so do their probabilities. This idea can be formally stated in a proposition.
 
 \begin{proposition}[Continuity of Probability]
+\label{prop:continuity}
 Let $(\Omega, \mathcal{F}, \Prob)$ be a probability space.
 
     \textbf{(i) Continuity from below.} If $A_1 \subseteq A_2 \subseteq A_3 \subseteq \cdots$ is an increasing sequence of events in $\mathcal{F}$, then
@@ -819,7 +884,7 @@ and rearranging gives the result.
 
 The deep idea here is that a probability measure behaves like a \emph{flow of mass}: every outcome $\omega \in \Omega$ carries a tiny parcel of probability, and when we accumulate outcomes into a set we collect the corresponding mass. For an increasing sequence of sets, each new set merely \emph{adds} more outcomes and hence more mass; the running total $\Prob(A_n)$ is monotone non-decreasing and bounded above by $1$, so it must converge.
 
-The key algebraic trick in the proof---decomposing the union into disjoint \`\`rings'' $B_n$---lets us cash in countable additivity, the cornerstone axiom, and turn an infinite union into a convergent series. Continuity from above follows almost for free by duality: complementation flips a decreasing family into an increasing one, and we recycle the first result. Together, the two statements say that the probability measure $\Prob$ is \emph{sequentially continuous} with respect to monotone set limits, in perfect analogy with how a continuous real-valued function commutes with limits of sequences.
+The key algebraic trick in the proof---decomposing the union into disjoint "rings" $B_n$---lets us cash in countable additivity, the cornerstone axiom, and turn an infinite union into a convergent series. Continuity from above follows almost for free by duality: complementation flips a decreasing family into an increasing one, and we recycle the first result. Together, the two statements say that the probability measure $\Prob$ is \emph{sequentially continuous} with respect to monotone set limits, in perfect analogy with how a continuous real-valued function commutes with limits of sequences.
 
 \begin{remark}[Necessity of the finiteness condition]
 In continuity from above, the hypothesis $\Prob(A_1) < \infty$ is automatically satisfied since
@@ -877,7 +942,7 @@ $$
 
 The definition may appear technical at first, but its logic is both natural and necessary. The measurability condition says that for any numerical range of interest $B$---for instance, the outcome produces a value no greater than\~5---the set of raw outcomes $\omega$ that lead to a value in $B$ must be an \emph{event}, that is, a member of $\mathcal{F}$. This is precisely the requirement needed for the statement $X$ lies in $B$ to have a well-defined probability: we need the pre-image $X^{-1}(B)$ to live inside $\mathcal{F}$ so that $\Prob$ can be applied to it.
 
-Without measurability, the expression $\Prob(X \in B)$ would be meaningless---we would be asking for the probability of a set that the probability measure cannot evaluate. In short, a random variable is not \`\`random'' in the colloquial sense of being haphazard; it is a perfectly deterministic function. What is random is the input $\omega$, drawn according to $\Prob$. The randomness of the outcome flows through the function $X$ to produce a random numerical value.
+Without measurability, the expression $\Prob(X \in B)$ would be meaningless---we would be asking for the probability of a set that the probability measure cannot evaluate. In short, a random variable is not "random" in the colloquial sense of being haphazard; it is a perfectly deterministic function. What is random is the input $\omega$, drawn according to $\Prob$. The randomness of the outcome flows through the function $X$ to produce a random numerical value.
 
 \begin{example}[Tossing a fair coin.]
 Let $\Omega = \{H, T\}$, $\mathcal{F} = 2^{\Omega}$, and $\Prob(H) = \Prob(T) = \tfrac{1}{2}$. Define
@@ -939,7 +1004,7 @@ A useful way to build intuition is to think about what \emph{fails} when measura
 
 Measurability ensures this never happens: every numerical question about $X$ translates back into an event whose probability is defined. In practice, all functions encountered in economics and finance---continuous functions, step functions, limits of sequences of measurable functions---are automatically measurable with respect to standard $\sigma$-algebras, so measurability is rarely a binding constraint in applications.
 
-Its importance is foundational: it guarantees that the induced distribution $\Prob_X(B) \equiv \Prob\bigl(X^{-1}(B)\bigr)$, known as the \emph{pushforward measure} or \emph{law} of $X$, is itself a well-defined probability measure on $(\mathbb{R}, \mathcal{B}(\mathbb{R}))$. In this sense, a random variable does not merely \`\`produce'' random numbers---it \emph{transports} the entire probability structure from the abstract sample space to the real line.
+Its importance is foundational: it guarantees that the induced distribution $\Prob_X(B) \equiv \Prob\bigl(X^{-1}(B)\bigr)$, known as the \emph{pushforward measure} or \emph{law} of $X$, is itself a well-defined probability measure on $(\mathbb{R}, \mathcal{B}(\mathbb{R}))$. In this sense, a random variable does not merely "produce" random numbers---it \emph{transports} the entire probability structure from the abstract sample space to the real line.
 
 # Distribution Function
 
@@ -1258,23 +1323,109 @@ The figure shows how the probability measure on rainfall states is transferred i
 
 ## CDF Properties
 
-\begin{theorem}
-Every CDF is non-decreasing, right-continuous, and satisfies:
+\begin{theorem}[Properties of a Cumulative Distribution Function]
+\label{thm:cdf-properties}
+Let $X$ be a random variable with CDF $F(x) = \Prob(X \leq x)$. Then $F$ is non-decreasing and right-continuous, and satisfies
 $$
-\lim_{x\to -\infty}F(x)=0, \quad \lim_{x\to \infty}F(x)=1
+\lim_{x\to -\infty}F(x)=0, \qquad \lim_{x\to \infty}F(x)=1.
 $$
 \end{theorem}
 
+**Logic and Intuition.** A CDF accumulates probability mass from left to right along the real line: $F(x)$ is the total mass lying at or below $x$. The three properties are exactly what one expects of such an accumulation. It is \emph{non-decreasing} because moving the threshold $x$ to the right can only sweep in additional mass, never discard any. It \emph{tends to $0$ at $-\infty$ and $1$ at $+\infty$} because, as the threshold recedes to the far left, no mass is captured, whereas as it advances to the far right, all of the mass --- which totals $1$ --- has been gathered. It is \emph{right-continuous} because the definition uses "$\leq x$": the point $x$ itself is included in the event $\{X \leq x\}$, so approaching $x$ from above (through slightly larger thresholds) does not lose the mass sitting exactly at $x$. Each property is therefore a statement about how the probabilities of a family of nested events behave, and the formal proof simply translates "nested events" into the \emph{Continuity of Probability} established earlier.
+
+\begin{proof}
+Write $A_x = \{X \leq x\} = \{\omega \in \Omega : X(\omega) \leq x\}$, so that $F(x) = \Prob(A_x)$.
+
+\medskip
+\noindent\textbf{Part 1: $F$ is non-decreasing.}
+Suppose $x_1 < x_2$. Any outcome with $X(\omega) \leq x_1$ also satisfies $X(\omega) \leq x_2$, so $A_{x_1} \subseteq A_{x_2}$. By the monotonicity of a probability measure (a derived property established for $(\Omega, \mathcal{F}, \Prob)$), event inclusion implies inequality of probabilities:
+$$
+F(x_1) = \Prob(A_{x_1}) \leq \Prob(A_{x_2}) = F(x_2).
+$$
+
+\medskip
+\noindent\textbf{Part 2: $F$ is right-continuous.}
+Fix $x_0$ and let $(x_n)$ be any sequence decreasing to $x_0$, written $x_n \downarrow x_0$. We must show $F(x_n) \to F(x_0)$. Because the thresholds decrease, the events $A_{x_n}$ form a \emph{decreasing} sequence,
+$$
+A_{x_1} \supseteq A_{x_2} \supseteq A_{x_3} \supseteq \cdots,
+$$
+and their intersection is
+$$
+\bigcap_{n=1}^{\infty} A_{x_n} = \{\omega : X(\omega) \leq x_n \text{ for all } n\}
+= \{\omega : X(\omega) \leq x_0\} = A_{x_0},
+$$
+where the middle equality uses $\inf_n x_n = x_0$: an outcome satisfies $X(\omega) \le x_n$ for \emph{every} $n$ precisely when $X(\omega) \le x_0$. Applying continuity from above (Proposition~\ref{prop:continuity}),
+$$
+\lim_{n \to \infty} F(x_n)
+= \lim_{n \to \infty} \Prob(A_{x_n})
+= \Prob\!\left(\bigcap_{n=1}^{\infty} A_{x_n}\right)
+= \Prob(A_{x_0}) = F(x_0).
+$$
+Since this holds for every sequence $x_n \downarrow x_0$, we conclude $\lim_{x \downarrow x_0} F(x) = F(x_0)$; that is, $F$ is right-continuous.
+
+\medskip
+\noindent\textbf{Part 3: The limits at $\pm\infty$.}
+For the limit at $+\infty$, take any sequence $x_n \uparrow \infty$. The events $A_{x_n}$ now \emph{increase},
+$$
+A_{x_1} \subseteq A_{x_2} \subseteq \cdots,
+\qquad
+\bigcup_{n=1}^{\infty} A_{x_n} = \{\omega : X(\omega) \leq x_n \text{ for some } n\} = \Omega,
+$$
+the last equality holding because $X$ is real-valued: every outcome $\omega$ has a finite value $X(\omega)$, which is eventually exceeded by $x_n$. Continuity from below (Proposition~\ref{prop:continuity}) then gives
+$$
+\lim_{n \to \infty} F(x_n) = \Prob\!\left(\bigcup_{n=1}^{\infty} A_{x_n}\right) = \Prob(\Omega) = 1.
+$$
+For the limit at $-\infty$, take $x_n \downarrow -\infty$. The events $A_{x_n}$ decrease, with
+$$
+\bigcap_{n=1}^{\infty} A_{x_n} = \{\omega : X(\omega) \leq x_n \text{ for all } n\} = \varnothing,
+$$
+since no finite value $X(\omega)$ can be less than or equal to every $x_n$ when $x_n \to -\infty$. Continuity from above yields
+$$
+\lim_{n \to \infty} F(x_n) = \Prob\!\left(\bigcap_{n=1}^{\infty} A_{x_n}\right) = \Prob(\varnothing) = 0.
+$$
+As both limits are independent of the chosen sequences, $\lim_{x\to\infty}F(x) = 1$ and $\lim_{x\to-\infty}F(x) = 0$.
+\end{proof}
+
+\begin{remark}[Why right-continuity and not left-continuity]
+The asymmetry between the two one-sided limits is a direct consequence of the ``$\leq$'' in the definition $F(x) = \Prob(X \leq x)$. Repeating the argument of Part 2 with a sequence increasing to $x_0$ shows that the \emph{left} limit is
+$$
+\lim_{x \uparrow x_0} F(x) = \Prob(X < x_0),
+$$
+so the size of any jump in the CDF is
+$$
+F(x_0) - \lim_{x \uparrow x_0} F(x) = \Prob(X \leq x_0) - \Prob(X < x_0) = \Prob(X = x_0).
+$$
+Thus $F$ is continuous at $x_0$ exactly when $\Prob(X = x_0) = 0$, and it has a jump of height $\Prob(X = x_0)$ at each atom of the distribution --- the discrete masses of §4 are precisely these jumps. This is the same point illustrated, in a limiting context, by the discussion of continuity points in convergence in distribution.
+\end{remark}
+
 ## Independence
 
-\begin{definition}
-Random variables $X,Y$ are independent if
+\begin{definition}[Independence]
+Random variables $X$ and $Y$ are \textbf{independent} if, for every pair of
+Borel sets $A,B\in\mathcal{B}(\mathbb{R})$,
 $$
-\Prob(X\in A, Y\in B)=\Prob(X\in A)\Prob(Y\in B)
+\Prob(X\in A,\;Y\in B)=\Prob(X\in A)\Prob(Y\in B).
 $$
+Equivalently, the $\sigma$-algebras generated by $X$ and $Y$ are independent.
 \end{definition}
 
+\begin{example}[Independent Bernoulli outcomes]
+Let $X$ indicate whether a randomly selected household receives a rainfall shock
+and let $Y$ indicate whether a separate, independently selected household receives
+the same type of shock. If $\Prob(X=1)=p$ and $\Prob(Y=1)=q$, independence implies
+$\Prob(X=1,Y=1)=pq$. The joint probability factors into its two marginal
+probabilities because learning the value of one variable conveys no information
+about the other.
+\end{example}
 
+\begin{remark}[Independence and zero covariance]
+If $X$ and $Y$ are independent and have finite second moments, then
+$\operatorname{Cov}(X,Y)=0$. The converse is false in general: zero covariance
+rules out only linear association, whereas independence rules out every form of
+probabilistic dependence. This distinction is important in econometrics, where
+uncorrelated errors may still be conditionally heteroskedastic or otherwise
+dependent.
+\end{remark}
 
 # Expectations
 
@@ -1285,6 +1436,11 @@ Let $X$ be a random variable on the probability space $(\Omega, \mathcal{F}, \Pr
 $$
   \E[X] \;=\; \int_{\Omega} X(\omega) \,d\Prob(\omega).
 $$
+The expectation is finite whenever $X$ is integrable, meaning
+$\E[|X|]<\infty$. More generally, the extended expectation is well defined if
+at least one of $\E[X^+]$ and $\E[X^-]$ is finite; it is undefined when both are
+infinite because this would require the indeterminate difference
+$\infty-\infty$.
 \end{definition}
 
 The logic and intuition of this definition are as follows. The expectation $\E[X]$ is a weighted average of the values that $X$ takes, where the weights are given by the probabilities of the corresponding outcomes. The Lebesgue integral is the appropriate mathematical tool for defining this average in a rigorous way, especially when $X$ can take infinitely many values or when the distribution of $X$ is continuous. The expectation captures the \emph{long-run average} value of $X$ if we were to repeat the random experiment many times and average the results. It is a fundamental building block for more advanced concepts such as variance, covariance, and higher moments, and it plays a central role in decision theory, economics, and statistics. 
@@ -1324,19 +1480,6 @@ which adds up all possible profits weighted by their probabilities. In either ca
 \begin{remark}[Interpretation of expectation]
 The expectation $\E[X]$ can be interpreted in several ways. It is the long-run average value of $X$ if we were to repeat the random experiment many times and average the results. It is also the center of mass of the probability distribution of $X$, reflecting the balance point of the distribution. In decision theory, $\E[X]$ represents the expected payoff of a random outcome, and it is often used as a criterion for rational choice under uncertainty. However, it is important to remember that $\E[X]$ is not necessarily a value that $X$ can actually take; it is a theoretical construct that summarises the distribution of $X$ in a single number. Also, note that the expected value, $\E[X]$, is not a sample average or an empirical mean; it is a population parameter that can only be estimated from data, and its estimation involves sampling variability and uncertainty.
 \end{remark}
-
-
-
-
-## Expected Value
-
-\begin{definition}
-For a random variable $X$,
-$$
-\E[X] = \int X \,d\Prob
-$$
-\end{definition}
-
 ## Properties
 
 \begin{theorem}[Linearity of Expectation]
@@ -1428,7 +1571,7 @@ $$
 
 \textit{General case.} Combining scalar multiplication and additivity:
 $$
-\E[aX + bY] = \E[aX] + \E[bY] = a\E[X] + b\E[Y]. \qed
+\E[aX + bY] = \E[aX] + \E[bY] = a\E[X] + b\E[Y].
 $$
 \end{proof}
 
@@ -1467,8 +1610,7 @@ monotonicity of expectation,
 $$
 \E[X] \;\geq\; \E\!\left[a \cdot \mathbf{1}_{\{X \geq a\}}\right] \;=\; a\,\Prob(X \geq a).
 $$
-Dividing both sides by $a > 0$ gives $\Prob(X \geq a) \leq \E[X]/a$. $\qed$
-\end{proof}
+Dividing both sides by $a > 0$ gives $\Prob(X \geq a) \leq \E[X]/a$.\end{proof}
 
 **Logic and Intuition.** Markov’s inequality rests on the most elementary fact about a non-negative random variable: it cannot spend much probability mass far above its mean without inflating that mean. Formally, the proof replaces $X$ by the cruder lower bound $a \cdot \mathbf{1}_{\{X \geq a\}}$, which is zero everywhere except on the very region whose probability we want to control. Averaging this lower bound gives $a\,\Prob(X \geq a)$, which cannot exceed $\E[X]$. Rearranging yields the bound.
 
@@ -1506,8 +1648,7 @@ $$
 \;=\; \frac{\sigma^{2}}{k^{2}}.
 $$
 Since $\{(X-\mu)^2 \geq k^2\} = \{|X - \mu| \geq k\}$ (because both sides square the
-same absolute deviation), the result follows. $\qed$
-\end{proof}
+same absolute deviation), the result follows.\end{proof}
 
 **Logic and Intuition.** Chebyshev’s inequality is Markov’s inequality applied one level up: instead of bounding the probability that $X$ is large, it bounds the probability that $X$ \emph{deviates} from its mean by more than $k$, using the variance as the controlling moment. The key move is squaring: by working with $(X - \mu)^2$ rather than $|X - \mu|$, we convert a two-sided deviation problem into a one-sided non-negativity problem to which Markov applies.
 
@@ -1590,10 +1731,73 @@ $$
 \E[\phi(X)] \;\geq\; \E\!\left[\phi(\E[X]) + \beta\,(X - \E[X])\right]
 = \phi(\E[X]) + \beta\,\E[X - \E[X]] = \phi(\E[X]) + \beta \cdot 0 = \phi(\E[X]),
 $$
-which is the desired inequality. $\qed$
-\end{proof}
+which is the desired inequality.\end{proof}
 
-**Logic and Intuition.** The key insight is geometric: a convex function curves upward, so the chord between any two points on its graph lies above the graph itself. Jensen’s inequality is simply this chord-above-curve property, applied to a probability-weighted average (the expectation) rather than a simple two-point average.
+**Logic and Intuition.** The key insight is geometric: a convex function curves upward, so the chord between any two points on its graph lies above the graph itself. Jensen’s inequality is simply this chord-above-curve property, applied to a probability-weighted average (the expectation) rather than a simple two-point average. `Figure~\ref{fig:jensen-geometry}`{=latex} illustrates this geometry.
+
+```{=latex}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=2.15cm, y=0.92cm, >=Stealth, line join=round]
+  % ---------- axes ----------
+  \draw[->] (-0.40,0) -- (2.70,0) node[below right] {$x$};
+  \draw[->] (0,-0.30) -- (0,4.70) node[above left] {$\phi(x)$};
+  \node[below left] at (0,0) {$0$};
+  \foreach \x in {1,2} {
+    \draw (\x,0.07) -- (\x,-0.07);
+  }
+  \node[below] at (1,-0.10) {$\E[X]=1$};
+  \node[below] at (2,-0.10) {$2$};
+
+  % ---------- supporting tangent at E[X]: y = 2x - 1 ----------
+  \draw[teal!65!black, thick, dashed] (0.52,0.04) -- (2.18,3.36);
+  \node[teal!55!black, font=\small, anchor=west] at (2.28,2.35)
+    {supporting tangent};
+
+  % ---------- convex curve φ(x) = x² ----------
+  \draw[blue!75!black, very thick, domain=-0.12:2.18, samples=90, smooth]
+    plot (\x, {\x*\x});
+  \node[blue!75!black, font=\small, anchor=west] at (2.28,3.20)
+    {$\phi(x)=x^{2}$};
+
+  % ---------- chord joining (0, φ(0)) to (2, φ(2)) ----------
+  \draw[red!80!black, very thick] (0,0) -- (2,4);
+  \node[red!80!black, font=\small, rotate=41] at (1.42,3.18) {chord};
+
+  % ---------- vertical guide at the mean ----------
+  \draw[dotted, gray] (1,0) -- (1,2);
+
+  % ---------- endpoints on the curve ----------
+  \fill[blue!75!black] (0,0) circle[radius=1.8pt];
+  \fill[blue!75!black] (2,4) circle[radius=1.8pt];
+  \node[blue!75!black, font=\small, anchor=south] at (1.72,4.12)
+    {$\phi(2)=4$};
+
+  % ---------- φ(E[X]) on the curve; E[φ(X)] on the chord ----------
+  \fill[blue!75!black] (1,1) circle[radius=1.8pt];
+  \node[blue!70!black, font=\small, anchor=east] at (0.90,0.78)
+    {$\phi(\E[X])=1$};
+  \fill[red!80!black] (1,2) circle[radius=1.9pt];
+  \node[red!80!black, font=\small, anchor=east] at (0.90,2.18)
+    {$\E[\phi(X)]=2$};
+
+  % ---------- Jensen gap ----------
+  \draw[<->, very thick, orange!85!black] (1.10,1.04) -- (1.10,1.96);
+  \node[orange!85!black, font=\small, anchor=west, align=left] at (1.18,1.50)
+    {Jensen gap\\ $=1=\mathrm{Var}(X)$};
+\end{tikzpicture}
+\caption{\textbf{The geometry of Jensen's inequality.}
+The convex function $\phi(x)=x^{2}$ (blue) is drawn together with the two-point random
+variable that takes the values $0$ and $2$ equally often. The chord (red) joining
+$(0,\phi(0))$ and $(2,\phi(2))$ lies above the graph; its midpoint is
+$(\E[X],\,\E[\phi(X)])=(1,2)$. The point on the curve at the mean is
+$(\E[X],\,\phi(\E[X]))=(1,1)$. The orange vertical gap between these two heights is the
+Jensen gap $\E[\phi(X)]-\phi(\E[X])=\mathrm{Var}(X)=1$. The dashed supporting tangent at
+$x=\E[X]$ lies everywhere below $\phi$ and meets the curve at $\phi(\E[X])$, which is the
+algebraic mechanism of the proof.}
+\label{fig:jensen-geometry}
+\end{figure}
+```
 
 The supporting tangent line (or subgradient) at $\E[X]$ provides the algebraic mechanism: it lies \emph{everywhere below} $\phi$, so averaging $\phi(X)$ over all realisations of $X$ yields something at least as large as averaging the linear lower bound, which by linearity of expectation collapses to $\phi(\E[X])$. The non-linearity of $\phi$ is what prevents equality: if $X$ is not degenerate, its realisations spread around the mean, and the curvature of $\phi$ ensures that the high values of $\phi$ outweigh the low values enough to push $\E[\phi(X)]$ above $\phi(\E[X])$.
 
@@ -1658,11 +1862,11 @@ $$
 $$
 Taking both sides to the power $1/s > 0$ (a monotone operation) yields
 $$
-\left(\E[|X|^r]\right)^{1/r} \;\leq\; \left(\E[|X|^s]\right)^{1/s}. \qed
+\left(\E[|X|^r]\right)^{1/r} \;\leq\; \left(\E[|X|^s]\right)^{1/s}.
 $$
 \end{proof}
 
-**Logic and Intuition.** Lyapunov’s inequality says that higher-order moments, once properly normalised by their order, are larger than lower-order moments. The reason is that raising $|X|$ to a higher power amplifies large values of $|X|$ disproportionately: if $|X|$ occasionally takes large values, those values contribute much more to $\E[|X|^s]$ (relative to its normalisation) than to $\E[|X|^r]$. The inequality formalises the fact that the $L^p$ ``size’’ of a random variable is a non-decreasing function of the exponent $p$.
+**Logic and Intuition.** Lyapunov’s inequality says that higher-order moments, once properly normalised by their order, are larger than lower-order moments. The reason is that raising $|X|$ to a higher power amplifies large values of $|X|$ disproportionately: if $|X|$ occasionally takes large values, those values contribute much more to $\E[|X|^s]$ (relative to its normalisation) than to $\E[|X|^r]$. The inequality formalises the fact that the $L^p$ "size" of a random variable is a non-decreasing function of the exponent $p$.
 
 A concrete illustration: take $X$ equal to $0$ or $10$ with equal probability. Then $\E[X] = 5$, $\E[X^2] = 50$, so $(\E[X^2])^{1/2} = \sqrt{50} \approx 7.07 > 5 = \E[X]^1$. The large value $10$ contributes a squared term of $100$, which when averaged and square-rooted dominates the simple average. This is the spirit of Lyapunov’s inequality: the amplification of extreme values by higher powers prevents the normalised higher moment from falling below the normalised lower moment.
 
@@ -1677,7 +1881,7 @@ Lyapunov’s inequality has two principal roles in econometric asymptotic theory
 $$
 \frac{1}{s_n^{2+\delta}} \sum_{i=1}^n \E[|X_i - \mu_i|^{2+\delta}] \;\longrightarrow\; 0,
 $$
-then $(S_n - \sum \mu_i)/s_n \xrightarrow{d} \mathcal{N}(0,1)$. This is the version of the CLT most commonly invoked in heterogeneous panel and time-series settings, where observations are drawn from different distributions. The Lyapunov condition ensures that no single observation dominates the sum, and its verification typically relies on Lyapunov’s inequality to bound the $(2+\delta)$-th moment from the variance.
+then $(S_n - \sum \mu_i)/s_n \xrightarrow{d} \mathcal{N}(0,1)$. This is a standard CLT for independent heterogeneous observations. The Lyapunov condition ensures that no single observation dominates the sum. It requires direct control of the $(2+\delta)$-th absolute central moments; Lyapunov’s inequality cannot bound these higher moments from the variance. Rather, it shows that an assumed finite $(2+\delta)$-th moment also guarantees the finiteness of all lower moments, including the variance.
 \end{remark}
 
 ------------------------------------------------------------------------
@@ -1693,9 +1897,9 @@ The study of convergence is central to both probability theory and econometrics.
 \begin{definition}[Sequence of Real Numbers]
 A \textbf{sequence of real numbers} is a function
 $$
-a : \mathbb{N} \longrightarrow \mathbb{R}, \qquad n \mapsto a_n,
+a_n : \mathbb{N} \longrightarrow \mathbb{R}, \qquad n \longmapsto a(n) =: a_{n} .
 $$
-that assigns to each positive integer $n$ a unique real number $a_n$, called the \textbf{$n$-th term} of the sequence. The sequence is denoted $(a_n)_{n=1}^{\infty}$, or simply $(a_n)$ when the index set is clear from context.
+That is, the function assigns to each positive integer $n$ a unique real number, its value $a(n)$, which we write with a subscript as $a_{n}$ and call the \textbf{$n$-th term} of the sequence. The sequence is denoted $(a_{n})_{n=1}^{\infty}$, or simply $(a_{n})$ when the index set is clear from context.
 \end{definition}
 
 \begin{remark}[Sequences as Ordered Lists]
@@ -1734,7 +1938,7 @@ where $e$ is Euler's number. This sequence illustrates that a limit need not be 
 
 ### The Limit of a Sequence
 
-The informal idea of a sequence ``approaching'' a value is made precise through the following classical definition.
+The informal idea of a sequence "approaching" a value is made precise through the following classical definition.
 
 \begin{definition}[Limit of a Sequence]
 Let $(a_n)_{n=1}^{\infty}$ be a sequence of real numbers. A real number $L$ is the \textbf{limit} of $(a_n)$, written
@@ -1808,7 +2012,7 @@ Since $\varepsilon > 0$ was chosen arbitrarily, we have shown that $|L - M| < \v
 for \emph{every} $\varepsilon > 0$. Because $|L - M|$ is a fixed non-negative real number
 and it is strictly less than every positive number, it must equal zero:
 $$
-|L - M| = 0 \implies L = M. \qed
+|L - M| = 0 \implies L = M.
 $$
 \end{proof}
 
@@ -1977,7 +2181,74 @@ at every continuity point $x$ of $F_X$.
 
 **Logic and Intuition.** Convergence in distribution is the weakest of the four convergence concepts. It does not require $X_n$ and $X$ to be defined on the same probability space, and it makes no claim about how close the \emph{realisations} $X_n(\omega)$ are to $X(\omega)$ for any individual $\omega$. Instead, it asks only that the \emph{probability distributions} of $X_n$ converge, in the sense that probabilities assigned to half-lines $(-\infty, x]$ converge to those assigned by the limiting distribution. The CDFs, viewed as sequences of real-valued functions of $x$, converge pointwise at every continuity point.
 
-The phrase ``at every continuity point'' is not a technicality to be overlooked. If $F_X$ has a jump at some $x^*$ (as discrete distributions do), the CDF values $F_{X_n}(x^*)$ are not required to converge to $F_X(x^*)$. This is because the limiting mass at the point $x^*$ can be approached from either side, and requiring convergence at a jump point would impose a convention about how the limiting distribution assigns mass to that point, which the definition wisely avoids.
+The phrase "at every continuity point" is not a technicality to be overlooked. If $F_X$ has a jump at some $x^*$ (as discrete distributions do), the CDF values $F_{X_n}(x^*)$ are not required to converge to $F_X(x^*)$. This is because the limiting mass at the point $x^*$ can be approached from either side, and requiring convergence at a jump point would impose a convention about how the limiting distribution assigns mass to that point, which the definition wisely avoids.
+
+A concrete example makes the point vivid. Let $X_n$ be degenerate at the value $a_n = 1/n$, so that all of its probability mass sits at a single point that slides toward the origin as $n$ grows. Intuitively $X_n$ converges to the constant $0$, and indeed $X_n \xrightarrow{d} X$ where $X$ is degenerate at $0$. Each $F_{X_n}$ is a step function that jumps from $0$ to $1$ at $a_n = 1/n$, while the limiting CDF $F_X$ jumps at $0$. At every point $x \neq 0$ the approximating CDFs eventually agree with the limit: for $x < 0$ all values are $0$, and for $x > 0$ they are eventually $1$. But exactly at the jump point $x^* = 0$ we have $F_{X_n}(0) = 0$ for \emph{every} $n$ (the mass sits just to the right, at $1/n > 0$), whereas $F_X(0) = 1$. The gap between $F_{X_n}(0)$ and $F_X(0)$ never closes --- it equals $1$ for all $n$ --- even though $X_n \xrightarrow{d} 0$ in every meaningful sense. Figure~\ref{fig:cdf-jump} illustrates this situation. Requiring convergence at $x^*$ would perversely declare this natural sequence non-convergent, which is precisely why the definition restricts attention to continuity points.
+
+```{=latex}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=2.7cm, y=3cm, >=Stealth, line join=round]
+  % ---------- axes ----------
+  \draw[->] (-1.25,0) -- (1.75,0) node[below right] {$x$};
+  \draw[->] (0,-0.05) -- (0,1.22);
+  \node[left] at (0,1) {$1$};
+  \node[below left] at (0,0) {$0$};
+
+  % ---------- approximating CDFs F_{X_n} : jumps at a_n = 1/n (blue) ----------
+  % n = 4 : jump at 1/4 (drawn first, sits underneath)
+  \draw[blue!45, thick, dashed] (-1.25,0) -- (0.25,0);
+  \draw[blue!45, thick, dashed] (0.25,1) -- (1.75,1);
+  \fill[blue!45] (0.25,1) circle[radius=1.3pt];
+  \draw[blue!45, fill=white, thick] (0.25,0) circle[radius=1.3pt];
+  \node[blue!55!black, font=\small, anchor=south west] at (0.27,0.30) {$a_n=\tfrac14$};
+  % n = 2 : jump at 1/2
+  \draw[blue!70, thick] (-1.25,0) -- (0.5,0);
+  \draw[blue!70, thick] (0.5,1) -- (1.75,1);
+  \fill[blue!70] (0.5,1) circle[radius=1.5pt];
+  \draw[blue!70, fill=white, thick] (0.5,0) circle[radius=1.5pt];
+  \node[blue!70!black, font=\small, anchor=south west] at (0.53,0.52) {$F_{X_n},\ a_n=\tfrac12$};
+
+  % ---------- limit CDF F_X : point mass at 0 (red, drawn last, on top) ----------
+  \draw[red!80!black, very thick] (-1.25,0) -- (0,0);
+  \draw[red!80!black, very thick] (0,1) -- (1.75,1);
+  \fill[red!80!black] (0,1) circle[radius=1.9pt];                    % F_X(0)=1 (closed)
+  \node[red!80!black, font=\small, anchor=south west] at (1.05,1.02) {$F_X$: limit, mass at $0$};
+
+  % ---------- arrow: jump slides toward 0 ----------
+  \draw[->, thick, gray] (0.48,-0.14) -- (0.03,-0.14);
+  \node[gray, font=\small, below] at (0.28,-0.145) {$a_n = 1/n \to 0$};
+
+  % ---------- the jump point x* = 0 ----------
+  \draw[dotted] (0,0) -- (0,1);
+  % the two values at x* = 0
+  \fill[blue!70!black] (0,0) circle[radius=1.9pt];                   % F_{X_n}(0)=0 for all n
+  % gap annotation
+  \draw[<->, very thick, orange!85!black] (-0.055,0.03) -- (-0.055,0.97);
+  \node[orange!85!black, font=\small, anchor=east, align=right] at (-0.10,0.5)
+    {permanent gap\\ $=1$ at $x^{*}=0$};
+  \node[font=\small, anchor=north east, blue!70!black] at (-0.03,-0.02) {$F_{X_n}(0)=0$};
+  \node[font=\small, anchor=south west, red!80!black] at (0.03,0.88) {$F_X(0)=1$};
+
+  % ---------- a continuity point where convergence DOES hold ----------
+  \draw[dotted, green!45!black] (1.3,0) -- (1.3,1);
+  \fill[green!45!black] (1.3,1) circle[radius=1.5pt];
+  \node[green!40!black, font=\small, anchor=north, align=center] at (1.3,-0.05)
+    {continuity point:\\ all CDFs $\to 1$};
+\end{tikzpicture}
+\caption{\textbf{Why convergence in distribution is required only at continuity points.}
+The random variable $X_n$ places all its mass at $a_n = 1/n$, so its CDF $F_{X_n}$ (blue)
+is a step that jumps from $0$ to $1$ at $1/n$; as $n \to \infty$ the jump slides left toward
+the origin. The limit $X$ is degenerate at $0$, with CDF $F_X$ (red) jumping at $x^{*}=0$.
+At every $x \neq 0$ the blue curves eventually coincide with the red one --- for instance at
+the continuity point marked in green, all CDFs equal $1$. But exactly at the jump point
+$x^{*}=0$ the approximating values stay pinned at $F_{X_n}(0)=0$ while $F_X(0)=1$, leaving a
+gap of $1$ that never closes. Insisting on convergence there would wrongly brand this perfectly
+sensible sequence non-convergent; restricting the requirement to continuity points resolves the
+paradox.}
+\label{fig:cdf-jump}
+\end{figure}
+```
 
 \begin{example}[Central Limit Theorem]
 Let $X_1, X_2, \ldots$ be i.i.d.\ with $\E[X_i] = \mu$ and $0 < \mathrm{Var}(X_i) = \sigma^2 < \infty$.
@@ -2046,7 +2317,7 @@ Each implication in Theorem 7.1 is strict; the converses fail.
 
 \textit{In probability does not imply a.s.} The classic counterexample is the ``moving bump'': for $n = 2^k + j$ with $0 \leq j < 2^k$, let $X_n = \mathbf{1}_{[j/2^k,\, (j+1)/2^k]}(U)$ where $U \sim \mathrm{Uniform}[0,1]$. Then $\Prob(|X_n| > \varepsilon) = 2^{-k} \to 0$, but for every $\omega$, $X_n(\omega) = 1$ infinitely often and $X_n(\omega) = 0$ infinitely often, so the sequence does not converge for any $\omega$.
 
-	extit{In distribution does not imply in probability.} Let $X \sim \mathcal{N}(0,1)$ and $X_n = -X$ for all $n$. Then $X_n \xrightarrow{d} X$ (same distribution), but $X_n$ does not converge in probability to $X$ because $\Prob(|X_n - X| > \varepsilon) = \Prob(2|X| > \varepsilon) \not\to 0$.
+\textit{In distribution does not imply in probability.} Let $X \sim \mathcal{N}(0,1)$ and $X_n = -X$ for all $n$. Then $X_n \xrightarrow{d} X$ (same distribution), but $X_n$ does not converge in probability to $X$ because $\Prob(|X_n - X| > \varepsilon) = \Prob(2|X| > \varepsilon) \not\to 0$.
 \end{remark}
 
 \begin{remark}[Convergence in Distribution to a Constant]
@@ -2137,11 +2408,21 @@ $$
 \;\leq\; \Prob\!\bigl(X \in g^{-1}(G)\bigr)
 = \Prob\!\bigl(g(X) \in G\bigr).
 $$
-Since $G$ was an arbitrary closed set, the Portmanteau theorem gives $g(X_n) \xrightarrow{d} g(X)$. $\qed$
-\end{proof}
+Since $G$ was an arbitrary closed set, the Portmanteau theorem gives $g(X_n) \xrightarrow{d} g(X)$.\end{proof}
 
 \begin{remark}[CMT in Econometrics]
-The CMT is used constantly in asymptotic theory. If $\hat\beta \xrightarrow{p} \beta_0$ (consistent estimator), then $\hat\sigma^2 = n^{-1}\sum \hat u_i^2$ is a continuous function of $\hat\beta$ and the data, so $\hat\sigma^2 \xrightarrow{p} \sigma^2$. If $Z_n \xrightarrow{d} \mathcal{N}(0,1)$, then $Z_n^2 \xrightarrow{d} \chi^2_1$ (since squaring is continuous). Test statistics defined as continuous functions of sample moments inherit their asymptotic distributions from those of the underlying moments via the CMT.
+The CMT is used constantly in asymptotic theory, but it normally operates together
+with an LLN. For example, if $\hat\beta \xrightarrow{p} \beta_0$ and
+$\hat u_i=y_i-x_i'\hat\beta$, consistency of
+$\hat\sigma^2=n^{-1}\sum_i\hat u_i^2$ requires an LLN for the relevant sample
+moments, appropriate finite-moment and model assumptions, and then the CMT to
+replace $\hat\beta$ by its probability limit inside the limiting expression. The
+CMT alone does not supply the probability limit of a growing sample average. By
+contrast, if $Z_n \xrightarrow{d} \mathcal{N}(0,1)$, then
+$Z_n^2 \xrightarrow{d} \chi^2_1$ directly because squaring is continuous. Test
+statistics defined as continuous functions of sample moments inherit their
+asymptotic distributions only after the required convergence of those moments has
+been established.
 \end{remark}
 
 ### Slutsky's Theorem
@@ -2159,7 +2440,33 @@ Then:
 **Logic and Intuition.** Slutsky's Theorem handles mixed situations where one sequence converges in distribution (to a non-degenerate limit) and another converges in probability (to a constant). The key insight is that the second sequence, because it converges to a constant, becomes \emph{asymptotically non-random}: it behaves like a fixed number in the limit. The joint pair $(X_n, Y_n)$ therefore converges in distribution to $(X, c)$, and continuous functions of the pair converge accordingly.
 
 \begin{remark}[Slutsky's Theorem in Econometrics]
-Slutsky's Theorem is the workhorse for handling the denominator in $t$-statistics and similar normalised test statistics. In a typical application, the OLS estimator satisfies $\sqrt{n}(\hat\beta - \beta_0) \xrightarrow{d} \mathcal{N}(0, \sigma^2 Q^{-1})$ and the sample variance estimator satisfies $\hat\sigma^2 \xrightarrow{p} \sigma^2$. The $t$-statistic $\sqrt{n}(\hat\beta - \beta_0)/\hat\sigma$ is the ratio of these two quantities. By Slutsky's Theorem, this ratio converges in distribution to $\mathcal{N}(0,1)/1 = \mathcal{N}(0, Q^{-1}/\sigma^2)$, from which the standard $t$-test is derived. Slutsky's Theorem is also used to justify replacing unknown population moments with consistent estimators in normalising constants, without changing the limiting distribution.
+Slutsky's Theorem is the workhorse for handling estimated normalising constants
+in $t$-statistics. Suppose, under the homoskedastic assumptions stated below,
+$$
+\sqrt{n}(\hat\beta-\beta_0)
+\xrightarrow{d}\mathcal{N}(0,\sigma^2Q^{-1}),
+\qquad
+\hat\sigma^2\xrightarrow{p}\sigma^2,
+\qquad
+\hat Q\xrightarrow{p}Q.
+$$
+For coefficient $j$, define the estimated asymptotic standard error
+$$
+\widehat{\operatorname{ase}}_j
+=\hat\sigma\sqrt{(\hat Q^{-1})_{jj}}.
+$$
+Then the fully studentised statistic
+$$
+t_{n,j}
+=\frac{\sqrt{n}(\hat\beta_j-\beta_{0j})}
+{\hat\sigma\sqrt{(\hat Q^{-1})_{jj}}}
+\xrightarrow{d}\mathcal{N}(0,1).
+$$
+Dividing only by $\hat\sigma$ would yield asymptotic covariance $Q^{-1}$,
+not $Q^{-1}/\sigma^2$, and would not generally produce a standard normal
+coefficient statistic. Slutsky's Theorem justifies replacing the unknown
+population normalising quantities by consistent estimators without changing the
+limiting distribution.
 \end{remark}
 
 ## Laws of Large Numbers
@@ -2177,14 +2484,184 @@ $$
 $$
 \end{theorem}
 
+**Logic and Intuition.** The theorem says the sample mean collapses onto the population mean as the sample grows. The engine behind this is a single mechanism: the sample mean is an unbiased estimator whose \emph{variance shrinks to zero} at rate $1/n$. Once the spread of a random variable around a fixed centre vanishes, essentially all of its probability mass must pile up arbitrarily close to that centre --- and Chebyshev's inequality is exactly the tool that converts "small variance" into "small probability of being far from the mean." The proof therefore has three moves: (i) locate the centre of $\bar X_n$ (its mean), (ii) measure its spread (its variance), and (iii) feed both into Chebyshev and let $n \to \infty$.
+
 \begin{proof}
-By linearity of expectation, $\E[\bar X_n] = \mu$. By independence,
-$\mathrm{Var}(\bar X_n) = \sigma^2/n$. Chebyshev's inequality gives, for any $\varepsilon > 0$,
+Fix an arbitrary tolerance $\varepsilon > 0$; it will remain fixed throughout. Our goal, by the definition of convergence in probability, is to show that $\Prob(|\bar X_n - \mu| \geq \varepsilon) \to 0$ as $n \to \infty$.
+
+\medskip
+\noindent\textbf{Step 1: The sample mean is centred at $\mu$ (no bias).}
+Using linearity of expectation (Theorem~\ref{thm:linearity}) and the fact that each $X_i$ has mean $\mu$,
 $$
-\Prob(|\bar X_n - \mu| > \varepsilon) \leq \frac{\sigma^2}{n\varepsilon^2} \to 0.
+\E[\bar X_n]
+= \E\!\left[\frac{1}{n}\sum_{i=1}^n X_i\right]
+= \frac{1}{n}\sum_{i=1}^n \E[X_i]
+= \frac{1}{n}\sum_{i=1}^n \mu
+= \frac{1}{n}\cdot n\mu
+= \mu.
 $$
-Hence $\bar X_n \xrightarrow{p} \mu$. $\qed$
+Thus $\bar X_n$ is an \emph{unbiased} estimator of $\mu$: whatever the sample size, its distribution is centred exactly on the target. Note that linearity alone suffices here --- independence is not yet needed.
+
+\medskip
+\noindent\textbf{Step 2: The variance of the sample mean is $\sigma^2/n$.}
+Pulling the constant $1/n$ out of the variance (which contributes its square, $1/n^2$) and using the additivity of variance for uncorrelated variables,
+$$
+\mathrm{Var}(\bar X_n)
+= \mathrm{Var}\!\left(\frac{1}{n}\sum_{i=1}^n X_i\right)
+= \frac{1}{n^2}\,\mathrm{Var}\!\left(\sum_{i=1}^n X_i\right).
+$$
+Now expand the variance of the sum. In general,
+$$
+\mathrm{Var}\!\left(\sum_{i=1}^n X_i\right)
+= \sum_{i=1}^n \mathrm{Var}(X_i)
+  + 2\!\!\sum_{1 \leq i < j \leq n}\!\! \mathrm{Cov}(X_i, X_j).
+$$
+Because the $X_i$ are independent, every cross-covariance vanishes: $\mathrm{Cov}(X_i, X_j) = 0$ for $i \neq j$. (Independence is precisely the assumption doing the work in this step.) Only the diagonal terms survive, and each equals $\sigma^2$, so
+$$
+\mathrm{Var}\!\left(\sum_{i=1}^n X_i\right) = \sum_{i=1}^n \sigma^2 = n\sigma^2,
+\qquad\text{hence}\qquad
+\mathrm{Var}(\bar X_n) = \frac{1}{n^2}\cdot n\sigma^2 = \frac{\sigma^2}{n}.
+$$
+This is the crux of the whole argument: the spread of $\bar X_n$ around $\mu$ decreases like $1/n$, and the finiteness of $\sigma^2$ is exactly what guarantees this quantity is well defined and tends to $0$.
+
+\medskip
+\noindent\textbf{Step 3: Convert small variance into small probability via Chebyshev.}
+Chebyshev's inequality (established earlier among the moment inequalities) states that for any random variable $Y$ with finite variance and any $\varepsilon > 0$,
+$\Prob(|Y - \E[Y]| \geq \varepsilon) \leq \mathrm{Var}(Y)/\varepsilon^2$.
+Apply it to $Y = \bar X_n$, whose mean is $\mu$ (Step 1) and whose variance is $\sigma^2/n$ (Step 2):
+$$
+\Prob\bigl(|\bar X_n - \mu| \geq \varepsilon\bigr)
+\;\leq\; \frac{\mathrm{Var}(\bar X_n)}{\varepsilon^2}
+\;=\; \frac{\sigma^2}{n\,\varepsilon^2}.
+$$
+
+\medskip
+\noindent\textbf{Step 4: Take the limit.}
+With $\varepsilon$ and $\sigma^2$ fixed, the right-hand side is a constant divided by $n$, so it vanishes as the sample grows:
+$$
+\lim_{n \to \infty} \frac{\sigma^2}{n\,\varepsilon^2} = 0.
+$$
+Since a probability is never negative, we have the sandwich
+$$
+0 \;\leq\; \Prob\bigl(|\bar X_n - \mu| \geq \varepsilon\bigr) \;\leq\; \frac{\sigma^2}{n\,\varepsilon^2},
+$$
+and both outer bounds tend to $0$. By the squeeze principle, the middle term tends to $0$ as well:
+$$
+\lim_{n\to\infty}\Prob\bigl(|\bar X_n - \mu| \geq \varepsilon\bigr) = 0.
+$$
+
+\medskip
+\noindent Because $\varepsilon > 0$ was arbitrary, this holds for every tolerance, which is exactly the definition of convergence in probability. Therefore $\bar X_n \xrightarrow{p} \mu$.
 \end{proof}
+
+\begin{remark}[On the assumptions and their econometric meaning]
+Two features of this proof deserve emphasis. First, \emph{finite variance is a convenience, not a necessity}: the WLLN in fact holds under the weaker assumption that only the mean $\E|X_1| < \infty$ exists (Khinchin's theorem), though that proof requires characteristic functions or a truncation argument rather than the one-line Chebyshev bound used here. The variance-based proof is preferred in a first course precisely because it is transparent. Second, the mechanism ``unbiased $+$ variance $\to 0$'' is the template for nearly every consistency proof in econometrics. To show an estimator $\hat\theta_n$ is consistent for $\theta_0$, one typically shows $\E[\hat\theta_n] \to \theta_0$ (asymptotic unbiasedness) and $\mathrm{Var}(\hat\theta_n) \to 0$, and then invokes exactly the Chebyshev argument above. The WLLN is thus not merely a result about sample means but the prototype for the large-sample justification of estimators throughout the discipline.
+\end{remark}
+
+#### Application: Proving the Consistency of Estimators
+
+The practical payoff of the Weak Law of Large Numbers is enormous, and its use in econometrics is remarkably simple and mechanical. Almost every estimator we work with can be written as a smooth function of \emph{sample averages}. The WLLN tells us that each such sample average converges in probability to the corresponding \emph{population expectation}. Establishing consistency then reduces to a three-step recipe:
+
+1. **Write the estimator through sample averages.** Express $\hat\theta_n$ as a continuous function of one or more quantities of the form $n^{-1}\sum_{i=1}^n h(W_i)$.
+
+2. **Invoke the WLLN.** Replace each sample average by its probability limit: $n^{-1}\sum_{i=1}^n h(W_i) \xrightarrow{p} \E[h(W_i)]$.
+
+3. **Apply the Continuous Mapping Theorem and Slutsky's Theorem.** Since the estimator is a continuous function of these averages (at the relevant limiting values), it converges in probability to the same function of the population expectations, which equals the true parameter.
+
+The whole difficulty of a consistency proof is therefore concentrated in a single, familiar tool. Once the estimator is written in terms of averages, one simply "reads off" the limits. The two examples below --- the workhorse OLS estimator and the general GMM estimator --- show the recipe in action.
+
+\begin{example}[Consistency of the OLS estimator]
+Consider the linear model $y_i = x_i' \beta_0 + u_i$, where $x_i$ is a $k \times 1$ vector of regressors and $\{(x_i, u_i)\}_{i=1}^n$ are i.i.d. Assume (i) $\E[x_i x_i'] = Q$ is finite and nonsingular, and (ii) $\E[x_i u_i] = 0$ (the regressors are exogenous), with finite second moments so that the WLLN applies to the averages below. The OLS estimator is
+$$
+\hat\beta_n = \left(\sum_{i=1}^n x_i x_i'\right)^{-1}\sum_{i=1}^n x_i y_i
+= \left(\frac{1}{n}\sum_{i=1}^n x_i x_i'\right)^{-1}\left(\frac{1}{n}\sum_{i=1}^n x_i y_i\right),
+$$
+where dividing numerator and denominator by $n$ turns both pieces into sample averages. Substituting $y_i = x_i'\beta_0 + u_i$ into the second factor,
+$$
+\frac{1}{n}\sum_{i=1}^n x_i y_i
+= \left(\frac{1}{n}\sum_{i=1}^n x_i x_i'\right)\beta_0 + \frac{1}{n}\sum_{i=1}^n x_i u_i,
+$$
+so that
+$$
+\hat\beta_n = \beta_0 + \left(\frac{1}{n}\sum_{i=1}^n x_i x_i'\right)^{-1}\left(\frac{1}{n}\sum_{i=1}^n x_i u_i\right).
+$$
+Now apply the WLLN to each average (element by element, each being an average of i.i.d.\ terms):
+$$
+\frac{1}{n}\sum_{i=1}^n x_i x_i' \xrightarrow{p} \E[x_i x_i'] = Q,
+\qquad
+\frac{1}{n}\sum_{i=1}^n x_i u_i \xrightarrow{p} \E[x_i u_i] = 0.
+$$
+Because matrix inversion is continuous at the nonsingular matrix $Q$, the Continuous Mapping Theorem (Theorem~\ref{thm:cmt}) gives $\bigl(n^{-1}\sum x_i x_i'\bigr)^{-1} \xrightarrow{p} Q^{-1}$, and Slutsky's Theorem lets us multiply the convergent factors:
+$$
+\hat\beta_n \xrightarrow{p} \beta_0 + Q^{-1}\cdot 0 = \beta_0.
+$$
+The OLS estimator is therefore consistent. The entire argument rests on two applications of the WLLN; exogeneity ($\E[x_i u_i] = 0$) is exactly what forces the error term to average out.
+\end{example}
+
+\begin{example}[Consistency of the GMM estimator]
+Generalised Method of Moments estimation starts from a population moment condition: there is a $q \times 1$ vector of moment functions $g(w_i, \theta)$ and a true parameter $\theta_0 \in \Theta \subseteq \mathbb{R}^p$ (with $q \geq p$) such that
+$$
+\E[g(w_i, \theta_0)] = 0,
+$$
+and $\theta_0$ is the \emph{only} value in $\Theta$ satisfying this (the identification condition). Given i.i.d.\ data $\{w_i\}$ and a weight matrix $W_n \xrightarrow{p} W$ (positive definite), the GMM estimator minimises the quadratic form in the sample moments,
+$$
+\hat\theta_n = \arg\min_{\theta \in \Theta} \; \bar g_n(\theta)' W_n\, \bar g_n(\theta),
+\qquad
+\bar g_n(\theta) = \frac{1}{n}\sum_{i=1}^n g(w_i, \theta).
+$$
+Here the WLLN again does the essential work. For each fixed $\theta$, $\bar g_n(\theta)$ is a sample average of the i.i.d.\ vectors $g(w_i, \theta)$, so
+$$
+\bar g_n(\theta) \xrightarrow{p} \E[g(w_i, \theta)] \equiv m(\theta).
+$$
+Consequently the sample objective converges to its population counterpart, $\;\bar g_n(\theta)' W_n \bar g_n(\theta) \xrightarrow{p} m(\theta)' W m(\theta) \equiv Q_0(\theta)$. Under identification, $m(\theta) = 0$ if and only if $\theta = \theta_0$, so $Q_0(\theta)$ is uniquely minimised at $\theta_0$ (where it equals $0$; elsewhere it is strictly positive since $W$ is positive definite). Provided the convergence of the sample objective to $Q_0$ is \emph{uniform} in $\theta$ (a uniform WLLN, guaranteed under standard regularity conditions such as a compact $\Theta$ and continuous, dominated $g$), the minimiser of the sample objective converges to the minimiser of the population objective:
+$$
+\hat\theta_n \xrightarrow{p} \theta_0.
+$$
+Once more the substantive engine is the WLLN, which delivers $\bar g_n(\theta) \xrightarrow{p} \E[g(w_i,\theta)]$; identification and uniform convergence merely upgrade this pointwise statement to convergence of the argmin.
+
+In the \emph{just-identified} case $q = p$, the estimator solves $\bar g_n(\hat\theta_n) = 0$ directly and the argument becomes as transparent as the OLS case above. For instance, the instrumental-variables estimator arises from the moment condition $\E[z_i(y_i - x_i'\beta_0)] = 0$, giving $\hat\beta_n^{\mathrm{IV}} = \bigl(n^{-1}\sum z_i x_i'\bigr)^{-1}\bigl(n^{-1}\sum z_i y_i\bigr)$, which is consistent by exactly the two-WLLN argument used for OLS, with $z_i$ replacing $x_i$ in the averages.
+\end{example}
+
+\begin{example}[Consistency of the linear GMM estimator]
+The general GMM argument becomes fully explicit --- with a closed-form estimator, exactly like OLS --- when the moment functions are \emph{linear} in the parameter. This is the case that covers instrumental-variables estimation with possibly more instruments than regressors, and it is the workhorse of applied econometrics.
+
+Consider again the linear model $y_i = x_i'\beta_0 + u_i$, where $x_i$ is $p \times 1$, but now suppose we have a $q \times 1$ vector of instruments $z_i$ with $q \geq p$, satisfying the moment condition
+$$
+\E[z_i\,u_i] = \E\!\left[z_i\,(y_i - x_i'\beta_0)\right] = 0.
+$$
+The corresponding sample moment function is linear in $\beta$,
+$$
+\bar g_n(\beta) = \frac{1}{n}\sum_{i=1}^n z_i(y_i - x_i'\beta)
+= S_{zy} - S_{zx}\,\beta,
+$$
+where we have introduced the sample averages $S_{zx} = n^{-1}\sum_i z_i x_i'$ (of dimension $q \times p$) and $S_{zy} = n^{-1}\sum_i z_i y_i$ (of dimension $q \times 1$). Given a weight matrix $W_n \xrightarrow{p} W$ (symmetric positive definite), the GMM estimator minimises the quadratic form $\bar g_n(\beta)' W_n\, \bar g_n(\beta)$. Because $\bar g_n(\beta)$ is linear in $\beta$, this is a quadratic minimisation with the explicit solution
+$$
+\hat\beta_n^{\mathrm{GMM}}
+= \bigl(S_{zx}' W_n\, S_{zx}\bigr)^{-1} S_{zx}' W_n\, S_{zy}.
+$$
+
+To establish consistency, substitute $y_i = x_i'\beta_0 + u_i$ into $S_{zy}$, which gives $S_{zy} = S_{zx}\beta_0 + n^{-1}\sum_i z_i u_i$. Writing $S_{zu} = n^{-1}\sum_i z_i u_i$ and inserting this into the formula above, the $\beta_0$ term passes through the estimator unchanged, leaving
+$$
+\hat\beta_n^{\mathrm{GMM}}
+= \beta_0 + \bigl(S_{zx}' W_n\, S_{zx}\bigr)^{-1} S_{zx}' W_n\, S_{zu}.
+$$
+Now every ingredient is a sample average to which the WLLN applies:
+$$
+S_{zx} \xrightarrow{p} \E[z_i x_i'] = Q_{zx},
+\qquad
+S_{zu} \xrightarrow{p} \E[z_i u_i] = 0,
+\qquad
+W_n \xrightarrow{p} W.
+$$
+Assume the \emph{rank condition} that $Q_{zx}$ has full column rank $p$ (instrument relevance); together with $W$ positive definite this makes the $p \times p$ matrix $Q_{zx}' W Q_{zx}$ nonsingular, so matrix inversion is continuous at the limit. Applying the Continuous Mapping Theorem (Theorem~\ref{thm:cmt}) and Slutsky's Theorem term by term,
+$$
+\hat\beta_n^{\mathrm{GMM}}
+\xrightarrow{p}
+\beta_0 + \bigl(Q_{zx}' W Q_{zx}\bigr)^{-1} Q_{zx}' W \cdot 0
+= \beta_0.
+$$
+The linear GMM estimator is therefore consistent. The proof is once more just the two-WLLN recipe --- one law for $S_{zx}$ (which must be well behaved and full rank) and one for $S_{zu}$ (which must average to zero by instrument exogeneity). This single estimator nests the earlier cases: taking $z_i = x_i$ recovers OLS (for any $W$), and taking $q = p$ recovers the just-identified IV estimator, in which the weight matrix drops out entirely because $S_{zx}$ is square and invertible.
+\end{example}
 
 ### Weak Law of Large Numbers (Non-i.i.d.)
 
@@ -2206,8 +2683,7 @@ $i$), the condition holds since $n^{-2}\sum \sigma_i^2 \leq C/n \to 0$.
 \begin{proof}
 Let $Z_n = n^{-1}\sum_{i=1}^n(X_i - \mu_i)$. Then $\E[Z_n] = 0$ and, by independence,
 $\mathrm{Var}(Z_n) = n^{-2}\sum_{i=1}^n\sigma_i^2 \to 0$. Chebyshev's inequality gives
-$\Prob(|Z_n| > \varepsilon) \leq \mathrm{Var}(Z_n)/\varepsilon^2 \to 0$. $\qed$
-\end{proof}
+$\Prob(|Z_n| > \varepsilon) \leq \mathrm{Var}(Z_n)/\varepsilon^2 \to 0$.\end{proof}
 
 \begin{example}[Stratified survey: urban and rural households in Tanzania]
 Consider a stratified sample of $n$ households from Tanzania, with $n_U = \lfloor \pi n
@@ -2271,13 +2747,20 @@ $$
 \mathrm{Var}(\bar X_T) \leq \frac{1}{T}\sum_{h=-\infty}^{\infty}|\gamma(h)| = \frac{C}{T} \to 0,
 $$
 where $C = \sum_{h}|\gamma(h)| < \infty$. Hence $\E[(\bar X_T - \mu)^2] \to 0$, giving
-$L^2$ convergence, which implies convergence in probability. $\qed$
-\end{proof}
+$L^2$ convergence, which implies convergence in probability.\end{proof}
 
 \begin{remark}[Summable Autocovariances and Weak Dependence]
 The condition $\sum_h |\gamma(h)| < \infty$ is a \emph{weak dependence} condition: it requires that the serial correlation of the process decays fast enough that the sum of all autocovariances is finite. This holds, for instance, when autocovariances decay at a geometric rate (as in stationary ARMA processes) or at a polynomial rate faster than $|h|^{-1}$. Processes with very long memory (such as ARFIMA models with $d \geq 1/2$) violate this condition, and the sample mean may converge more slowly than $T^{-1/2}$, requiring different normalisation in inference.
 
-A stronger result uses the Ergodic Theorem: for a strictly stationary and \emph{ergodic} process with $\E[|X_t|] < \infty$, $\bar X_T \xrightarrow{\mathrm{a.s.}} \mu$. Ergodicity is the condition that events measurable with respect to the distant future are trivial (have probability 0 or 1), and it implies that time averages equal ensemble averages almost surely.
+A stronger result uses the Ergodic Theorem: for a strictly stationary and
+\emph{ergodic} process with $\E[|X_t|] < \infty$,
+$\bar X_T \xrightarrow{\mathrm{a.s.}} \mu$. Ergodicity means that every event
+invariant under the time-shift operator has probability zero or one. It is this
+absence of non-trivial invariant components that makes time averages equal
+ensemble expectations almost surely. Tail triviality---the triviality of events
+determined by the arbitrarily distant future---is a distinct and generally
+stronger property and is not the definition of ergodicity
+[@davidson2021stochastic; @white2000asymptotic].
 \end{remark}
 
 ## Central Limit Theorems
@@ -2295,14 +2778,29 @@ $$
 or equivalently, $\sqrt{n}(\bar X_n - \mu) \xrightarrow{d} \mathcal{N}(0, \sigma^2)$.
 \end{theorem}
 
-**Logic and Intuition.** The CLT is remarkable because the normal limit emerges regardless of the shape of the distribution of the individual $X_i$: symmetric or skewed, bounded or unbounded, discrete or continuous. The explanation lies in the convolution structure of the sum $S_n = \sum X_i$. Each term independently adds a ``contribution'' to the sum, and as $n$ grows, the combined distribution of these contributions smooths out, with no single term dominating. The characteristic function proof makes this precise: the characteristic function of the standardised sum converges to $e^{-t^2/2}$, the characteristic function of $\mathcal{N}(0,1)$, because the second-order Taylor expansion of $\log\phi_X(t/\sqrt{n})$ captures the variance term and higher-order contributions vanish.
+**Logic and Intuition.** The CLT is remarkable because the normal limit emerges regardless of the shape of the distribution of the individual $X_i$: symmetric or skewed, bounded or unbounded, discrete or continuous. The explanation lies in the convolution structure of the sum $S_n = \sum X_i$. Each term independently adds a "contribution" to the sum, and as $n$ grows, the combined distribution of these contributions smooths out, with no single term dominating. The characteristic function proof makes this precise: the characteristic function of the standardised sum converges to $e^{-t^2/2}$, the characteristic function of $\mathcal{N}(0,1)$, because the second-order Taylor expansion of $\log\phi_X(t/\sqrt{n})$ captures the variance term and higher-order contributions vanish.
 
 \begin{remark}[CLT in Econometrics]
-The Lindeberg--Lévy CLT underpins the asymptotic normality of the OLS estimator. Under standard regularity conditions (exogeneity, finite variance of regressors and errors, full rank of $X'X/n$), the OLS estimator satisfies
+The Lindeberg--Lévy CLT helps underpin the asymptotic normality of the OLS
+estimator. For i.i.d.\ observations, assume
+$\E[u_i\mid x_i]=0$, $\E[\|x_i\|^2]<\infty$,
+$Q=\E[x_ix_i']$ is nonsingular, and conditional homoskedasticity
+$\E[u_i^2\mid x_i]=\sigma^2$, together with sufficient higher-moment conditions
+for the CLT. Then
 $$
 \sqrt{n}(\hat\beta_{\mathrm{OLS}} - \beta_0) \xrightarrow{d} \mathcal{N}(0,\, \sigma^2 Q^{-1}),
 $$
-where $Q = \plim\, n^{-1}X'X$ is the population moment matrix of the regressors. This result justifies $t$-tests, $F$-tests, and confidence intervals for regression coefficients in large samples. The same argument applies to IV and GMM estimators, with appropriate modifications to the asymptotic variance.
+where $Q = \plim\, n^{-1}X'X$ is the population moment matrix of the regressors.
+Under conditional heteroskedasticity, the covariance becomes the sandwich matrix
+$$
+Q^{-1}\Omega Q^{-1},
+\qquad
+\Omega=\E[u_i^2x_ix_i'],
+$$
+and heteroskedasticity-robust standard errors are required. With serial dependence,
+the middle matrix is a long-run covariance and HAC methods are appropriate. These
+results justify large-sample tests and confidence intervals only under their
+corresponding assumptions [@hansen2022probability; @white2000asymptotic].
 \end{remark}
 
 ### Lyapunov CLT (Non-Identically Distributed)
@@ -2320,7 +2818,22 @@ $$
 $$
 \end{theorem}
 
-**Logic and Intuition.** The Lyapunov condition is a \emph{negligibility} condition: it requires that the $(2+\delta)$-th moment of any individual term, scaled by the total spread $s_n^{2+\delta}$, becomes negligible as $n \to \infty$. This ensures that no single observation dominates the sum, so that the central limit phenomenon --- the smoothing effect of averaging many independent contributions --- still operates. The condition is verified using Lyapunov's inequality (§6.4): if the $(2+\delta)$-th moments are bounded and the sum of variances grows without bound ($s_n^2 \to \infty$), the Lyapunov condition is automatically satisfied.
+**Logic and Intuition.** The Lyapunov condition is a \emph{negligibility}
+condition: it requires the aggregate $(2+\delta)$-th absolute central moment,
+scaled by the total spread $s_n^{2+\delta}$, to vanish. This ensures that no
+individual observation dominates the sum. The condition must be checked using
+higher-moment bounds; variance information alone is insufficient. One convenient
+sufficient condition is
+$$
+\sup_i \E[|X_i-\mu_i|^{2+\delta}]<\infty
+\quad\text{and}\quad
+s_n^2\geq cn
+$$
+for some $c>0$ and all sufficiently large $n$. The numerator is then $O(n)$
+while the denominator is at least of order
+$n^{1+\delta/2}$, so their ratio tends to zero. Lyapunov's inequality (§6.4)
+works in the other direction: a finite higher moment guarantees finite lower
+moments.
 
 \begin{remark}[Lyapunov CLT in Econometrics]
 The Lyapunov CLT is the version of the CLT most commonly invoked in heterogeneous panel data and cross-sectional econometrics, where observations are drawn from different distributions. In stratified surveys, treatment effect estimations with heterogeneous units, and panel regressions with varying regressors, the i.i.d.\ assumption is implausible, and the Lyapunov CLT provides the theoretical basis for asymptotic normality. It is also used in the asymptotic theory of GMM estimators when the moment conditions involve heterogeneous observations.
@@ -2328,7 +2841,7 @@ The Lyapunov CLT is the version of the CLT most commonly invoked in heterogeneou
 
 ### CLT for Dependent Sequences
 
-The i.i.d.\ and Lyapunov CLTs require independence. In time-series settings, where observations are serially correlated, a different set of CLTs applies. The key condition is that the dependence is ``weak'' enough that the central limit phenomenon persists.
+The i.i.d.\ and Lyapunov CLTs require independence. In time-series settings, where observations are serially correlated, a different set of CLTs applies. The key condition is that the dependence is "weak" enough that the central limit phenomenon persists.
 
 \begin{theorem}[CLT for Stationary Mixing Sequences — informal statement]
 Let $\{X_t\}$ be a strictly stationary and strong-mixing sequence with $\E[X_t] = \mu$,
@@ -2346,6 +2859,29 @@ $$
 \begin{remark}[Long-Run Variance and HAC Estimation]
 The critical difference from the i.i.d.\ case is that the asymptotic variance is the \emph{long-run variance} $\Sigma^2 = \sum_h \gamma(h)$, not merely $\gamma(0) = \mathrm{Var}(X_t)$. Positive serial correlation ($\gamma(h) > 0$ for $h > 0$) inflates $\Sigma^2$ above $\gamma(0)$: the sample mean is more variable than it would be under independence, because observations carry redundant information. Negative serial correlation deflates it. In practice, $\Sigma^2$ must be estimated from the data; this is the role of \textbf{heteroskedasticity and autocorrelation consistent (HAC)} standard errors (e.g.\ Newey--West), which consistently estimate $\Sigma^2$ under general forms of serial correlation and thereby make valid inference possible in time-series regressions.
 \end{remark}
+
+## Review Exercises
+
+1. Let $\Omega=\{\text{drought},\text{normal},\text{flood}\}$. Construct a
+   $\sigma$-algebra that distinguishes drought from non-drought conditions but
+   does not distinguish normal rainfall from flooding. Define a probability
+   measure on it.
+2. Give an example of two random variables that are uncorrelated but not
+   independent, and verify both claims.
+3. State the integrability condition under which $\E[X]$ is finite. Explain why
+   the expectation of a standard Cauchy random variable is not defined.
+4. Prove Chebyshev's inequality from Markov's inequality and identify the step
+   that requires a finite variance.
+5. Construct a sequence that converges in probability but not almost surely.
+   Explain which part of the definition fails.
+6. In the linear model $y_i=x_i'\beta_0+u_i$, list separately the assumptions
+   needed for consistency and those added for asymptotic normality.
+7. Derive the homoskedastic OLS asymptotic covariance and then show where the
+   sandwich middle matrix $\Omega=\E[u_i^2x_ix_i']$ enters under
+   heteroskedasticity.
+8. For a heterogeneous independent triangular array, propose conditions that
+   make the Lyapunov ratio vanish and verify their rate implications.
+
 # Monte Carlo Illustrations
 
 Mathematical theorems tell us what must happen in the limit; Monte Carlo simulation lets us watch it happen. In this section we use the computer to draw random samples, compute sample statistics, and visualise how those statistics behave as sample size grows. The two results we simulate --- the Law of Large Numbers and the Central Limit Theorem --- are the cornerstones of asymptotic econometrics established in Section 7. Seeing them emerge from raw simulation, across distributions with very different shapes, builds an intuition that no formal proof alone can provide.
@@ -2443,7 +2979,7 @@ ggplot(lln_data, aes(x = n, y = running_mean, group = path)) +
 
 ### Reading the Figure
 
-Several features of Figure \ref{fig:fig-lln} are worth noting.
+Several features of @fig-lln are worth noting.
 
 **Early-sample volatility.** All four panels show substantial path-to-path variability when $n$ is small. This is not a failure of the LLN; it is exactly what probability theory predicts. $\mathrm{Var}(\bar X_n) = \sigma^2/n$ is large when $n$ is small, so the sample mean is genuinely noisy. The LLN is an asymptotic result --- it describes the eventual behaviour of the average, not its behaviour at any finite $n$.
 
@@ -2551,7 +3087,7 @@ ggplot(clt_data, aes(x = z)) +
 
 ### Reading the Figure
 
-Figure \ref{fig:fig-clt} rewards careful examination row by row and column by column.
+@fig-clt rewards careful examination row by row and column by column.
 
 **Along the columns (increasing $n$).** At $n = 1$, the histogram simply reflects the shape of the parent distribution: right-skewed for the Exponential, flat for the Uniform, two-spike for the Bernoulli. By $n = 5$ some bell-shaping is already visible for the Uniform but the Exponential and Bernoulli remain noticeably asymmetric. By $n = 30$ all three distributions are well-approximated by the normal curve, and at $n = 100$ the match is nearly exact in every case. This progression is the CLT in action.
 
@@ -2560,15 +3096,18 @@ Figure \ref{fig:fig-clt} rewards careful examination row by row and column by co
 **The role of standardisation.** Notice that the histograms are plotted for the standardised statistic $Z_n = \sqrt{n}(\bar X_n - \mu)/\sigma$, not the raw sample mean $\bar X_n$. Without standardisation, the mean’s distribution would shrink toward a point (by the LLN), giving a trivial degenerate limit. Standardising by $\sqrt{n}$ inflates the scale just enough to keep the distribution non-degenerate, revealing its shape --- and it is that shape which converges to $\mathcal{N}(0,1)$.
 
 \begin{remark}[From Simulation to Asymptotic Inference]
-These simulations reveal why the CLT is the engine of asymptotic inference in econometrics. A $t$-statistic for a regression coefficient is, asymptotically, exactly $Z_n$ for a suitably defined statistic. The fact that $Z_n \xrightarrow{d} \mathcal{N}(0,1)$ regardless of the distribution of the errors means that $t$-tests and confidence intervals are valid in large samples without any normality assumption on the data. The simulation shows concretely how ``large’’ the sample needs to be: for approximately symmetric distributions, $n = 30$ is often sufficient; for highly skewed or discrete distributions, $n = 100$ or more may be needed. These are the practical considerations that guide choices between exact finite-sample methods and asymptotic approximations in applied work.
+These simulations reveal why the CLT is the engine of asymptotic inference in
+econometrics. A fully studentised statistic for a regression coefficient is
+asymptotically analogous to $Z_n$. Under the relevant sampling, moment,
+identification, and dependence conditions, asymptotic normality can justify
+$t$-tests and confidence intervals without assuming normally distributed data.
+The figures also show that convergence can be much slower for skewed or discrete
+populations. They should not be read as establishing universal sample-size rules:
+whether $n=30$, $100$, or more is adequate depends on tail behaviour,
+heterogeneity, dependence, leverage, and the statistic being studied. Simulation
+calibrated to the empirical application is therefore preferable to a fixed rule
+of thumb.
 \end{remark}
-
-\newpage
-
-# Bibliography {.unnumbered}
-
-::: {#refs}
-:::
 
 # Appendix
 
@@ -3094,68 +3633,78 @@ This unification is not merely aesthetic. It means that every theorem proved usi
 
 ## R Code: Monte Carlo Simulations
 
-This section contains the fully annotated R code that produces Figures \ref{fig:fig-lln} and \ref{fig:fig-clt} in Section 8. Both simulations use base R for random number generation and `ggplot2` with `theme_classic()` for all graphics. No additional packages beyond `ggplot2` and `scales` are required.
+This section contains the fully annotated R code that produces the Law of Large Numbers figure (@fig-lln) and the Central Limit Theorem figure (@fig-clt) in Section 8. Both simulations use base R for random number generation and `ggplot2` with `theme_classic()` for all graphics. No additional packages beyond `ggplot2` and `scales` are required.
 
 ### Simulating the Law of Large Numbers
 
-The code below generates five independent realisations of the running sample mean for each of four distributions and plots them against sample size, with the true mean shown as a horizontal reference line.
+This program plots the running sample mean $\bar X_k = k^{-1}\sum_{i=1}^k X_i$ against the sample size $k$, for five independent samples drawn from each of four distributions, and overlays the true population mean as a reference line. If the LLN holds, every path should settle onto that line as $k$ grows. The code is organised into four stages, presented and explained one at a time below.
 
-```{r}
-#| label: lln-appendix
-#| echo: true
-#| eval: false
+**Stage 1 --- Load the library, fix the seed, set the parameters.** Loading `ggplot2` makes the plotting functions available. The call to `set.seed(42)` fixes the state of R's random-number generator so that re-running the script reproduces exactly the same figure --- essential for a result that others must be able to replicate. The two parameters control how much data we generate: `n_max` is the largest sample size shown on the horizontal axis, and `n_paths` is how many independent repetitions we draw per distribution (five, so the reader can see that *all* paths converge, not just a lucky one).
 
-library(ggplot2)
-set.seed(42)
+```r
+library(ggplot2)   # plotting functions
+set.seed(42)       # reproducible random numbers
 
-# ── Parameters ────────────────────────────────────────────────────────────────
-n_max   <- 2000   # maximum sample size per path
-n_paths <- 5      # number of independent paths per distribution
+n_max   <- 2000    # longest sample path (x-axis: 1 .. n_max)
+n_paths <- 5       # independent repetitions per distribution
+```
 
-# ── Helper: compute running means for one distribution ────────────────────────
-# rfun     : function(n) that draws n observations from the target distribution
-# mu_true  : population mean of that distribution
-# dist_label: display name for facet strip
+**Stage 2 --- A helper that builds the running-mean paths for one distribution.** The function `make_paths()` takes three arguments: `rfun`, a function that draws `n` observations from the target distribution; `mu_true`, that distribution's known population mean (used later for the reference line); and `dist_label`, the text shown above each panel. For each of the `n_paths` repetitions it draws one full sample `x` of length `n_max`, then computes the running mean at every step. The key expression is `cumsum(x) / seq_len(n_max)`: `cumsum(x)` is the vector of partial sums $(x_1,\ x_1+x_2,\ \ldots)$, and dividing element-wise by $(1, 2, 3, \ldots)$ yields the sequence of sample means $\bar X_1, \bar X_2, \ldots$ The results for the five repetitions are stacked into one data frame by `do.call(rbind, ...)`.
+
+```r
+# Build the running means of n_paths independent samples
+# from one distribution and stack them in a data frame.
+#   rfun       : function(n) drawing n observations
+#   mu_true    : population mean (for the reference line)
+#   dist_label : label shown on the panel strip
 make_paths <- function(rfun, mu_true, dist_label) {
   do.call(rbind, lapply(seq_len(n_paths), function(p) {
-    x <- rfun(n_max)
+    x <- rfun(n_max)                # one sample of size n_max
     data.frame(
       n            = seq_len(n_max),
-      running_mean = cumsum(x) / seq_len(n_max),   # bar X_n at each step
-      path         = factor(p),
-      distribution = dist_label,
-      mu_true      = mu_true
+      # running mean X-bar_k for every k = 1 .. n_max
+      running_mean = cumsum(x) / seq_len(n_max),
+      path         = factor(p),     # which repetition
+      distribution = dist_label,    # panel label
+      mu_true      = mu_true        # true mean
     )
   }))
 }
+```
 
-# ── Simulate four distributions ───────────────────────────────────────────────
+**Stage 3 --- Run the helper for four distributions.** We call `make_paths()` four times, once per distribution, and `rbind` the results into a single long data frame `lln_data`. The four distributions are deliberately varied --- a symmetric continuous law, a skewed one, a bounded one, and a discrete one --- to show that the LLN does not depend on the shape of the underlying distribution. Each is paired with its known mean. The last line extracts the distinct `(distribution, mu_true)` pairs into `mu_ref`, which supplies one dashed reference line per panel.
+
+```r
 lln_data <- rbind(
-  make_paths(function(n) rnorm(n, 0, 1),    mu_true = 0,   dist_label = "Normal(0, 1)   mu = 0"),
-  make_paths(function(n) rexp(n, rate = 1), mu_true = 1,   dist_label = "Exponential(1)   mu = 1"),
-  make_paths(function(n) runif(n, 0, 1),    mu_true = 0.5, dist_label = "Uniform(0, 1)   mu = 0.5"),
-  make_paths(function(n) rbinom(n, 1, 0.3), mu_true = 0.3, dist_label = "Bernoulli(0.3)   mu = 0.3")
+  make_paths(function(n) rnorm(n, 0, 1),
+             mu_true = 0,   dist_label = "Normal(0,1), mu=0"),
+  make_paths(function(n) rexp(n, rate = 1),
+             mu_true = 1,   dist_label = "Exponential(1), mu=1"),
+  make_paths(function(n) runif(n, 0, 1),
+             mu_true = 0.5, dist_label = "Uniform(0,1), mu=0.5"),
+  make_paths(function(n) rbinom(n, 1, 0.3),
+             mu_true = 0.3, dist_label = "Bernoulli(0.3), mu=0.3")
 )
 
-# Reference lines: one per distribution panel
+# one reference row (true mean) per distribution
 mu_ref <- unique(lln_data[, c("distribution", "mu_true")])
+```
 
-# ── Plot ──────────────────────────────────────────────────────────────────────
+**Stage 4 --- Draw the plot.** The `ggplot()` call maps sample size `n` to the horizontal axis and `running_mean` to the vertical axis, with `group = path` so that each repetition is drawn as its own line. `geom_line()` renders the five paths as translucent blue curves; `geom_hline()` adds the dashed red line at the true mean, read from `mu_ref`; and `facet_wrap()` splits the plot into one panel per distribution, each with its own vertical scale (`scales = "free_y"`). The remaining lines label the axes and apply the classic (unshaded) theme.
+
+```r
 ggplot(lln_data, aes(x = n, y = running_mean, group = path)) +
-  geom_line(colour = "#2b6cb0", alpha = 0.55, linewidth = 0.45) +
-  geom_hline(
-    data = mu_ref,
-    aes(yintercept = mu_true),
-    colour    = "#c0392b",
-    linetype  = "dashed",
-    linewidth = 0.75
-  ) +
+  # the five sample-mean paths (translucent blue)
+  geom_line(colour = "#2b6cb0", alpha = 0.55,
+            linewidth = 0.45) +
+  # the true population mean (dashed red)
+  geom_hline(data = mu_ref, aes(yintercept = mu_true),
+             colour = "#c0392b", linetype = "dashed",
+             linewidth = 0.75) +
+  # one panel per distribution, independent y-scales
   facet_wrap(~ distribution, scales = "free_y", nrow = 2) +
   scale_x_continuous(labels = scales::comma) +
-  labs(
-    x = "Sample size  n",
-    y = expression(bar(X)[n])
-  ) +
+  labs(x = "Sample size  n", y = expression(bar(X)[n])) +
   theme_classic(base_size = 11) +
   theme(
     strip.background = element_blank(),
@@ -3167,48 +3716,55 @@ ggplot(lln_data, aes(x = n, y = running_mean, group = path)) +
 
 ### Simulating the Central Limit Theorem
 
-The code below draws $B = 5{,}000$ independent samples of each size $n \in \{1, 5, 30, 100\}$ from three non-normal distributions, standardises each sample mean, and overlays the empirical histogram with the $\mathcal{N}(0,1)$ density.
+This program approximates the *sampling distribution* of the standardised sample mean by brute force: for each distribution and each sample size $n$, it draws $B = 5{,}000$ independent samples, computes and standardises the mean of each, and plots a histogram of the $5{,}000$ standardised values against the $\mathcal{N}(0,1)$ density. As $n$ grows, the histograms should approach the bell curve regardless of the parent distribution. The code again proceeds in stages.
 
-```{r}
-#| label: clt-appendix
-#| echo: true
-#| eval: false
+**Stage 1 --- Parameters.** `B` is the number of Monte Carlo replications: the more samples we draw, the smoother and more accurate the estimated sampling distribution. `sample_sizes` lists the four values of $n$ we examine; these become the columns of the final figure and let us watch the approximation improve as $n$ increases.
 
+```r
 library(ggplot2)
-set.seed(42)
+set.seed(42)                       # reproducibility
 
-# ── Parameters ────────────────────────────────────────────────────────────────
 B            <- 5000               # Monte Carlo replications
-sample_sizes <- c(1, 5, 30, 100)   # sample sizes to examine
+sample_sizes <- c(1, 5, 30, 100)   # sample sizes examined
+```
 
-# ── Distribution specifications ───────────────────────────────────────────────
-# Each entry: display name, random draw function, population mean, population sd
+**Stage 2 --- Describe the three distributions.** Each distribution is stored as a small list holding four items: a display `name`, a draw function `rfun`, the true mean `mu`, and the true standard deviation `sigma`. The mean and standard deviation are needed because standardising a sample mean requires the *exact* population values, not estimates. The three closed-form standard deviations used are $\sigma = 1$ for $\mathrm{Exp}(1)$, $\sigma = \sqrt{1/12}$ for $\mathrm{Uniform}(0,1)$, and $\sigma = \sqrt{p(1-p)} = \sqrt{0.3\cdot 0.7}$ for $\mathrm{Bernoulli}(0.3)$.
+
+```r
+# Each entry: name, draw function, true mean, true sd.
 dist_specs <- list(
-  list(
-    name  = "Exponential(1)",
-    rfun  = function(n) rexp(n, rate = 1),
-    mu    = 1,
-    sigma = 1                          # sd of Exp(1) is 1
-  ),
-  list(
-    name  = "Uniform(0, 1)",
-    rfun  = function(n) runif(n, 0, 1),
-    mu    = 0.5,
-    sigma = sqrt(1 / 12)               # sd of Uniform(0,1)
-  ),
-  list(
-    name  = "Bernoulli(0.3)",
-    rfun  = function(n) rbinom(n, 1, 0.3),
-    mu    = 0.3,
-    sigma = sqrt(0.3 * 0.7)            # sd of Bernoulli(0.3)
-  )
+  list(name  = "Exponential(1)",
+       rfun  = function(n) rexp(n, rate = 1),
+       mu    = 1,
+       sigma = 1),                     # sd of Exp(1)
+  list(name  = "Uniform(0, 1)",
+       rfun  = function(n) runif(n, 0, 1),
+       mu    = 0.5,
+       sigma = sqrt(1 / 12)),          # sd of Unif(0,1)
+  list(name  = "Bernoulli(0.3)",
+       rfun  = function(n) rbinom(n, 1, 0.3),
+       mu    = 0.3,
+       sigma = sqrt(0.3 * 0.7))        # sd of Bern(0.3)
 )
+```
 
-# ── Simulate: for each distribution × sample size, collect B standardised means
+**Stage 3 --- The simulation loop (the heart of the program).** Two nested loops (written with `lapply`) run over every distribution `d` and every sample size `n`. For a given pair, the line
+
+`means <- replicate(B, mean(d$rfun(n)))`
+
+does the core work: `d$rfun(n)` draws one sample of size `n`, `mean(...)` collapses it to a single sample mean, and `replicate(B, ...)` repeats this `B` times, yielding a vector of $5{,}000$ sample means. The next line standardises each mean,
+$$
+Z_n = \frac{\bar X_n - \mu}{\sigma/\sqrt{n}},
+$$
+which is exactly the transformation appearing in the CLT. The standardised values, together with labels identifying the sample size and distribution, are stored in a data frame; `do.call(rbind, ...)` stacks all the pieces into one long table `clt_data`.
+
+```r
 clt_data <- do.call(rbind, lapply(dist_specs, function(d) {
   do.call(rbind, lapply(sample_sizes, function(n) {
-    means <- replicate(B, mean(d$rfun(n)))          # B sample means
-    z     <- (means - d$mu) / (d$sigma / sqrt(n))  # standardise to Z_n
+    # B independent sample means of size n
+    means <- replicate(B, mean(d$rfun(n)))
+    # standardise each mean to Z_n
+    z <- (means - d$mu) / (d$sigma / sqrt(n))
     data.frame(
       z            = z,
       n_label      = paste0("n = ", n),
@@ -3216,40 +3772,42 @@ clt_data <- do.call(rbind, lapply(dist_specs, function(d) {
     )
   }))
 }))
+```
 
-# Preserve factor order for facets
-clt_data$n_label      <- factor(clt_data$n_label,
-                                levels = paste0("n = ", sample_sizes))
-clt_data$distribution <- factor(clt_data$distribution,
-                                levels = sapply(dist_specs, `[[`, "name"))
+**Stage 4 --- Fix the panel order and build the reference curve.** By default R orders factor levels alphabetically, which would scramble the panels. Converting `n_label` and `distribution` to factors with explicit `levels` forces the columns to appear in increasing $n$ and the rows in the intended order. The last two lines tabulate the standard normal density on a fine grid from $-4$ to $4$; this is the red curve overlaid on every panel.
 
-# ── N(0,1) reference curve ────────────────────────────────────────────────────
-norm_df         <- data.frame(z = seq(-4, 4, length.out = 300))
+```r
+# put panels in the intended order (not alphabetical)
+clt_data$n_label <- factor(
+  clt_data$n_label,
+  levels = paste0("n = ", sample_sizes))
+clt_data$distribution <- factor(
+  clt_data$distribution,
+  levels = sapply(dist_specs, `[[`, "name"))
+
+# N(0,1) density for the reference curve
+norm_df <- data.frame(z = seq(-4, 4, length.out = 300))
 norm_df$density <- dnorm(norm_df$z)
+```
 
-# ── Plot ──────────────────────────────────────────────────────────────────────
+**Stage 5 --- Draw the plot.** `geom_histogram()` draws the empirical sampling distribution, with `aes(y = after_stat(density))` rescaling the bars to integrate to one so they are directly comparable to a density. `geom_line()` overlays the $\mathcal{N}(0,1)$ curve from `norm_df`. `facet_grid(distribution ~ n_label)` arranges the panels in a grid --- one row per distribution, one column per sample size --- so the eye can track convergence across each row. `coord_cartesian(xlim = c(-4, 4))` trims the view to the region of interest.
+
+```r
 ggplot(clt_data, aes(x = z)) +
-  geom_histogram(
-    aes(y = after_stat(density)),
-    bins      = 55,
-    fill      = "#2b6cb0",
-    colour    = "white",
-    alpha     = 0.70,
-    linewidth = 0.15
-  ) +
-  geom_line(
-    data        = norm_df,
-    aes(x = z, y = density),
-    colour      = "#c0392b",
-    linewidth   = 0.80,
-    inherit.aes = FALSE
-  ) +
+  # empirical sampling distribution (density-scaled)
+  geom_histogram(aes(y = after_stat(density)),
+                 bins = 55, fill = "#2b6cb0",
+                 colour = "white", alpha = 0.70,
+                 linewidth = 0.15) +
+  # N(0,1) reference density (red)
+  geom_line(data = norm_df, aes(x = z, y = density),
+            colour = "#c0392b", linewidth = 0.80,
+            inherit.aes = FALSE) +
+  # rows = distributions, columns = sample sizes
   facet_grid(distribution ~ n_label) +
   coord_cartesian(xlim = c(-4, 4)) +
-  labs(
-    x = expression("Standardised sample mean  " * Z[n]),
-    y = "Density"
-  ) +
+  labs(x = expression("Standardised mean  " * Z[n]),
+       y = "Density") +
   theme_classic(base_size = 10) +
   theme(
     strip.background = element_blank(),
@@ -3259,3 +3817,10 @@ ggplot(clt_data, aes(x = z)) +
     axis.title       = element_text(size = 10)
   )
 ```
+
+\newpage
+
+# Bibliography {.unnumbered}
+
+::: {#refs}
+:::

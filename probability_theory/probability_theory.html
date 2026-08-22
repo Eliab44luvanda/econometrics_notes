@@ -2,14 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Eliab Luvanda">
-<meta name="dcterms.date" content="2026-04-29">
+<meta name="dcterms.date" content="2026-07-23">
 
-<title>Measure-Theoretic Probability for Econometrics</title>
+<title>Probability Theory for Econometrics: A Measure-Theoretic Approach</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -89,7 +89,7 @@ div.csl-indent {
 <script src="probability_theory_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="probability_theory_files/libs/quarto-html/anchor.min.js"></script>
 <link href="probability_theory_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="probability_theory_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="probability_theory_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="probability_theory_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="probability_theory_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="probability_theory_files/libs/bootstrap/bootstrap-138a6193a3bd40baf1e627da441a4734.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -146,8 +146,8 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Measure-Theoretic Probability for Econometrics</h1>
-<p class="subtitle lead">Foundations, Random Variables, Expectation, and Convergence</p>
+<h1 class="title">Probability Theory for Econometrics: A Measure-Theoretic Approach</h1>
+<p class="subtitle lead">From Probability Spaces and Random Variables to Asymptotic Theory</p>
 </div>
 
 
@@ -164,7 +164,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 29, 2026</p>
+      <p class="date">July 23, 2026</p>
     </div>
   </div>
   
@@ -216,6 +216,40 @@ window.Quarto = {
 <section id="subjective" class="level3">
 <h3 class="anchored" data-anchor-id="subjective">Subjective</h3>
 <p>The subjective (or Bayesian) approach to probability defines probability as a degree of belief or confidence that an individual assigns to the occurrence of an event, based on their personal judgment, information, and prior experience. Formally, let <span class="math inline">\(A\)</span> be an event, and let <span class="math inline">\(\Prob(A)\)</span> represent the subjective probability assigned to <span class="math inline">\(A\)</span>. This interpretation is inherently personal and can vary between individuals, as it reflects their unique perspectives and information sets. The subjective approach is particularly useful in decision-making under uncertainty, where probabilities are used to guide choices in the absence of objective frequencies or symmetries. However, it can be criticized for its lack of objectivity and potential for inconsistency across different individuals.</p>
+<section id="the-subjective-approach-as-the-foundation-of-bayesian-econometrics" class="level4">
+<h4 class="anchored" data-anchor-id="the-subjective-approach-as-the-foundation-of-bayesian-econometrics">The Subjective Approach as the Foundation of Bayesian Econometrics</h4>
+<p>The subjective interpretation of probability is not merely a philosophical position — it is the operational foundation of an entire approach to statistical inference known as <strong>Bayesian econometrics</strong> (or Bayesian statistics). The central mechanism that converts subjective prior beliefs into updated posterior beliefs in light of data is <strong>Bayes’ theorem</strong>, first stated by the Reverend Thomas Bayes in 1763. For an event <span class="math inline">\(A\)</span> and observed data <span class="math inline">\(D\)</span>,</p>
+<p><span class="math display">\[
+\Prob(A \mid D) = \frac{\Prob(D \mid A)\,\Prob(A)}{\Prob(D)}.
+\]</span></p>
+<p>In an econometric context, let <span class="math inline">\(\theta\)</span> denote the parameter of interest (a regression coefficient, an elasticity, a structural parameter) and let <span class="math inline">\(y\)</span> denote the observed data. Bayes’ theorem gives the <strong>posterior distribution</strong> of <span class="math inline">\(\theta\)</span> given the data:</p>
+<p><span class="math display">\[
+\underbrace{p(\theta \mid y)}_{\text{posterior}} \;\propto\; \underbrace{p(y \mid \theta)}_{\text{likelihood}} \;\times\; \underbrace{p(\theta)}_{\text{prior}}.
+\]</span></p>
+<p>This equation is the engine of Bayesian inference. It says: start with a prior distribution <span class="math inline">\(p(\theta)\)</span> that quantifies your beliefs about <span class="math inline">\(\theta\)</span> before seeing the data; update those beliefs using the likelihood <span class="math inline">\(p(y \mid \theta)\)</span>, which measures how probable the observed data would be under each possible value of <span class="math inline">\(\theta\)</span>; the result is the posterior distribution <span class="math inline">\(p(\theta \mid y)\)</span>, which represents your updated beliefs about <span class="math inline">\(\theta\)</span> after incorporating the data. All Bayesian inference — point estimates, interval estimates, hypothesis tests, predictions — is derived from the posterior.</p>
+</section>
+<section id="the-essence-of-bayesian-econometrics" class="level4">
+<h4 class="anchored" data-anchor-id="the-essence-of-bayesian-econometrics">The Essence of Bayesian Econometrics</h4>
+<p>Bayesian econometrics treats model parameters as <strong>random variables</strong> that have probability distributions, rather than as fixed but unknown constants. This shift in ontology has several concrete implications.</p>
+<p><strong>Prior distributions.</strong> Before observing any data, the researcher specifies a prior distribution <span class="math inline">\(p(\theta)\)</span> over the parameter space. This distribution encodes existing knowledge, theoretical restrictions, or expert judgment. A prior can be <strong>informative</strong> — reflecting substantive prior knowledge, such as the belief from prior studies that an income elasticity is likely between 0.5 and 1.5 — or <strong>diffuse</strong> (sometimes called weakly informative or non-informative), such as a flat or very wide distribution that exerts little influence on the posterior, effectively letting the data speak. In practice, the choice of prior is a modelling decision, analogous to choosing a functional form or instrument set in classical econometrics, and should be made transparently and defended on substantive grounds.</p>
+<p><strong>The likelihood.</strong> The likelihood function <span class="math inline">\(p(y \mid \theta)\)</span> is common to both Bayesian and classical approaches. It summarises the information that the observed data carry about <span class="math inline">\(\theta\)</span> under a given model.</p>
+<p><strong>Posterior distributions and inference.</strong> Once the prior and likelihood are specified, the posterior <span class="math inline">\(p(\theta \mid y)\)</span> is fully determined by Bayes’ theorem. All inferential statements are then statements about the posterior. A <strong>point estimate</strong> is typically the posterior mean, median, or mode. A <strong>credible interval</strong> — the Bayesian counterpart of a confidence interval — is a region that contains the parameter with a specified posterior probability, e.g.<br>
+<span class="math display">\[
+\Prob(\theta \in [L, U] \mid y) = 0.95.
+\]</span> This statement has the direct probabilistic interpretation that analysts often mistakenly attribute to classical confidence intervals: given the observed data, there is a <span class="math inline">\(95\%\)</span> probability that <span class="math inline">\(\theta\)</span> lies in <span class="math inline">\([L, U]\)</span>. Bayesian hypothesis testing proceeds by comparing posterior probabilities or Bayes factors, rather than <span class="math inline">\(p\)</span>-values.</p>
+<p><strong>Prediction.</strong> Bayesian econometrics produces predictive distributions for out-of-sample outcomes by integrating over the posterior uncertainty in <span class="math inline">\(\theta\)</span>: <span class="math display">\[
+p(\tilde{y} \mid y) = \int p(\tilde{y} \mid \theta)\,p(\theta \mid y)\,d\theta.
+\]</span> This <strong>posterior predictive distribution</strong> propagates parameter uncertainty into forecasts, yielding prediction intervals that honestly reflect both sampling variation and parameter uncertainty.</p>
+</section>
+<section id="how-bayesian-econometrics-differs-from-classical-econometrics" class="level4">
+<h4 class="anchored" data-anchor-id="how-bayesian-econometrics-differs-from-classical-econometrics">How Bayesian Econometrics Differs from Classical Econometrics</h4>
+<p>Classical (frequentist) econometrics and Bayesian econometrics share the same mathematical foundation — probability theory and statistical models — but they differ fundamentally in their interpretation of probability, their treatment of parameters, and their inferential targets.</p>
+<p><strong>The nature of parameters.</strong> In classical econometrics, the parameter <span class="math inline">\(\theta\)</span> is a fixed but unknown constant. It has a true value; it simply is not observed. Probability statements can only be made about estimators — random functions of the data — not about <span class="math inline">\(\theta\)</span> itself. In Bayesian econometrics, <span class="math inline">\(\theta\)</span> is a random variable with a probability distribution. Probability statements about <span class="math inline">\(\theta\)</span> are well-defined and are the primary output of inference.</p>
+<p><strong>The interpretation of probability.</strong> Classical econometrics uses the frequentist interpretation: probability refers to the long-run frequency of outcomes in repeated hypothetical experiments. A confidence interval at the <span class="math inline">\(95\%\)</span> level means that, if the estimation procedure were repeated on many independent samples from the same data-generating process, <span class="math inline">\(95\%\)</span> of the resulting intervals would contain the true parameter. The interval from any particular sample either contains <span class="math inline">\(\theta\)</span> or it does not — there is no probability statement to be made about the specific realised interval. Bayesian econometrics uses the subjective interpretation: the <span class="math inline">\(95\%\)</span> credible interval directly means that, conditional on the observed data, <span class="math inline">\(\theta\)</span> lies in the interval with probability <span class="math inline">\(0.95\)</span>.</p>
+<p><strong>Prior information.</strong> Classical econometrics, at least in its standard forms, does not incorporate prior information about parameters formally into the estimation procedure. All information flows from the likelihood. Bayesian econometrics formalises prior knowledge through the prior distribution, enabling the systematic incorporation of evidence from previous studies, theoretical restrictions, or calibrated structural knowledge. This is a significant advantage in small-sample settings, where the data alone may be too sparse to identify parameters precisely, and in structural models, where economic theory places strong restrictions on the parameter space.</p>
+<p><strong>Estimation and inference.</strong> Classical estimators — OLS, IV, GMM, MLE — are constructed to minimise a loss function or maximise a likelihood, and their sampling properties (unbiasedness, consistency, efficiency) are evaluated over hypothetical repeated samples. Bayesian estimators are derived from the posterior distribution and their properties are evaluated conditionally on the observed data. Classical hypothesis tests produce <span class="math inline">\(p\)</span>-values — the probability, under the null hypothesis and the assumed model, of observing a test statistic as extreme as or more extreme than the one obtained. Bayesian hypothesis tests produce posterior probabilities or Bayes factors, which directly compare the posterior probability of competing hypotheses given the data.</p>
+<p><strong>Computational demands.</strong> Classical estimation is often analytically tractable or numerically straightforward (OLS has a closed-form solution; MLE requires a single optimisation). Bayesian estimation requires computing the posterior distribution <span class="math inline">\(p(\theta \mid y)\)</span>, which is typically a high-dimensional integral with no closed form except in special cases (conjugate prior-likelihood pairs). In practice, Bayesian inference relies on simulation methods, principally <strong>Markov Chain Monte Carlo (MCMC)</strong> algorithms such as the Gibbs sampler and the Metropolis-Hastings algorithm, which draw samples from the posterior without requiring it to be computed analytically. Advances in computing power and the development of probabilistic programming languages (Stan, PyMC, JAGS) have made Bayesian methods increasingly practical for complex structural models.</p>
+</section>
 </section>
 <section id="axiomatic-measure-theoretic" class="level3">
 <h3 class="anchored" data-anchor-id="axiomatic-measure-theoretic">Axiomatic (Measure-Theoretic)</h3>
@@ -351,88 +385,238 @@ Figure&nbsp;2: Discrete rainfall shocks, household income, and the induced distr
 </section>
 <section id="important-inequalities" class="level1">
 <h1>Important Inequalities</h1>
-<p>Moment-based inequalities are fundamental in probability theory because they convert information about means, variances, and higher moments into practical bounds on the probabilities and sizes of random variables. Among the most important inequalities of this type are Markov’s inequality, Chebyshev’s inequality, Jensen’s inequality, and Lyapunov’s inequality. Markov’s and Chebyshev’s inequalities offer basic probability bounds that are crucial for showing convergence in probability and establishing laws of large numbers.</p>
-<p>Jensen’s inequality connects convex functions to expectations and is commonly applied in deriving moment conditions, assessing risk, and studying estimator properties. Lyapunov’s inequality expresses the ordering of moments and helps in checking regularity conditions that involve higher moments. Taken together, these inequalities are key tools in statistical inference and econometric theory, particularly in proofs concerning consistency, asymptotic approximations, existence of moments, and stochastic convergence.</p>
+<p>A recurring challenge in probability theory and econometrics is that the full distribution of a random variable is rarely known. What is often available instead is partial information: a mean, a variance, or a higher moment. Moment-based inequalities convert this partial information into sharp, universally valid bounds on probabilities and expectations, without requiring knowledge of the distribution beyond the specified moment. They are therefore indispensable tools, both in theoretical arguments — consistency proofs, derivations of convergence rates, verification of regularity conditions — and in applied work, where they discipline what can be inferred from data.</p>
+<p>The four inequalities treated in this section form a natural hierarchy. Markov’s inequality is the most elementary, requiring only a non-negative mean. Chebyshev’s inequality refines it by incorporating variance, yielding tighter probability bounds. Jensen’s inequality connects convex transformations to expectations and underlies a vast range of results in decision theory, information theory, and econometrics. Lyapunov’s inequality relates moments of different orders and provides the regularity conditions that make central limit theorems applicable. Together they constitute the foundational toolkit of moment-based reasoning.</p>
+<section id="markovs-inequality" class="level2">
+<h2 class="anchored" data-anchor-id="markovs-inequality">Markov’s Inequality</h2>
+<p><strong>Logic and Intuition.</strong> Markov’s inequality rests on the most elementary fact about a non-negative random variable: it cannot spend much probability mass far above its mean without inflating that mean. Formally, the proof replaces <span class="math inline">\(X\)</span> by the cruder lower bound <span class="math inline">\(a \cdot \mathbf{1}_{\{X \geq a\}}\)</span>, which is zero everywhere except on the very region whose probability we want to control. Averaging this lower bound gives <span class="math inline">\(a\,\Prob(X \geq a)\)</span>, which cannot exceed <span class="math inline">\(\E[X]\)</span>. Rearranging yields the bound.</p>
+<p>The geometric picture is equally clear. Plot the density of <span class="math inline">\(X\)</span> on the positive half-line and shade the region to the right of <span class="math inline">\(a\)</span>. Markov’s inequality says that shaded area (the probability) times the horizontal distance <span class="math inline">\(a\)</span> cannot exceed the total first moment (the area-weighted average position of probability mass). If the mean is small relative to <span class="math inline">\(a\)</span>, the tail probability must be small too, because a large tail would push the mean above its actual value.</p>
+<p>The bound is tight: the random variable <span class="math inline">\(X\)</span> that takes value <span class="math inline">\(0\)</span> with probability <span class="math inline">\(1 - p\)</span> and value <span class="math inline">\(a\)</span> with probability <span class="math inline">\(p\)</span> has <span class="math inline">\(\E[X] = ap\)</span> and <span class="math inline">\(\Prob(X \geq a) = p = \E[X]/a\)</span>, so equality holds. This also reveals the bound’s weakness: it makes no use of how the distribution is shaped above <span class="math inline">\(a\)</span>, only of the mean.</p>
+</section>
+<section id="chebyshevs-inequality" class="level2">
+<h2 class="anchored" data-anchor-id="chebyshevs-inequality">Chebyshev’s Inequality</h2>
+<p><strong>Logic and Intuition.</strong> Chebyshev’s inequality is Markov’s inequality applied one level up: instead of bounding the probability that <span class="math inline">\(X\)</span> is large, it bounds the probability that <span class="math inline">\(X\)</span> from its mean by more than <span class="math inline">\(k\)</span>, using the variance as the controlling moment. The key move is squaring: by working with <span class="math inline">\((X - \mu)^2\)</span> rather than <span class="math inline">\(|X - \mu|\)</span>, we convert a two-sided deviation problem into a one-sided non-negativity problem to which Markov applies.</p>
+<p>The <span class="math inline">\(k = t\sigma\)</span> form is the most interpretable. It says that regardless of the distribution of <span class="math inline">\(X\)</span> — whether it is normal, skewed, heavy-tailed, or discrete — at most <span class="math inline">\(1/t^2\)</span> of the probability mass lies more than <span class="math inline">\(t\)</span> standard deviations from the mean. For <span class="math inline">\(t = 2\)</span>, at most <span class="math inline">\(25\%\)</span> can lie outside two standard deviations; for <span class="math inline">\(t = 3\)</span>, at most <span class="math inline">\(11\%\)</span>. These bounds are intentionally conservative: for a normal distribution, the actual probability beyond two standard deviations is about <span class="math inline">\(5\%\)</span>, far below the <span class="math inline">\(25\%\)</span> ceiling. The bound is distribution-free, which is its power, but distribution-agnosticism comes at the cost of looseness.</p>
+<p>\end{remark}</p>
+</section>
 <section id="jensens-inequality" class="level2">
 <h2 class="anchored" data-anchor-id="jensens-inequality">Jensen’s Inequality</h2>
+<p><strong>Logic and Intuition.</strong> The key insight is geometric: a convex function curves upward, so the chord between any two points on its graph lies above the graph itself. Jensen’s inequality is simply this chord-above-curve property, applied to a probability-weighted average (the expectation) rather than a simple two-point average.</p>
+<p>The supporting tangent line (or subgradient) at <span class="math inline">\(\E[X]\)</span> provides the algebraic mechanism: it lies <span class="math inline">\(\phi\)</span>, so averaging <span class="math inline">\(\phi(X)\)</span> over all realisations of <span class="math inline">\(X\)</span> yields something at least as large as averaging the linear lower bound, which by linearity of expectation collapses to <span class="math inline">\(\phi(\E[X])\)</span>. The non-linearity of <span class="math inline">\(\phi\)</span> is what prevents equality: if <span class="math inline">\(X\)</span> is not degenerate, its realisations spread around the mean, and the curvature of <span class="math inline">\(\phi\)</span> ensures that the high values of <span class="math inline">\(\phi\)</span> outweigh the low values enough to push <span class="math inline">\(\E[\phi(X)]\)</span> above <span class="math inline">\(\phi(\E[X])\)</span>.</p>
+<p>A concrete example fixes the idea. Take <span class="math inline">\(\phi(x) = x^2\)</span> (strictly convex) and suppose <span class="math inline">\(X\)</span> takes values <span class="math inline">\(0\)</span> and <span class="math inline">\(2\)</span> with equal probability. Then <span class="math inline">\(\E[X] = 1\)</span> and <span class="math inline">\(\phi(\E[X]) = 1\)</span>, but <span class="math inline">\(\E[\phi(X)] = \E[X^2] = (0 + 4)/2 = 2 &gt; 1\)</span>. The spreading of <span class="math inline">\(X\)</span> around its mean inflates the squared expectation relative to the square of the expectation, and this inflation is exactly the variance: <span class="math inline">\(\E[X^2] - (\E[X])^2 = \mathrm{Var}(X) \geq 0\)</span>.</p>
+</section>
+<section id="lyapunovs-inequality" class="level2">
+<h2 class="anchored" data-anchor-id="lyapunovs-inequality">Lyapunov’s Inequality</h2>
+<p><strong>Logic and Intuition.</strong> Lyapunov’s inequality says that higher-order moments, once properly normalised by their order, are larger than lower-order moments. The reason is that raising <span class="math inline">\(|X|\)</span> to a higher power amplifies large values of <span class="math inline">\(|X|\)</span> disproportionately: if <span class="math inline">\(|X|\)</span> occasionally takes large values, those values contribute much more to <span class="math inline">\(\E[|X|^s]\)</span> (relative to its normalisation) than to <span class="math inline">\(\E[|X|^r]\)</span>. The inequality formalises the fact that the <span class="math inline">\(L^p\)</span> ``size’’ of a random variable is a non-decreasing function of the exponent <span class="math inline">\(p\)</span>.</p>
+<p>A concrete illustration: take <span class="math inline">\(X\)</span> equal to <span class="math inline">\(0\)</span> or <span class="math inline">\(10\)</span> with equal probability. Then <span class="math inline">\(\E[X] = 5\)</span>, <span class="math inline">\(\E[X^2] = 50\)</span>, so <span class="math inline">\((\E[X^2])^{1/2} = \sqrt{50} \approx 7.07 &gt; 5 = \E[X]^1\)</span>. The large value <span class="math inline">\(10\)</span> contributes a squared term of <span class="math inline">\(100\)</span>, which when averaged and square-rooted dominates the simple average. This is the spirit of Lyapunov’s inequality: the amplification of extreme values by higher powers prevents the normalised higher moment from falling below the normalised lower moment.</p>
+<p>The proof relies on Jensen’s inequality in a particularly elegant way: the map <span class="math inline">\(t \mapsto t^{s/r}\)</span> is convex for <span class="math inline">\(s &gt; r\)</span>, so Jensen applied to the random variable <span class="math inline">\(|X|^r\)</span> immediately gives the comparison of moments. Thus Lyapunov’s inequality is, at its core, a consequence of convexity — the same geometric property that underlies Jensen’s inequality itself.</p>
 <hr>
 </section>
 </section>
-<section id="convergence-concepts" class="level1">
-<h1>Convergence Concepts</h1>
+<section id="convergence-concepts-in-econometrics" class="level1">
+<h1>Convergence Concepts in Econometrics</h1>
+<p>The study of convergence is central to both probability theory and econometrics. Estimators are defined as functions of samples of increasing size, and the validity of asymptotic inference rests on precise statements about how sequences of random quantities behave as the sample grows without bound. Before analysing the convergence of stochastic sequences — sequences of random variables — it is essential to understand the convergence of deterministic sequences of real numbers. The deterministic case provides the precise <span class="math inline">\(\varepsilon\)</span>-<span class="math inline">\(N\)</span> language that is then imported, with appropriate modification, into all the stochastic convergence concepts that underpin econometric theory.</p>
+<section id="sequences-of-real-numbers" class="level2">
+<h2 class="anchored" data-anchor-id="sequences-of-real-numbers">Sequences of Real Numbers</h2>
+<section id="formal-definition" class="level3">
+<h3 class="anchored" data-anchor-id="formal-definition">Formal Definition</h3>
+
+</section>
+<section id="examples-of-sequences" class="level3">
+<h3 class="anchored" data-anchor-id="examples-of-sequences">Examples of Sequences</h3>
+
+</section>
+<section id="the-limit-of-a-sequence" class="level3">
+<h3 class="anchored" data-anchor-id="the-limit-of-a-sequence">The Limit of a Sequence</h3>
+<p>The informal idea of a sequence ``approaching’’ a value is made precise through the following classical definition.</p>
+</section>
+<section id="uniqueness-of-the-limit" class="level3">
+<h3 class="anchored" data-anchor-id="uniqueness-of-the-limit">Uniqueness of the Limit</h3>
+<p><strong>Logic and Intuition.</strong> The proof exploits a single fundamental insight: the definition of convergence places candidate limits <span class="math inline">\(L\)</span> and <span class="math inline">\(M\)</span> in an arbitrarily tight grip around the terms of the sequence simultaneously. Because every tail of the sequence must lie within <span class="math inline">\(\varepsilon/2\)</span> of <span class="math inline">\(L\)</span> and within <span class="math inline">\(\varepsilon/2\)</span> of <span class="math inline">\(M\)</span>, the triangle inequality forces <span class="math inline">\(L\)</span> and <span class="math inline">\(M\)</span> to be within <span class="math inline">\(\varepsilon\)</span> of — and this holds for every <span class="math inline">\(\varepsilon &gt; 0\)</span>, no matter how small.</p>
+<p>Think of it geometrically. Imagine two points <span class="math inline">\(L\)</span> and <span class="math inline">\(M\)</span> on the real line, separated by some distance <span class="math inline">\(d = |L - M|\)</span>. Now draw a band of radius <span class="math inline">\(d/3\)</span> around each. If the sequence eventually stays inside both bands simultaneously, then every term in the tail is simultaneously within <span class="math inline">\(d/3\)</span> of <span class="math inline">\(L\)</span> and within <span class="math inline">\(d/3\)</span> of <span class="math inline">\(M\)</span>. But two balls of radius <span class="math inline">\(d/3\)</span> centred at points separated by <span class="math inline">\(d\)</span> do not overlap: a point cannot be within <span class="math inline">\(d/3\)</span> of both <span class="math inline">\(L\)</span> and <span class="math inline">\(M\)</span> if <span class="math inline">\(d &gt; 0\)</span>. This contradiction forces <span class="math inline">\(d = 0\)</span>, i.e.&nbsp;<span class="math inline">\(L = M\)</span>.</p>
+</section>
+<section id="relevance-to-convergence-concepts-in-econometrics" class="level3">
+<h3 class="anchored" data-anchor-id="relevance-to-convergence-concepts-in-econometrics">Relevance to Convergence Concepts in Econometrics</h3>
+<p>, understanding what it means for a sequence of real numbers to converge, and being able to verify or refute convergence using the <span class="math inline">\(\varepsilon\)</span>-<span class="math inline">\(N\)</span> definition, is the prerequisite skill. The stochastic convergence concepts that drive econometric asymptotic theory are obtained by inserting a probability measure into the same logical structure that governs sequences of real numbers. \end{remark}</p>
+</section>
+</section>
 <section id="almost-sure-convergence" class="level2">
 <h2 class="anchored" data-anchor-id="almost-sure-convergence">Almost Sure Convergence</h2>
-
+<p><strong>Logic and Intuition.</strong> Almost sure convergence is the most demanding of the stochastic convergence concepts, because it is a statement. The sample space <span class="math inline">\(\Omega\)</span> can be thought of as a collection of possible histories of the world. For each history <span class="math inline">\(\omega\)</span>, the sequence <span class="math inline">\(X_1(\omega), X_2(\omega), X_3(\omega), \ldots\)</span> is an ordinary sequence of real numbers. Almost sure convergence requires that this deterministic sequence converges to <span class="math inline">\(X(\omega)\)</span> in the classical sense for history — that is, for all histories except possibly a set that the probability measure assigns total mass zero. It is the most direct probabilistic analogue of pointwise convergence of functions.</p>
+<p>The contrast with weaker convergence concepts is instructive. Convergence in probability only requires that, at each fixed <span class="math inline">\(n\)</span>, the random variable <span class="math inline">\(X_n\)</span> is close to <span class="math inline">\(X\)</span> with high probability — but it permits deviations to recur infinitely often across different values of <span class="math inline">\(n\)</span>, provided they become individually rare. Almost sure convergence rules this out: it requires that the entire trajectory <span class="math inline">\(\{X_n(\omega)\}_{n=1}^\infty\)</span> ultimately stays close to <span class="math inline">\(X(\omega)\)</span> and never strays again.</p>
 </section>
 <section id="convergence-in-probability" class="level2">
-<h2 class="anchored" data-anchor-id="convergence-in-probability">6.2 Convergence in Probability</h2>
-
+<h2 class="anchored" data-anchor-id="convergence-in-probability">Convergence in Probability</h2>
+<p><strong>Logic and Intuition.</strong> Convergence in probability is a statement about the of the deviation <span class="math inline">\(|X_n - X|\)</span> at each <span class="math inline">\(n\)</span>, not about the path <span class="math inline">\(\omega \mapsto X_n(\omega)\)</span>. It says that for any fixed tolerance <span class="math inline">\(\varepsilon &gt; 0\)</span>, the probability that <span class="math inline">\(X_n\)</span> and <span class="math inline">\(X\)</span> differ by more than <span class="math inline">\(\varepsilon\)</span> shrinks to zero as <span class="math inline">\(n\)</span> grows. The sequence need not converge path by path; it is permitted that individual paths wander, provided that the probability mass attached to large deviations evaporates in the limit.</p>
+<p>A useful way to build intuition is to picture the probability distribution of <span class="math inline">\(X_n\)</span> as a cloud of mass on the real line. Convergence in probability says that, as <span class="math inline">\(n \to \infty\)</span>, the cloud concentrates around <span class="math inline">\(X\)</span>: for any ball of radius <span class="math inline">\(\varepsilon\)</span> around <span class="math inline">\(X\)</span>, the fraction of probability mass lying outside that ball tends to zero. The cloud need not collapse to a point along any particular trajectory — it only needs to concentrate in the distributional sense.</p>
+</section>
+<section id="convergence-in-mean-square" class="level2">
+<h2 class="anchored" data-anchor-id="convergence-in-mean-square">Convergence in Mean Square</h2>
+<p><strong>Logic and Intuition.</strong> Mean square convergence requires that the between <span class="math inline">\(X_n\)</span> and <span class="math inline">\(X\)</span> vanishes. Because <span class="math inline">\(\E[(X_n - X)^2] = \mathrm{Var}(X_n - X) + [\E(X_n - X)]^2\)</span>, mean square convergence jointly demands that both the bias <span class="math inline">\(\E[X_n - X]\)</span> and the variance <span class="math inline">\(\mathrm{Var}(X_n - X)\)</span> of the deviation tend to zero. It is therefore a statement about the second moment of the error, not merely about its probability.</p>
+<p>The relationship to convergence in probability is immediate from Markov’s inequality applied to <span class="math inline">\((X_n - X)^2\)</span>: for any <span class="math inline">\(\varepsilon &gt; 0\)</span>, <span class="math display">\[
+\Prob(|X_n - X| &gt; \varepsilon) = \Prob\!\left((X_n - X)^2 &gt; \varepsilon^2\right)
+\leq \frac{\E[(X_n - X)^2]}{\varepsilon^2} \longrightarrow 0.
+\]</span> Hence . The converse is false: convergence in probability does not require the second moment to exist, let alone to vanish.</p>
 </section>
 <section id="convergence-in-distribution" class="level2">
-<h2 class="anchored" data-anchor-id="convergence-in-distribution">6.3 Convergence in Distribution</h2>
+<h2 class="anchored" data-anchor-id="convergence-in-distribution">Convergence in Distribution</h2>
+<p><strong>Logic and Intuition.</strong> Convergence in distribution is the weakest of the four convergence concepts. It does not require <span class="math inline">\(X_n\)</span> and <span class="math inline">\(X\)</span> to be defined on the same probability space, and it makes no claim about how close the <span class="math inline">\(X_n(\omega)\)</span> are to <span class="math inline">\(X(\omega)\)</span> for any individual <span class="math inline">\(\omega\)</span>. Instead, it asks only that the of <span class="math inline">\(X_n\)</span> converge, in the sense that probabilities assigned to half-lines <span class="math inline">\((-\infty, x]\)</span> converge to those assigned by the limiting distribution. The CDFs, viewed as sequences of real-valued functions of <span class="math inline">\(x\)</span>, converge pointwise at every continuity point.</p>
+<p>The phrase ``at every continuity point’’ is not a technicality to be overlooked. If <span class="math inline">\(F_X\)</span> has a jump at some <span class="math inline">\(x^*\)</span> (as discrete distributions do), the CDF values <span class="math inline">\(F_{X_n}(x^*)\)</span> are not required to converge to <span class="math inline">\(F_X(x^*)\)</span>. This is because the limiting mass at the point <span class="math inline">\(x^*\)</span> can be approached from either side, and requiring convergence at a jump point would impose a convention about how the limiting distribution assigns mass to that point, which the definition wisely avoids.</p>
+<p>A concrete example makes the point vivid. Let <span class="math inline">\(X_n\)</span> be degenerate at the value <span class="math inline">\(a_n = 1/n\)</span>, so that all of its probability mass sits at a single point that slides toward the origin as <span class="math inline">\(n\)</span> grows. Intuitively <span class="math inline">\(X_n\)</span> converges to the constant <span class="math inline">\(0\)</span>, and indeed <span class="math inline">\(X_n \xrightarrow{d} X\)</span> where <span class="math inline">\(X\)</span> is degenerate at <span class="math inline">\(0\)</span>. Each <span class="math inline">\(F_{X_n}\)</span> is a step function that jumps from <span class="math inline">\(0\)</span> to <span class="math inline">\(1\)</span> at <span class="math inline">\(a_n = 1/n\)</span>, while the limiting CDF <span class="math inline">\(F_X\)</span> jumps at <span class="math inline">\(0\)</span>. At every point <span class="math inline">\(x \neq 0\)</span> the approximating CDFs eventually agree with the limit: for <span class="math inline">\(x &lt; 0\)</span> all values are <span class="math inline">\(0\)</span>, and for <span class="math inline">\(x &gt; 0\)</span> they are eventually <span class="math inline">\(1\)</span>. But exactly at the jump point <span class="math inline">\(x^* = 0\)</span> we have <span class="math inline">\(F_{X_n}(0) = 0\)</span> for <span class="math inline">\(n\)</span> (the mass sits just to the right, at <span class="math inline">\(1/n &gt; 0\)</span>), whereas <span class="math inline">\(F_X(0) = 1\)</span>. The gap between <span class="math inline">\(F_{X_n}(0)\)</span> and <span class="math inline">\(F_X(0)\)</span> never closes — it equals <span class="math inline">\(1\)</span> for all <span class="math inline">\(n\)</span> — even though <span class="math inline">\(X_n \xrightarrow{d} 0\)</span> in every meaningful sense. Figure~<span class="math inline">\(\ref{fig:cdf-jump}\)</span> illustrates this situation. Requiring convergence at <span class="math inline">\(x^*\)</span> would perversely declare this natural sequence non-convergent, which is precisely why the definition restricts attention to continuity points.</p>
+</section>
+<section id="relationships-among-convergence-concepts" class="level2">
+<h2 class="anchored" data-anchor-id="relationships-among-convergence-concepts">Relationships Among Convergence Concepts</h2>
+<p>The four convergence concepts introduced above are not independent: they form a strict hierarchy, with almost sure convergence being the strongest and convergence in distribution the weakest. Understanding these relationships is essential for knowing which convergence results carry over to others, and which do not.</p>
+<section id="the-continuous-mapping-theorem" class="level3">
+<h3 class="anchored" data-anchor-id="the-continuous-mapping-theorem">The Continuous Mapping Theorem</h3>
+<p>A key tool for deriving the large-sample distributions of functions of estimators is the Continuous Mapping Theorem (CMT), which states that continuous transformations preserve convergence.</p>
+<p><strong>Logic and Intuition.</strong> The CMT says that continuous functions cannot create new limiting behaviour: if the inputs converge (in any of the three senses), the outputs converge to the image of the limit. The reason is that continuity at <span class="math inline">\(X(\omega)\)</span> means that for any <span class="math inline">\(\varepsilon &gt; 0\)</span> there exists <span class="math inline">\(\delta &gt; 0\)</span> such that <span class="math inline">\(\|x - X(\omega)\| &lt; \delta \implies \|g(x) - g(X(\omega))\| &lt; \varepsilon\)</span>. Whenever <span class="math inline">\(X_n(\omega)\)</span> is within <span class="math inline">\(\delta\)</span> of <span class="math inline">\(X(\omega)\)</span>, <span class="math inline">\(g(X_n(\omega))\)</span> is automatically within <span class="math inline">\(\varepsilon\)</span> of <span class="math inline">\(g(X(\omega))\)</span>. The condition <span class="math inline">\(\Prob(X \in C) = 1\)</span> is the precise sense in which <span class="math inline">\(g\)</span> is “essentially continuous”: discontinuities are permitted, but they must form a set that the limiting random variable <span class="math inline">\(X\)</span> visits with probability zero.</p>
+</section>
+<section id="slutskys-theorem" class="level3">
+<h3 class="anchored" data-anchor-id="slutskys-theorem">Slutsky’s Theorem</h3>
+<p><strong>Logic and Intuition.</strong> Slutsky’s Theorem handles mixed situations where one sequence converges in distribution (to a non-degenerate limit) and another converges in probability (to a constant). The key insight is that the second sequence, because it converges to a constant, becomes : it behaves like a fixed number in the limit. The joint pair <span class="math inline">\((X_n, Y_n)\)</span> therefore converges in distribution to <span class="math inline">\((X, c)\)</span>, and continuous functions of the pair converge accordingly.</p>
+</section>
+</section>
+<section id="laws-of-large-numbers" class="level2">
+<h2 class="anchored" data-anchor-id="laws-of-large-numbers">Laws of Large Numbers</h2>
+<p>Laws of Large Numbers (LLNs) are the results that formalise the intuition that sample averages converge to population means. They are the primary tools for establishing the consistency of estimators and sample analogue statistics. This section presents four versions: the Weak Law for i.i.d.&nbsp;sequences, the Weak Law for independent non-identically distributed sequences, the Strong Law (Kolmogorov), and a Law of Large Numbers for stationary time series.</p>
+<section id="weak-law-of-large-numbers-i.i.d." class="level3">
+<h3 class="anchored" data-anchor-id="weak-law-of-large-numbers-i.i.d.">Weak Law of Large Numbers (i.i.d.)</h3>
+<p><strong>Logic and Intuition.</strong> The theorem says the sample mean collapses onto the population mean as the sample grows. The engine behind this is a single mechanism: the sample mean is an unbiased estimator whose at rate <span class="math inline">\(1/n\)</span>. Once the spread of a random variable around a fixed centre vanishes, essentially all of its probability mass must pile up arbitrarily close to that centre — and Chebyshev’s inequality is exactly the tool that converts <code>small variance'' into</code>small probability of being far from the mean.’’ The proof therefore has three moves: (i) locate the centre of <span class="math inline">\(\bar X_n\)</span> (its mean), (ii) measure its spread (its variance), and (iii) feed both into Chebyshev and let <span class="math inline">\(n \to \infty\)</span>.</p>
+<section id="application-proving-the-consistency-of-estimators" class="level4">
+<h4 class="anchored" data-anchor-id="application-proving-the-consistency-of-estimators">Application: Proving the Consistency of Estimators</h4>
+<p>The practical payoff of the Weak Law of Large Numbers is enormous, and its use in econometrics is remarkably simple and mechanical. Almost every estimator we work with can be written as a smooth function of . The WLLN tells us that each such sample average converges in probability to the corresponding . Establishing consistency then reduces to a three-step recipe:</p>
+<ol type="1">
+<li><p><strong>Write the estimator through sample averages.</strong> Express <span class="math inline">\(\hat\theta_n\)</span> as a continuous function of one or more quantities of the form <span class="math inline">\(n^{-1}\sum_{i=1}^n h(W_i)\)</span>.</p></li>
+<li><p><strong>Invoke the WLLN.</strong> Replace each sample average by its probability limit: <span class="math inline">\(n^{-1}\sum_{i=1}^n h(W_i) \xrightarrow{p} \E[h(W_i)]\)</span>.</p></li>
+<li><p><strong>Apply the Continuous Mapping Theorem and Slutsky’s Theorem.</strong> Since the estimator is a continuous function of these averages (at the relevant limiting values), it converges in probability to the same function of the population expectations, which equals the true parameter.</p></li>
+</ol>
+<p>The whole difficulty of a consistency proof is therefore concentrated in a single, familiar tool. Once the estimator is written in terms of averages, one simply ``reads off’’ the limits. The two examples below — the workhorse OLS estimator and the general GMM estimator — show the recipe in action.</p>
+</section>
+</section>
+<section id="weak-law-of-large-numbers-non-i.i.d." class="level3">
+<h3 class="anchored" data-anchor-id="weak-law-of-large-numbers-non-i.i.d.">Weak Law of Large Numbers (Non-i.i.d.)</h3>
 
 </section>
-<section id="relationships" class="level2">
-<h2 class="anchored" data-anchor-id="relationships">6.4 Relationships</h2>
-<hr>
+<section id="strong-law-of-large-numbers" class="level3">
+<h3 class="anchored" data-anchor-id="strong-law-of-large-numbers">Strong Law of Large Numbers</h3>
+
 </section>
-<section id="weak-law-of-large-numbers" class="level2">
-<h2 class="anchored" data-anchor-id="weak-law-of-large-numbers">6.5 Weak Law of Large Numbers</h2>
-<p>\section{Weak Law of Large Numbers (WLLN)}</p>
-<p>Let <span class="math inline">\(X_1, X_2, \dots\)</span> be i.i.d.&nbsp;random variables with finite mean <span class="math display">\[\mu = \E[X_1]\]</span> and finite variance <span class="math display">\[\sigma^2 = \mathrm{Var}(X_1) &lt; \infty.\]</span> Define the sample mean <span class="math display">\[\overline{X}_n = \frac{1}{n}\sum_{i=1}^n X_i.\]</span> The states that <span class="math display">\[\overline{X}_n \xrightarrow{\Prob} \mu,\]</span> i.e., for every <span class="math inline">\(\varepsilon &gt; 0\)</span>, <span class="math display">\[\Prob\left(\left|\overline{X}_n - \mu\right| &gt; \varepsilon\right) \to 0\quad \text{as } n\to\infty.\]</span></p>
-<p>First compute the expectation of <span class="math inline">\(\overline{X}_n\)</span>. By linearity of expectation, <span class="math display">\[\E[\overline{X}_n]= \E\left[\frac{1}{n}\sum_{i=1}^n X_i\right]= \frac{1}{n}\sum_{i=1}^n \E[X_i]= \frac{1}{n}\cdot n\mu= \mu.\]</span></p>
-<p>Next compute the variance. Using <span class="math inline">\(\mathrm{Var}(aY)=a^2\mathrm{Var}(Y)\)</span> and independence, <span class="math display">\[\mathrm{Var}(\overline{X}_n)= \mathrm{Var}\left(\frac{1}{n}\sum_{i=1}^n X_i\right)= \frac{1}{n^2}\mathrm{Var}\left(\sum_{i=1}^n X_i\right)= \frac{1}{n^2}\sum_{i=1}^n \mathrm{Var}(X_i)= \frac{1}{n^2}\cdot n\sigma^2= \frac{\sigma^2}{n}.\]</span></p>
-<p>Now apply Chebyshev’s inequality: for any random variable <span class="math inline">\(Y\)</span> with finite variance and any <span class="math inline">\(\varepsilon&gt;0\)</span>, <span class="math display">\[\Prob\left(|Y-\E[Y]|\ge \varepsilon\right)\le \frac{\mathrm{Var}(Y)}{\varepsilon^2}.\]</span> Take <span class="math inline">\(Y=\overline{X}_n\)</span>. Since <span class="math inline">\(\E[\overline{X}_n]=\mu\)</span>, <span class="math display">\[\Prob\left(\left|\overline{X}_n - \mu\right|\ge \varepsilon\right)\le \frac{\mathrm{Var}(\overline{X}_n)}{\varepsilon^2}= \frac{\sigma^2/n}{\varepsilon^2}= \frac{\sigma^2}{n\varepsilon^2}.\]</span> As <span class="math inline">\(n\to\infty\)</span>, we have <span class="math inline">\(\frac{\sigma^2}{n\varepsilon^2}\to 0\)</span>, hence <span class="math display">\[\Prob\left(\left|\overline{X}_n - \mu\right|\ge \varepsilon\right)\to 0.\]</span> Therefore <span class="math inline">\(\overline{X}_n \xrightarrow{\Prob} \mu\)</span>. </p>
-<p>Let <span class="math inline">\(X_1, X_2, \dots\)</span> be random variables with finite means <span class="math display">\[\mu_i := \E[X_i], \qquad i=1,2,\dots\]</span> and finite variances <span class="math display">\[\sigma_i^2 := \mathrm{Var}(X_i) &lt; \infty.\]</span> Define the partial sums and their expectations <span class="math display">\[S_n := \sum_{i=1}^n X_i,\qquad A_n := \sum_{i=1}^n \mu_i = \E[S_n].\]</span></p>
-<p>A standard version of the in this setting is:</p>
-<p>Define the centered variables <span class="math display">\[Y_i := X_i - \mu_i.\]</span> Then <span class="math inline">\(\E[Y_i]=0\)</span> and <span class="math inline">\(\mathrm{Var}(Y_i)=\sigma_i^2\)</span>. Also, since the <span class="math inline">\(X_i\)</span> are independent, the <span class="math inline">\(Y_i\)</span> are independent.</p>
-<p>Now write <span class="math display">\[S_n - A_n = \sum_{i=1}^n (X_i - \mu_i) = \sum_{i=1}^n Y_i.\]</span> Hence <span class="math display">\[\E[S_n - A_n] = \sum_{i=1}^n \E[Y_i] = 0.\]</span></p>
-<p>Next compute the variance. By independence, <span class="math display">\[\mathrm{Var}(S_n - A_n)= \mathrm{Var}\!\left(\sum_{i=1}^n Y_i\right)= \sum_{i=1}^n \mathrm{Var}(Y_i)= \sum_{i=1}^n \sigma_i^2.\]</span> Therefore, <span class="math display">\[\mathrm{Var}\!\left(\frac{S_n - A_n}{n}\right)= \frac{1}{n^2}\mathrm{Var}(S_n - A_n)= \frac{1}{n^2}\sum_{i=1}^n \sigma_i^2.\]</span></p>
-<p>Fix <span class="math inline">\(\varepsilon&gt;0\)</span>. Apply Chebyshev’s inequality to the random variable <span class="math display">\[Z_n := \frac{S_n - A_n}{n},\qquad \text{for which } \E[Z_n]=0:\]</span> <span class="math display">\[\Prob\!\left(|Z_n|&gt;\varepsilon\right)\le \frac{\mathrm{Var}(Z_n)}{\varepsilon^2}= \frac{1}{\varepsilon^2}\cdot \frac{1}{n^2}\sum_{i=1}^n \sigma_i^2.\]</span> By assumption, <span class="math inline">\(\frac{1}{n^2}\sum_{i=1}^n \sigma_i^2 \to 0\)</span>, so the right-hand side tends to <span class="math inline">\(0\)</span>. Hence <span class="math display">\[\Prob\!\left(\left|\frac{S_n - A_n}{n}\right|&gt;\varepsilon\right)\to 0,\]</span> which is exactly <span class="math display">\[\frac{S_n - A_n}{n} \xrightarrow{\Prob} 0.\qquad \qed\]</span></p>
-<p>If there exists a constant <span class="math inline">\(C&lt;\infty\)</span> such that <span class="math inline">\(\sigma_i^2 \le C\)</span> for all <span class="math inline">\(i\)</span> (uniformly bounded variances), then <span class="math display">\[\frac{1}{n^2}\sum_{i=1}^n \sigma_i^2\le \frac{1}{n^2}\cdot nC= \frac{C}{n}\to 0,\]</span> so the theorem applies and the WLLN holds: <span class="math display">\[\frac{1}{n}\sum_{i=1}^n X_i - \frac{1}{n}\sum_{i=1}^n \mu_i \xrightarrow{\Prob} 0.\]</span> -</p>
-<p>Consider a population of households partitioned into two subpopulations (strata): and . We model the income of the <span class="math inline">\(i\)</span>th sampled household by a random variable <span class="math inline">\(X_i\)</span> (annual income, say in USD or TZS).</p>
-<p>Assume we draw households independently, but the distribution depends on whether the household is urban or rural, so the <span class="math inline">\(X_i\)</span> are .</p>
-<p>Let the urban income distribution have mean and variance <span class="math display">\[\mu_U := \E[X \mid \text{urban}], \qquad \sigma_U^2 := \mathrm{Var}(X \mid \text{urban}),\]</span> and the rural income distribution have mean and variance <span class="math display">\[\mu_R := \E[X \mid \text{rural}], \qquad \sigma_R^2 := \mathrm{Var}(X \mid \text{rural}).\]</span></p>
-<p>For a concrete example, suppose <span class="math display">\[\mu_U = 12{,}000,\quad \sigma_U^2 = (6{,}000)^2,\qquad\mu_R = 4{,}000,\quad \sigma_R^2 = (2{,}000)^2.\]</span> (Interpret these as annual incomes in a consistent currency unit.)</p>
-<p>Suppose we sample <span class="math inline">\(n\)</span> households total, with a fixed stratified allocation: <span class="math display">\[n_U = \lfloor \pi n \rfloor \quad \text{urban draws}, \qquad n_R = n - n_U \quad \text{rural draws},\]</span> where <span class="math inline">\(\pi \in (0,1)\)</span> is the (planned) urban sampling fraction.</p>
-<p>Index the sampled incomes as <span class="math display">\[X_1^{(U)},\dots,X_{n_U}^{(U)} \stackrel{\text{i.i.d.}}{\sim} \text{Urban distribution},\qquad X_1^{(R)},\dots,X_{n_R}^{(R)} \stackrel{\text{i.i.d.}}{\sim} \text{Rural distribution},\]</span> and assume all sampled households are mutually independent.</p>
-<p>Now define the combined sample mean income <span class="math display">\[\overline{X}_n := \frac{1}{n}\left(\sum_{i=1}^{n_U} X_i^{(U)} + \sum_{j=1}^{n_R} X_j^{(R)}\right).\]</span> This is an average of independent but variables because the urban draws and rural draws come from different distributions.</p>
-<p>The expectation is <span class="math display">\[\E[\overline{X}_n]= \frac{n_U}{n}\mu_U + \frac{n_R}{n}\mu_R.\]</span> If <span class="math inline">\(n_U/n \to \pi\)</span> and <span class="math inline">\(n_R/n \to 1-\pi\)</span>, then <span class="math display">\[\E[\overline{X}_n] \to \pi \mu_U + (1-\pi)\mu_R.\]</span></p>
-<p>Because of independence, <span class="math display">\[\mathrm{Var}(\overline{X}_n)= \frac{1}{n^2}\left(n_U \sigma_U^2 + n_R \sigma_R^2\right)= \frac{n_U}{n^2}\sigma_U^2 + \frac{n_R}{n^2}\sigma_R^2.\]</span> If <span class="math inline">\(n_U/n \to \pi\)</span> and <span class="math inline">\(n_R/n \to 1-\pi\)</span>, then <span class="math display">\[\mathrm{Var}(\overline{X}_n)\sim \frac{1}{n}\left(\pi \sigma_U^2 + (1-\pi)\sigma_R^2\right)\longrightarrow 0.\]</span></p>
-<p>By Chebyshev’s inequality, for every <span class="math inline">\(\varepsilon&gt;0\)</span>, <span class="math display">\[\Prob\!\left(\left|\overline{X}_n - \E[\overline{X}_n]\right|&gt;\varepsilon\right)\le \frac{\mathrm{Var}(\overline{X}_n)}{\varepsilon^2}= \frac{n_U \sigma_U^2 + n_R \sigma_R^2}{n^2\varepsilon^2}\to 0,\]</span> so <span class="math display">\[\overline{X}_n - \E[\overline{X}_n] \xrightarrow{\Prob} 0.\]</span> If, in addition, <span class="math inline">\(n_U/n \to \pi\)</span>, then <span class="math inline">\(\E[\overline{X}_n]\to \pi\mu_U+(1-\pi)\mu_R\)</span>, and thus <span class="math display">\[\overline{X}_n \xrightarrow{\Prob} \pi\mu_U + (1-\pi)\mu_R.\]</span></p>
-<p>Even though individual households are drawn from different income distributions (urban vs.&nbsp;rural), the overall sample average income still concentrates (in probability) around the <span class="math inline">\(\pi\mu_U+(1-\pi)\mu_R\)</span> under a stable sampling fraction and finite within-stratum variances.</p>
-<p>Let <span class="math inline">\(\{X_t\}_{t\in\mathbb{Z}}\)</span> be a strictly stationary time series with finite mean <span class="math display">\[
-\mu = \E[X_t].
-\]</span> We are interested in conditions under which the sample average <span class="math display">\[
-\bar X_T = \frac{1}{T}\sum_{t=1}^T X_t
-\]</span> converges to <span class="math inline">\(\mu\)</span> as <span class="math inline">\(T\to\infty\)</span>.</p>
-<p>Stationarity alone is not enough. For example, let <span class="math inline">\(X_t = Z\)</span> for all <span class="math inline">\(t\)</span>, where <span class="math inline">\(Z\)</span> is a non-degenerate random variable with finite mean. Then <span class="math inline">\(\{X_t\}\)</span> is strictly stationary, but <span class="math display">\[
-\bar X_T = Z
-\]</span> for every <span class="math inline">\(T\)</span>, and therefore <span class="math inline">\(\bar X_T\)</span> does not converge to <span class="math inline">\(\E[Z]\)</span> unless <span class="math inline">\(Z=\E[Z]\)</span> almost surely. Thus, some form of weak dependence or ergodicity is required.</p>
+<section id="law-of-large-numbers-for-stationary-time-series" class="level3">
+<h3 class="anchored" data-anchor-id="law-of-large-numbers-for-stationary-time-series">Law of Large Numbers for Stationary Time Series</h3>
+<p>In time-series settings, observations are dependent, so the i.i.d.&nbsp;LLNs do not apply directly. Consistency of time-series estimators requires a version of the LLN that accommodates dependence.</p>
 </section>
 </section>
-<section id="exercises" class="level1">
-<h1>7. Exercises</h1>
+<section id="central-limit-theorems" class="level2">
+<h2 class="anchored" data-anchor-id="central-limit-theorems">Central Limit Theorems</h2>
+<p>While Laws of Large Numbers establish that sample averages converge to their population means, they say nothing about the of convergence or the of the sampling distribution for large <span class="math inline">\(n\)</span>. Central Limit Theorems (CLTs) supply both: they show that, after scaling by <span class="math inline">\(\sqrt{n}\)</span>, the deviation <span class="math inline">\(\bar X_n - \mu\)</span> converges in distribution to a normal random variable, regardless of the distribution of the individual observations. This normal approximation is the foundation of virtually all asymptotic inference in econometrics.</p>
+<section id="classical-clt-lindeberglévy" class="level3">
+<h3 class="anchored" data-anchor-id="classical-clt-lindeberglévy">Classical CLT (Lindeberg–Lévy)</h3>
+<p><strong>Logic and Intuition.</strong> The CLT is remarkable because the normal limit emerges regardless of the shape of the distribution of the individual <span class="math inline">\(X_i\)</span>: symmetric or skewed, bounded or unbounded, discrete or continuous. The explanation lies in the convolution structure of the sum <span class="math inline">\(S_n = \sum X_i\)</span>. Each term independently adds a ``contribution’’ to the sum, and as <span class="math inline">\(n\)</span> grows, the combined distribution of these contributions smooths out, with no single term dominating. The characteristic function proof makes this precise: the characteristic function of the standardised sum converges to <span class="math inline">\(e^{-t^2/2}\)</span>, the characteristic function of <span class="math inline">\(\mathcal{N}(0,1)\)</span>, because the second-order Taylor expansion of <span class="math inline">\(\log\phi_X(t/\sqrt{n})\)</span> captures the variance term and higher-order contributions vanish.</p>
+</section>
+<section id="lyapunov-clt-non-identically-distributed" class="level3">
+<h3 class="anchored" data-anchor-id="lyapunov-clt-non-identically-distributed">Lyapunov CLT (Non-Identically Distributed)</h3>
+<p><strong>Logic and Intuition.</strong> The Lyapunov condition is a condition: it requires that the <span class="math inline">\((2+\delta)\)</span>-th moment of any individual term, scaled by the total spread <span class="math inline">\(s_n^{2+\delta}\)</span>, becomes negligible as <span class="math inline">\(n \to \infty\)</span>. This ensures that no single observation dominates the sum, so that the central limit phenomenon — the smoothing effect of averaging many independent contributions — still operates. The condition is verified using Lyapunov’s inequality (§6.4): if the <span class="math inline">\((2+\delta)\)</span>-th moments are bounded and the sum of variances grows without bound (<span class="math inline">\(s_n^2 \to \infty\)</span>), the Lyapunov condition is automatically satisfied.</p>
+</section>
+<section id="clt-for-dependent-sequences" class="level3">
+<h3 class="anchored" data-anchor-id="clt-for-dependent-sequences">CLT for Dependent Sequences</h3>
+<p>The i.i.d.&nbsp;and Lyapunov CLTs require independence. In time-series settings, where observations are serially correlated, a different set of CLTs applies. The key condition is that the dependence is ``weak’’ enough that the central limit phenomenon persists.</p>
+</section>
+</section>
+</section>
+<section id="monte-carlo-illustrations" class="level1">
+<h1>Monte Carlo Illustrations</h1>
+<p>Mathematical theorems tell us what must happen in the limit; Monte Carlo simulation lets us watch it happen. In this section we use the computer to draw random samples, compute sample statistics, and visualise how those statistics behave as sample size grows. The two results we simulate — the Law of Large Numbers and the Central Limit Theorem — are the cornerstones of asymptotic econometrics established in Section 7. Seeing them emerge from raw simulation, across distributions with very different shapes, builds an intuition that no formal proof alone can provide.</p>
+<p>The R code that produces every figure in this section is collected in Appendix B, where it is presented with full annotations. The figures appear here; the mechanics are there.</p>
+<section id="the-logic-of-monte-carlo-simulation" class="level2">
+<h2 class="anchored" data-anchor-id="the-logic-of-monte-carlo-simulation">The Logic of Monte Carlo Simulation</h2>
+<p>A Monte Carlo simulation replaces a difficult analytical calculation with a large number of random draws. The idea rests directly on the Law of Large Numbers: if we repeat an experiment a very large number of times <span class="math inline">\(B\)</span> and average the results, the average converges to the true expected value. We therefore use the computer as a probability engine — instructing it to draw pseudo-random numbers from a specified distribution, compute whatever statistic interests us, and repeat the process thousands of times to trace out the statistic’s sampling distribution.</p>
+<p>For our purposes, the workflow is:</p>
+<ol type="1">
+<li><strong>Specify a distribution</strong> with known mean <span class="math inline">\(\mu\)</span> and variance <span class="math inline">\(\sigma^2\)</span> (e.g.&nbsp;Exponential, Uniform, Bernoulli).</li>
+<li><strong>Draw a sample</strong> of size <span class="math inline">\(n\)</span> and compute the sample mean <span class="math inline">\(\bar X_n\)</span>.</li>
+<li><strong>Repeat</strong> step 2 independently <span class="math inline">\(B = 5{,}000\)</span> times, collecting <span class="math inline">\(B\)</span> values of <span class="math inline">\(\bar X_n\)</span>.</li>
+<li><strong>Examine</strong> how the collection of <span class="math inline">\(\bar X_n\)</span> values behaves as <span class="math inline">\(n\)</span> changes.</li>
+</ol>
+<p>This procedure lets us verify the LLN (the values of <span class="math inline">\(\bar X_n\)</span> converge toward <span class="math inline">\(\mu\)</span>) and the CLT (the standardised values <span class="math inline">\(\sqrt{n}(\bar X_n - \mu)/\sigma\)</span> converge in distribution to <span class="math inline">\(\mathcal{N}(0,1)\)</span>) empirically, across distributions of very different shapes.</p>
+</section>
+<section id="simulating-the-law-of-large-numbers" class="level2">
+<h2 class="anchored" data-anchor-id="simulating-the-law-of-large-numbers">Simulating the Law of Large Numbers</h2>
+<section id="logic-and-intuition" class="level3">
+<h3 class="anchored" data-anchor-id="logic-and-intuition">Logic and Intuition</h3>
+<p>The Weak Law of Large Numbers states that for any <span class="math inline">\(\varepsilon &gt; 0\)</span>, <span class="math inline">\(\Prob(|\bar X_n - \mu| &gt; \varepsilon) \to 0\)</span> as <span class="math inline">\(n \to \infty\)</span>. The Strong Law strengthens this to almost sure convergence: for almost every realised sequence of draws, the running average <span class="math inline">\(n^{-1}\sum_{i=1}^n X_i\)</span> converges to <span class="math inline">\(\mu\)</span> as a deterministic sequence of real numbers.</p>
+<p>To see this visually, we simulate multiple independent — each path is one realised sequence of draws — and plot the running mean after each observation. If the LLN holds, every path should eventually settle near <span class="math inline">\(\mu\)</span>, regardless of how erratically it begins.</p>
+<p>The key insight the simulation reveals is that convergence is a property of the long run, not the short run. In early observations the running mean can wander substantially from <span class="math inline">\(\mu\)</span>, especially for distributions with large variance or heavy tails. But as <span class="math inline">\(n\)</span> grows, the probability that the mean deviates from <span class="math inline">\(\mu\)</span> by more than any fixed tolerance shrinks to zero. The variance of the sample mean is <span class="math inline">\(\sigma^2/n\)</span>, which falls at rate <span class="math inline">\(1/n\)</span>; the simulation makes this shrinkage visible.</p>
+<p>We simulate four distributions with different shapes and moments to show that the LLN is a universal result, not an artefact of normality:</p>
+<ul>
+<li><span class="math inline">\(\mathcal{N}(0, 1)\)</span>: symmetric, thin-tailed, <span class="math inline">\(\mu = 0\)</span>.</li>
+<li><span class="math inline">\(\mathrm{Exponential}(1)\)</span>: right-skewed, <span class="math inline">\(\mu = 1\)</span>.</li>
+<li><span class="math inline">\(\mathrm{Uniform}(0, 1)\)</span>: bounded and flat, <span class="math inline">\(\mu = 0.5\)</span>.</li>
+<li><span class="math inline">\(\mathrm{Bernoulli}(0.3)\)</span>: discrete, <span class="math inline">\(\mu = 0.3\)</span>.</li>
+</ul>
+<p>For each distribution, five independent paths are shown.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1000</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>means <span class="ot">&lt;-</span> <span class="fu">cumsum</span>(x)<span class="sc">/</span><span class="fu">seq_along</span>(x)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">n =</span> <span class="fu">seq_along</span>(means), <span class="at">mean =</span> means)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> n, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Sample size"</span>, <span class="at">y =</span> <span class="st">"Mean"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="probability_theory_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption>Simulating the Law of Large Numbers</figcaption>
+<div id="fig-lln" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-lln-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="probability_theory_files/figure-html/fig-lln-1.png" class="img-fluid figure-img" data-fig-pos="H" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lln-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: <strong>Law of Large Numbers simulation.</strong> Each panel shows five independent realisations of the running sample mean <span class="math inline">\(\bar X_n = n^{-1}\sum_{i=1}^n X_i\)</span> (blue lines) plotted against sample size <span class="math inline">\(n\)</span>, for four distributions with markedly different shapes. The red dashed line marks the true population mean <span class="math inline">\(\mu\)</span> in each case. Regardless of the distribution, every path converges toward <span class="math inline">\(\mu\)</span> as <span class="math inline">\(n\)</span> grows, illustrating the universality of the LLN.
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
+</section>
+<section id="reading-the-figure" class="level3">
+<h3 class="anchored" data-anchor-id="reading-the-figure">Reading the Figure</h3>
+<p>Several features of <a href="#fig-lln" class="quarto-xref">Figure&nbsp;3</a> are worth noting.</p>
+<p><strong>Early-sample volatility.</strong> All four panels show substantial path-to-path variability when <span class="math inline">\(n\)</span> is small. This is not a failure of the LLN; it is exactly what probability theory predicts. <span class="math inline">\(\mathrm{Var}(\bar X_n) = \sigma^2/n\)</span> is large when <span class="math inline">\(n\)</span> is small, so the sample mean is genuinely noisy. The LLN is an asymptotic result — it describes the eventual behaviour of the average, not its behaviour at any finite <span class="math inline">\(n\)</span>.</p>
+<p><strong>Universality across distributions.</strong> The convergence pattern is qualitatively identical across all four distributions, despite their very different shapes. A binary <span class="math inline">\(\mathrm{Bernoulli}(0.3)\)</span> variable that only ever takes the values 0 and 1 produces a running mean that converges to 0.3 just as surely as a continuous <span class="math inline">\(\mathrm{Normal}(0,1)\)</span> variable converges to 0. This universality is the content of the LLN.</p>
+<p><strong>Rate of convergence.</strong> The paths settle toward <span class="math inline">\(\mu\)</span> at roughly the same rate across distributions for similar variance. The Exponential(1), which has <span class="math inline">\(\sigma^2 = 1\)</span>, converges at about the same rate as the Normal(0,1), also with <span class="math inline">\(\sigma^2 = 1\)</span>. This confirms the theoretical result <span class="math inline">\(\mathrm{Var}(\bar X_n) = \sigma^2/n\)</span>: it is the variance <span class="math inline">\(\sigma^2\)</span>, not the shape of the distribution, that governs how quickly the mean concentrates.</p>
+</section>
+</section>
+<section id="simulating-the-central-limit-theorem" class="level2">
+<h2 class="anchored" data-anchor-id="simulating-the-central-limit-theorem">Simulating the Central Limit Theorem</h2>
+<section id="logic-and-intuition-1" class="level3">
+<h3 class="anchored" data-anchor-id="logic-and-intuition-1">Logic and Intuition</h3>
+<p>The Central Limit Theorem asserts that the standardised sample mean <span class="math display">\[
+Z_n = \frac{\bar X_n - \mu}{\sigma/\sqrt{n}} = \frac{\sqrt{n}(\bar X_n - \mu)}{\sigma}
+\]</span> converges in distribution to <span class="math inline">\(\mathcal{N}(0,1)\)</span> as <span class="math inline">\(n \to \infty\)</span>, regardless of the distribution of the <span class="math inline">\(X_i\)</span> (provided <span class="math inline">\(\sigma^2 &lt; \infty\)</span>). This is a statement about the of the sampling distribution of <span class="math inline">\(\bar X_n\)</span>: it becomes increasingly bell-shaped as <span class="math inline">\(n\)</span> grows, no matter how non-normal the original data.</p>
+<p>The simulation makes this concrete by repeating the following experiment <span class="math inline">\(B = 5{,}000\)</span> times for each combination of distribution and sample size: draw <span class="math inline">\(n\)</span> observations, compute <span class="math inline">\(Z_n\)</span>, and record its value. After <span class="math inline">\(B\)</span> repetitions, the histogram of the recorded <span class="math inline">\(Z_n\)</span> values approximates the true sampling distribution. Overlaying the <span class="math inline">\(\mathcal{N}(0,1)\)</span> density curve reveals how quickly the approximation becomes accurate.</p>
+<p>We use three deliberately non-normal distributions to stress-test the CLT:</p>
+<ul>
+<li><span class="math inline">\(\mathrm{Exponential}(1)\)</span>: strongly right-skewed, <span class="math inline">\(\mu = 1\)</span>, <span class="math inline">\(\sigma = 1\)</span>.</li>
+<li><span class="math inline">\(\mathrm{Uniform}(0,1)\)</span>: bounded and perfectly flat, <span class="math inline">\(\mu = 0.5\)</span>, <span class="math inline">\(\sigma = 1/\sqrt{12}\)</span>.</li>
+<li><span class="math inline">\(\mathrm{Bernoulli}(0.3)\)</span>: discrete, heavily asymmetric, <span class="math inline">\(\mu = 0.3\)</span>, <span class="math inline">\(\sigma = \sqrt{0.21}\)</span>.</li>
+</ul>
+<p>For each distribution we examine four sample sizes: <span class="math inline">\(n \in \{1, 5, 30, 100\}\)</span>, arranged as columns in the figure.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-clt" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-pos="H">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-clt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="probability_theory_files/figure-html/fig-clt-1.png" class="img-fluid figure-img" data-fig-pos="H" width="864">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-clt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: <strong>Central Limit Theorem simulation.</strong> Each panel shows the simulated sampling distribution of the standardised sample mean <span class="math inline">\(Z_n = \sqrt{n}(\bar X_n - \mu)/\sigma\)</span> (blue histogram, <span class="math inline">\(B = 5{,}000\)</span> replications) overlaid with the standard normal density (red curve). Rows correspond to three non-normal parent distributions; columns to four sample sizes. The progressive convergence of each histogram toward the bell curve illustrates the CLT.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="reading-the-figure-1" class="level3">
+<h3 class="anchored" data-anchor-id="reading-the-figure-1">Reading the Figure</h3>
+<p><a href="#fig-clt" class="quarto-xref">Figure&nbsp;4</a> rewards careful examination row by row and column by column.</p>
+<p><strong>Along the columns (increasing <span class="math inline">\(n\)</span>).</strong> At <span class="math inline">\(n = 1\)</span>, the histogram simply reflects the shape of the parent distribution: right-skewed for the Exponential, flat for the Uniform, two-spike for the Bernoulli. By <span class="math inline">\(n = 5\)</span> some bell-shaping is already visible for the Uniform but the Exponential and Bernoulli remain noticeably asymmetric. By <span class="math inline">\(n = 30\)</span> all three distributions are well-approximated by the normal curve, and at <span class="math inline">\(n = 100\)</span> the match is nearly exact in every case. This progression is the CLT in action.</p>
+<p><strong>Across the rows (different distributions).</strong> The speed of convergence varies with how far the parent distribution is from normality. The Uniform, being symmetric and bounded, approximates normality very quickly — even at <span class="math inline">\(n = 5\)</span> the fit is good. The Exponential, being right-skewed, takes longer; at <span class="math inline">\(n = 30\)</span> there is still a faint rightward tilt. The Bernoulli, being discrete and asymmetric, is the slowest but still well-approximated by <span class="math inline">\(n = 30\)</span>. This confirms the theoretical result: the CLT holds for all three, but the rate of convergence depends on the distribution.</p>
+<p><strong>The role of standardisation.</strong> Notice that the histograms are plotted for the standardised statistic <span class="math inline">\(Z_n = \sqrt{n}(\bar X_n - \mu)/\sigma\)</span>, not the raw sample mean <span class="math inline">\(\bar X_n\)</span>. Without standardisation, the mean’s distribution would shrink toward a point (by the LLN), giving a trivial degenerate limit. Standardising by <span class="math inline">\(\sqrt{n}\)</span> inflates the scale just enough to keep the distribution non-degenerate, revealing its shape — and it is that shape which converges to <span class="math inline">\(\mathcal{N}(0,1)\)</span>.</p>
 <div style="page-break-after: always;"></div>
+</section>
+</section>
 </section>
 <section id="bibliography" class="level1 unnumbered">
 <h1 class="unnumbered">Bibliography</h1>
@@ -441,7 +625,7 @@ Figure&nbsp;2: Discrete rainfall shocks, household income, and the induced distr
 Axler, S. 2010. <em>Measure, Integration and Real Analysis</em>. Springer Open.
 </div>
 <div id="ref-bieren2004introduction" class="csl-entry" role="listitem">
-Bieren, Heman, and J. 2004. <em>Introduction to the Mathematical and Statistical Foundations of Econometrics</em>. Cambridge University Press.
+Bierens, Herman J. 2004. <em>Introduction to the Mathematical and Statistical Foundations of Econometrics</em>. Cambridge University Press.
 </div>
 <div id="ref-billingsley1995probability" class="csl-entry" role="listitem">
 Billingsley, P. 1995. <em>Probability and Measure</em>. Third. John Wiley &amp; Sons Inc.
@@ -497,94 +681,259 @@ White, H. 2000. <em>Asymptotic Theory for Econometricians</em>. Academic Press.
 <h1>Appendix</h1>
 <section id="lebesgue-measure-and-lebesgue-integration" class="level2">
 <h2 class="anchored" data-anchor-id="lebesgue-measure-and-lebesgue-integration">Lebesgue Measure and Lebesgue Integration</h2>
-<p>This appendix is a self-contained, intuition-first introduction to two ideas that underlie modern probability theory: <strong>Lebesgue measure</strong> and the <strong>Lebesgue integral</strong>. No prior exposure to real analysis is assumed. The goal is not a complete treatment— proofs of the harder theorems are omitted—but rather to give you enough geometric and conceptual grounding to read measure-theoretic probability with confidence.</p>
-<section id="why-do-we-need-a-new-notion-of-length" class="level3">
-<h3 class="anchored" data-anchor-id="why-do-we-need-a-new-notion-of-length">Why Do We Need a New Notion of “Length”?</h3>
-<p>You already have a perfectly good notion of length: the length of the interval <span class="math inline">\([a,b]\)</span> is <span class="math inline">\(b-a\)</span>. What could go wrong?</p>
-<p>It turns out that when we try to build a theory of probability on the real line, we need to assign a “size” (a probability, or more generally a measure) not just to intervals, but to complicated sets formed by taking countably many unions, intersections, and complements of intervals. The naive approach—just add up the lengths of the pieces—runs into serious problems once we allow infinitely many operations.</p>
-<blockquote class="blockquote">
-<p><strong>Motivating example.</strong></p>
-<p>Consider the set <span class="math inline">\(\mathbb{Q} \cap [0,1]\)</span>, the rational numbers in <span class="math inline">\([0,1]\)</span>. This set is <em>dense</em> (between any two points there is a rational), so it “looks” as if it should have positive length. Yet there are only <em>countably many</em> rationals, and each single point has length zero. Intuitively, infinitely many zeros should still sum to zero. Lebesgue measure will confirm this: <span class="math inline">\(\lambda(\mathbb{Q} \cap
-[0,1]) = 0\)</span>, even though the rationals are dense. The Riemann integral, by contrast, cannot even “integrate” the indicator function of <span class="math inline">\(\mathbb{Q}\)</span> over <span class="math inline">\([0,1]\)</span>.</p>
-</blockquote>
+<p>This appendix introduces two foundational ideas of modern mathematics — <strong>Lebesgue measure</strong> and the <strong>Lebesgue integral</strong> — from the ground up, with intuition and pictures rather than formal proofs. No prior exposure to real analysis is assumed. By the end, you should understand why economists and probability theorists use these tools, what they actually do, and how they connect to the expectation operator that appears throughout this text.</p>
+<p>Think of this appendix as a guided tour, not a textbook. We will stop at the key landmarks, look at them from multiple angles, and move on without inspecting every brick.</p>
+<hr>
+<section id="a.1-the-problem-we-are-trying-to-solve" class="level3">
+<h3 class="anchored" data-anchor-id="a.1-the-problem-we-are-trying-to-solve">A.1 — The Problem We Are Trying to Solve</h3>
+<p><strong>Start with something familiar.</strong> You know how to compute the average income in a population: add up everyone’s income and divide by the number of people. In continuous models — where income <span class="math inline">\(Y\)</span> is drawn from a probability distribution with density <span class="math inline">\(f\)</span> — the average is the integral <span class="math inline">\(\int y\, f(y)\,dy\)</span>. This is just an infinite version of the weighted average, with weights given by the density.</p>
+<p>So far, so good. The integral you learned in calculus (the Riemann integral) handles this perfectly well as long as the density <span class="math inline">\(f\)</span> is reasonably smooth. But economics and probability routinely produce objects that are not smooth — distributions with atoms (discrete mass at a point), distributions that are partly discrete and partly continuous, and limiting objects in asymptotic theory that arise as limits of sequences of functions. The Riemann integral struggles or fails with all of these.</p>
+<p><strong>The specific failure.</strong> The Riemann integral is built by slicing the <em>horizontal</em> axis into thin strips, approximating the function over each strip by a constant, and summing up the resulting rectangles. This works beautifully for smooth functions. But consider the function <span class="math inline">\(\mathbf{1}_{\mathbb{Q}}\)</span> that equals <span class="math inline">\(1\)</span> at every rational number and <span class="math inline">\(0\)</span> at every irrational number. Over the interval <span class="math inline">\([0,1]\)</span>, every horizontal strip contains both rationals and irrationals, so the function oscillates wildly between <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span> inside every strip, no matter how thin you make it. The Riemann integral cannot be defined.</p>
+<p>Yet intuitively, the rational numbers in <span class="math inline">\([0,1]\)</span> are “vanishingly few” compared to the irrationals — there are only countably many of them, while the irrationals are uncountable. The integral should be <span class="math inline">\(0\)</span>. The Lebesgue integral agrees: it gives <span class="math inline">\(\int \mathbf{1}_{\mathbb{Q}}\,d\lambda = 0\)</span>. The Riemann integral cannot even get started.</p>
+<p><strong>Why does this matter for economics?</strong> In econometrics, we regularly take limits of sequences of random variables and need to interchange the limit and the integral (i.e., swap <span class="math inline">\(\lim\)</span> and <span class="math inline">\(\E[\cdot]\)</span>). The theorems that justify this swap — the Monotone Convergence Theorem, Dominated Convergence Theorem, and Fatou’s Lemma — are proved using the Lebesgue integral. Without them, asymptotic theory would have no rigorous foundation.</p>
+<hr>
 </section>
-<section id="building-lebesgue-measure-step-by-step" class="level3">
-<h3 class="anchored" data-anchor-id="building-lebesgue-measure-step-by-step">Building Lebesgue Measure Step by Step</h3>
-<p>Think of Lebesgue measure <span class="math inline">\(\lambda\)</span> as the “correct” generalisation of length from intervals to a much larger collection of sets. We build it in three intuitive steps.</p>
-<section id="step-1-start-with-intervals" class="level4">
-<h4 class="anchored" data-anchor-id="step-1-start-with-intervals">Step 1 — Start with intervals</h4>
-<p>For any interval (open, closed, or half-open), declare its measure to equal its length: <span class="math display">\[      \lambda\bigl([a,b]\bigr) \;=\; \lambda\bigl((a,b)\bigr) \;=\; b - a.\]</span> Single points have measure zero: <span class="math inline">\(\lambda(\{a\}) = a - a = 0\)</span>.</p>
+<section id="a.2-measuring-the-size-of-sets" class="level3">
+<h3 class="anchored" data-anchor-id="a.2-measuring-the-size-of-sets">A.2 — Measuring the “Size” of Sets</h3>
+<p>Before we can integrate, we need a reliable way to measure how large a set is. This is the job of Lebesgue measure.</p>
+<p><strong>What does “size” mean?</strong> For an interval <span class="math inline">\([a, b]\)</span>, size clearly means length <span class="math inline">\(b - a\)</span>. For a rectangle in the plane, it means area. For a solid object in space, it means volume. Lebesgue measure generalises all of these to arbitrary subsets of <span class="math inline">\(\mathbb{R}\)</span> (or <span class="math inline">\(\mathbb{R}^n\)</span>), providing a consistent notion of “how much space a set occupies.”</p>
+<p>The key properties we want any reasonable measure of size to satisfy are:</p>
+<ul>
+<li><strong>Non-negativity:</strong> every set has a size of at least zero.</li>
+<li><strong>Normalisation:</strong> a single point has size zero.</li>
+<li><strong>Additivity:</strong> if two sets do not overlap, their combined size equals the sum of their individual sizes.</li>
+<li><strong>Consistency with length:</strong> for intervals, size should equal length.</li>
+</ul>
+<p><strong>Points have zero size.</strong> A single point on the real line occupies no space: <span class="math inline">\(\lambda(\{c\}) = 0\)</span>. This might seem obvious, but it has a powerful consequence: countably many points, taken together, also have zero size. The rational numbers <span class="math inline">\(\mathbb{Q}\)</span> are countable (you can list them: <span class="math inline">\(0, 1, -1, \tfrac{1}{2}, -\tfrac{1}{2}, 2, \ldots\)</span>), so <span class="math inline">\(\lambda(\mathbb{Q}) = 0\)</span>. This is true even though the rationals are on the real line — between any two real numbers there is always a rational. “Dense” does not mean “large in measure.” The reals are so much more numerous than the rationals that the rationals take up no measurable space at all.</p>
+<hr>
 </section>
-<section id="step-2-cover-complicated-sets-with-intervals" class="level4">
-<h4 class="anchored" data-anchor-id="step-2-cover-complicated-sets-with-intervals">Step 2 — Cover complicated sets with intervals</h4>
-<p>For a general set <span class="math inline">\(E \subseteq \mathbb{R}\)</span>, we define the <em>outer measure</em> <span class="math inline">\(\lambda^*(E)\)</span> by trying to cover <span class="math inline">\(E\)</span> with a countable collection of open intervals <span class="math inline">\(\{I_1, I_2, \ldots\}\)</span> and asking: what is the smallest total length we can achieve?</p>
-<p><span class="math display">\[      \lambda^*(E) \;=\; \inf\!\left\{ \sum_{n=1}^{\infty} |I_n| \;\Big|\;
-      E \subseteq \bigcup_{n=1}^{\infty} I_n,\; I_n \text{ open intervals} \right\}.\]</span></p>
-<blockquote class="blockquote">
-<p><strong>Geometric picture.</strong></p>
-<p>Imagine draping a “net” of open intervals over the set <span class="math inline">\(E\)</span>. Outer measure is the least amount of net you must use, optimised over all possible covers. For an interval <span class="math inline">\([a,b]\)</span> the optimum cover is just <span class="math inline">\((a-\varepsilon, b+\varepsilon)\)</span>, and shrinking <span class="math inline">\(\varepsilon\to 0\)</span> recovers <span class="math inline">\(\lambda^*([a,b])=b-a\)</span>. For a single point the cover can be made arbitrarily thin, giving <span class="math inline">\(\lambda^*(\{a\})=0\)</span>.</p>
-</blockquote>
+<section id="a.3-building-lebesgue-measure-the-covering-idea" class="level3">
+<h3 class="anchored" data-anchor-id="a.3-building-lebesgue-measure-the-covering-idea">A.3 — Building Lebesgue Measure: The Covering Idea</h3>
+<p>Now we need to extend “size” from simple intervals to arbitrary complicated sets. The central technique is <strong>covering</strong>: we approximate the size of a set by asking how efficiently we can cover it with intervals.</p>
+<p><strong>Outer measure: wrapping a set in intervals.</strong> Given any set <span class="math inline">\(E\)</span>, imagine throwing a collection of open intervals over it like a net, making sure every point of <span class="math inline">\(E\)</span> is inside at least one interval. The total length of the net is an upper bound on the size of <span class="math inline">\(E\)</span>. The <strong>outer measure</strong> <span class="math inline">\(\lambda^*(E)\)</span> is the smallest total length achievable over all possible coverings: <span class="math display">\[
+\lambda^*(E) = \inf\!\left\{ \sum_{n=1}^{\infty} |I_n| \;\bigg|\; E \subseteq \bigcup_{n=1}^{\infty} I_n,\ I_n \text{ open intervals} \right\}.
+\]</span></p>
+<p><strong>Measurable sets.</strong> Outer measure works for any set, but some pathological sets behave inconsistently. A set <span class="math inline">\(E\)</span> is called <strong>Lebesgue measurable</strong> if it cleanly splits every other set <span class="math inline">\(A\)</span> into two non-overlapping pieces — those inside <span class="math inline">\(E\)</span> and those outside — with sizes that add up correctly: <span class="math display">\[
+\lambda^*(A) = \lambda^*(A \cap E) + \lambda^*(A \cap E^c) \quad \text{for every set } A.
+\]</span> This is Carathéodory’s criterion. Think of it as a consistency check: a measurable set is one that “plays nicely” with all other sets. For such sets, we write <span class="math inline">\(\lambda(E)\)</span> for the outer measure and call it the Lebesgue measure.</p>
+<p>In practice, every set you will ever encounter in economics and probability — open sets, closed sets, intervals, their countable unions and intersections, the support of any distribution — is Lebesgue measurable. The sets that fail the criterion (called non-measurable sets) are mathematical curiosities that require the Axiom of Choice to construct and have no economic interpretation.</p>
+<p><strong>Summary: what Lebesgue measure gives us.</strong> The Lebesgue measure <span class="math inline">\(\lambda\)</span> is a function that assigns a non-negative real number (or <span class="math inline">\(+\infty\)</span>) to every measurable set, satisfying:</p>
+<ul>
+<li><span class="math inline">\(\lambda([a,b]) = b - a\)</span> (consistent with ordinary length),</li>
+<li><span class="math inline">\(\lambda\!\bigl(\bigcup_n E_n\bigr) = \sum_n \lambda(E_n)\)</span> for pairwise disjoint measurable sets <span class="math inline">\(E_n\)</span> (countable additivity),</li>
+<li><span class="math inline">\(\lambda(E + t) = \lambda(E)\)</span> for every real number <span class="math inline">\(t\)</span> (translation invariance: shifting a set doesn’t change its size).</li>
+</ul>
+<hr>
 </section>
-<section id="step-3-identify-the-well-behaved-sets-measurable-sets" class="level4">
-<h4 class="anchored" data-anchor-id="step-3-identify-the-well-behaved-sets-measurable-sets">Step 3 — Identify the “well-behaved” sets (measurable sets)</h4>
-<p>Not every subset of <span class="math inline">\(\mathbb{R}\)</span> behaves nicely under this covering procedure. A set <span class="math inline">\(E\)</span> is called <em>Lebesgue measurable</em> if it does not “straddle” any other set in a pathological way; the precise condition (Carathéodory’s criterion) is:</p>
-<p><span class="math display">\[      \lambda^*(A) \;=\; \lambda^*(A \cap E) \;+
-      \;\lambda^*(A \cap E^c) \quad \text{for every set } A \subseteq \mathbb{R}.\]</span></p>
-<p>For measurable sets, we simply write <span class="math inline">\(\lambda(E) := \lambda^*(E)\)</span> and call it the <em>Lebesgue measure</em> of <span class="math inline">\(E\)</span>.</p>
-<p>The collection <span class="math inline">\(\mathcal{L}\)</span> of all Lebesgue measurable sets is enormous. It contains: all open sets, all closed sets, all countable unions and intersections thereof (the Borel sets), and many more. In practice, every set you will ever encounter in economics or probability is Lebesgue measurable.</p>
-<p><strong>Definition (Lebesgue Measure)</strong> The <em>Lebesgue measure</em> on <span class="math inline">\(\mathbb{R}\)</span> is the function <span class="math display">\[\lambda : \mathcal{L} \to [0,\infty]\]</span> satisfying:</p>
-<ol type="1">
-<li><span class="math inline">\(\lambda([a,b]) = b - a\)</span> for all <span class="math inline">\(a \le b\)</span>.</li>
-<li>Countable additivity: if <span class="math inline">\(E_1, E_2, \ldots\)</span> are pairwise disjoint measurable sets, then <span class="math inline">\(\lambda\!\left(\bigcup_{n=1}^{\infty} E_n\right) = \sum_{n=1}^{\infty} \lambda(E_n)\)</span>.</li>
-<li>Translation invariance: <span class="math inline">\(\lambda(E + t) = \lambda(E)\)</span> for all <span class="math inline">\(t \in \mathbb{R}\)</span>.</li>
-</ol>
+<section id="a.4-the-riemann-integral-and-its-limits" class="level3">
+<h3 class="anchored" data-anchor-id="a.4-the-riemann-integral-and-its-limits">A.4 — The Riemann Integral and Its Limits</h3>
+<p>Before introducing the Lebesgue integral, it helps to understand exactly what the Riemann integral does and why it is not enough for probability theory.</p>
+<p><strong>How the Riemann integral works.</strong> To compute <span class="math inline">\(\int_a^b f(x)\,dx\)</span> in the Riemann sense, you partition the horizontal axis <span class="math inline">\([a,b]\)</span> into <span class="math inline">\(n\)</span> thin sub-intervals <span class="math inline">\([x_{k-1}, x_k]\)</span>, approximate <span class="math inline">\(f\)</span> over each sub-interval by a constant (say, the value at the left endpoint), and sum the resulting rectangles. As the sub-intervals get thinner (<span class="math inline">\(n \to \infty\)</span>), the sum converges to the integral — provided the function is well-behaved enough.</p>
+<p><strong>Where Riemann fails.</strong> The Riemann integral requires that, as sub-intervals shrink, the upper and lower approximations to the function converge to the same limit. For the function <span class="math inline">\(\mathbf{1}_{\mathbb{Q}}\)</span> (equal to <span class="math inline">\(1\)</span> on rationals, <span class="math inline">\(0\)</span> on irrationals), every sub-interval contains both rationals and irrationals, so the upper approximation is always <span class="math inline">\(1\)</span> and the lower approximation is always <span class="math inline">\(0\)</span>. They never meet, so the Riemann integral does not exist.</p>
+<p>More generally, the Riemann integral has difficulty with functions that have too many discontinuities, with limits of sequences of integrable functions, and with integrals over abstract spaces (such as the probability space <span class="math inline">\(\Omega\)</span>) that have no natural notion of “interval.” The Lebesgue integral overcomes all of these.</p>
+<hr>
+</section>
+<section id="a.5-the-lebesgue-integral-a-better-way-to-average" class="level3">
+<h3 class="anchored" data-anchor-id="a.5-the-lebesgue-integral-a-better-way-to-average">A.5 — The Lebesgue Integral: A Better Way to Average</h3>
+<p><strong>The key idea: slice the range, not the domain.</strong> Instead of partitioning the <span class="math inline">\(x\)</span>-axis into strips and approximating the function from above and below, the Lebesgue integral partitions the <span class="math inline">\(y\)</span>-axis (the set of output values) and asks: <em>for each output level, how much of the input produces that output?</em> That “how much” is answered by Lebesgue measure.</p>
+<p>Think of it this way. You want to compute the total wage bill for a group of workers. The Riemann approach says: go through each worker one by one (<span class="math inline">\(x\)</span>-axis = workers), multiply their wage by their hours, and add up. The Lebesgue approach says: group workers by pay grade (<span class="math inline">\(y\)</span>-axis = wages), compute how many workers are in each pay grade (measure of the pre-image), multiply by the wage, and add up. Both approaches give the same total, but the second is more powerful because it can handle groups of any structure, not just ordered lists.</p>
+<p><strong>Step 1: Simple functions.</strong> The simplest non-constant functions are <strong>simple functions</strong> — functions that take only finitely many distinct values. A simple function looks like a staircase: it equals a constant <span class="math inline">\(a_i\)</span> on each of finitely many measurable sets <span class="math inline">\(E_i\)</span>.</p>
+<p>For a simple function <span class="math inline">\(\phi = \sum_{i=1}^n a_i \mathbf{1}_{E_i}\)</span>, the Lebesgue integral is defined as: <span class="math display">\[
+\int \phi \,d\lambda = \sum_{i=1}^n a_i \,\lambda(E_i).
+\]</span> This is completely natural: multiply each value by the measure (size) of the set where the function takes that value, and sum up. It is a weighted average where the weights are the “sizes” of the regions, not just their count.</p>
+<p><strong>Step 2: General non-negative functions.</strong> Any non-negative measurable function <span class="math inline">\(f\)</span> can be approximated by an increasing sequence of simple functions <span class="math inline">\(\phi_1 \leq \phi_2 \leq \cdots \leq f\)</span> that converge upward to <span class="math inline">\(f\)</span> at every point. The Lebesgue integral of <span class="math inline">\(f\)</span> is defined as the limit of the integrals of the approximations: <span class="math display">\[
+\int f \,d\lambda = \lim_{n \to \infty} \int \phi_n \,d\lambda.
+\]</span></p>
+<p><strong>Step 3: Functions with positive and negative parts.</strong> For a general function <span class="math inline">\(f\)</span> that can be negative, we split it into its positive part <span class="math inline">\(f^+ = \max(f,0)\)</span> and negative part <span class="math inline">\(f^- = \max(-f,0)\)</span>, integrate each separately using Step 2, and subtract: <span class="math display">\[
+\int f \,d\lambda = \int f^+\,d\lambda - \int f^-\,d\lambda.
+\]</span> If both integrals are finite, <span class="math inline">\(f\)</span> is called <strong>Lebesgue integrable</strong> and we write <span class="math inline">\(f \in L^1(\lambda)\)</span>.</p>
+<hr>
+</section>
+<section id="a.6-three-advantages-that-matter-for-probability" class="level3">
+<h3 class="anchored" data-anchor-id="a.6-three-advantages-that-matter-for-probability">A.6 — Three Advantages That Matter for Probability</h3>
+<p>The Lebesgue integral agrees with the Riemann integral whenever both are defined — nothing is lost from what you already know. But the Lebesgue integral does three things that the Riemann integral cannot.</p>
+<p><strong>Advantage 1: Handles discontinuous functions.</strong> The Lebesgue integral can handle functions with far more discontinuities than the Riemann integral. In particular, it handles the mixed discrete-continuous distributions common in economics. A distribution with a mass point at <span class="math inline">\(c\)</span> (e.g., a corner solution where a household has exactly zero savings) is neither purely discrete nor purely continuous. The Lebesgue integral can integrate over it seamlessly, because the “weight” of the mass point at <span class="math inline">\(c\)</span> is simply <span class="math inline">\(\Prob(\{c\}) &gt; 0\)</span>, which Lebesgue measure assigns correctly. The Riemann integral cannot handle this without special cases and workarounds.</p>
+<p><strong>Advantage 2: “Almost everywhere” is the right standard.</strong> Under Lebesgue integration, two functions that agree except on a set of measure zero are treated as identical. Two functions <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> are said to be equal <strong>almost everywhere</strong> (written <span class="math inline">\(f = g\)</span> a.e.) if the set where they differ has measure zero: <span class="math display">\[
+\lambda(\{x : f(x) \neq g(x)\}) = 0.
+\]</span> This is important in probability because we typically do not care about events that have probability zero. Modifying a density function at finitely many isolated points changes nothing — those points form a set of measure zero and contribute zero to any integral.</p>
+<p><strong>Advantage 3: Limits and integrals can be swapped.</strong> This is the most important advantage for econometric theory. The three key results are:</p>
+<ul>
+<li><strong>Monotone Convergence Theorem (MCT):</strong> If <span class="math inline">\(0 \leq f_1 \leq f_2 \leq \cdots\)</span> and <span class="math inline">\(f_n \to f\)</span> pointwise, then <span class="math inline">\(\int f_n\,d\lambda \to \int f\,d\lambda\)</span>.</li>
+<li><strong>Dominated Convergence Theorem (DCT):</strong> If <span class="math inline">\(f_n \to f\)</span> pointwise and <span class="math inline">\(|f_n| \leq g\)</span> for an integrable function <span class="math inline">\(g\)</span>, then <span class="math inline">\(\int f_n\,d\lambda \to \int f\,d\lambda\)</span>.</li>
+<li><strong>Fatou’s Lemma:</strong> <span class="math inline">\(\int \liminf_n f_n\,d\lambda \leq \liminf_n \int f_n\,d\lambda\)</span> for non-negative <span class="math inline">\(f_n\)</span>.</li>
+</ul>
+<p>These theorems are used throughout econometric theory. Consistency proofs often need to show that <span class="math inline">\(\E[g(X_n)] \to \E[g(X)]\)</span> for some function <span class="math inline">\(g\)</span>; the Dominated Convergence Theorem justifies moving the limit inside the expectation. Derivations of moment conditions for GMM and proofs of the existence of moments for asymptotic distributions also invoke these results repeatedly.</p>
+<hr>
+</section>
+<section id="a.7-from-lebesgue-to-probability-expectation-as-an-integral" class="level3">
+<h3 class="anchored" data-anchor-id="a.7-from-lebesgue-to-probability-expectation-as-an-integral">A.7 — From Lebesgue to Probability: Expectation as an Integral</h3>
+<p>Everything above extends naturally from the real line to an abstract probability space <span class="math inline">\((\Omega, \mathcal{F}, \Prob)\)</span>. A probability measure <span class="math inline">\(\Prob\)</span> is simply a Lebesgue-type measure on the abstract space <span class="math inline">\(\Omega\)</span>, with the single additional requirement that the total mass equals one: <span class="math inline">\(\Prob(\Omega) = 1\)</span>.</p>
+<p>A random variable <span class="math inline">\(X : \Omega \to \mathbb{R}\)</span> is a measurable function from the abstract outcome space <span class="math inline">\(\Omega\)</span> to the real line. Its <strong>expected value</strong> is the Lebesgue integral of <span class="math inline">\(X\)</span> with respect to <span class="math inline">\(\Prob\)</span>: <span class="math display">\[
+\E[X] = \int_\Omega X(\omega)\,d\Prob(\omega).
+\]</span> This single expression unifies three cases that are usually treated separately in elementary statistics:</p>
+<p>This unification is not merely aesthetic. It means that every theorem proved using the Lebesgue integral — including the convergence theorems of Section A.6 — applies simultaneously to discrete, continuous, and mixed random variables, without separate case-by-case arguments. In econometrics, where sample spaces and distributions can be exotic (panel data with fixed effects, treatment variables with mass points, generated regressors), this generality is indispensable.</p>
+<p><strong>The connection to the rest of this text.</strong> Every time you see <span class="math inline">\(\E[X]\)</span> in the main text, you are seeing the Lebesgue integral <span class="math inline">\(\int X\,d\Prob\)</span> in shorthand. Every convergence theorem in Section 7 — the Laws of Large Numbers, the Central Limit Theorems, the limit-swap results used in their proofs — rests on the measure-theoretic framework built here. Lebesgue measure and Lebesgue integration are not abstract generalisations for their own sake; they are the precise, reliable machinery that makes modern probability theory — and therefore modern econometrics — work.</p>
+<hr>
+<p><em>For a thorough graduate-level treatment, see Billingsley, (3rd ed.); Royden and Fitzpatrick, (4th ed.); and Folland, (2nd ed.).</em></p>
+<hr>
 </section>
 </section>
-<section id="key-properties-of-lebesgue-measure" class="level3">
-<h3 class="anchored" data-anchor-id="key-properties-of-lebesgue-measure">Key Properties of Lebesgue Measure</h3>
-<p><strong>Countable sets have measure zero.</strong> If <span class="math inline">\(E = \{x_1, x_2, x_3, \ldots\}\)</span> is a countable set, then by countable additivity, <span class="math inline">\(\lambda(E) = \sum_{n=1}^{\infty} \lambda(\{x_n\}) = \sum_{n=1}^{\infty} 0 = 0\)</span>. In particular, <span class="math inline">\(\lambda(\mathbb{Q}) = 0\)</span>: the rational numbers, despite being dense in <span class="math inline">\(\mathbb{R}\)</span>, occupy no space at all in the sense of Lebesgue measure.</p>
-<p><strong>Measure is monotone.</strong> If <span class="math inline">\(A \subseteq B\)</span> and both are measurable, then <span class="math inline">\(\lambda(A) \le \lambda(B)\)</span>.</p>
-<p><strong>Countable subadditivity.</strong> For any sequence of measurable sets (not necessarily disjoint), <span class="math inline">\(\lambda\!\left(\bigcup_{n} E_n\right) \le \sum_{n} \lambda(E_n)\)</span>.</p>
-<p><strong>Continuity of measure.</strong> If <span class="math inline">\(E_1 \subseteq E_2 \subseteq \cdots\)</span> is an increasing sequence with union <span class="math inline">\(E\)</span>, then <span class="math inline">\(\lambda(E_n) \to \lambda(E)\)</span>; if <span class="math inline">\(E_1 \supseteq E_2 \supseteq \cdots\)</span> is decreasing with <span class="math inline">\(\lambda(E_1) &lt; \infty\)</span>, then <span class="math inline">\(\lambda(E_n) \to \lambda\!\left(\bigcap_n E_n\right)\)</span>.</p>
+<section id="r-code-monte-carlo-simulations" class="level2">
+<h2 class="anchored" data-anchor-id="r-code-monte-carlo-simulations">R Code: Monte Carlo Simulations</h2>
+<p>This section contains the fully annotated R code that produces the Law of Large Numbers figure (<a href="#fig-lln" class="quarto-xref">Figure&nbsp;3</a>) and the Central Limit Theorem figure (<a href="#fig-clt" class="quarto-xref">Figure&nbsp;4</a>) in Section 8. Both simulations use base R for random number generation and <code>ggplot2</code> with <code>theme_classic()</code> for all graphics. No additional packages beyond <code>ggplot2</code> and <code>scales</code> are required.</p>
+<section id="simulating-the-law-of-large-numbers-1" class="level3">
+<h3 class="anchored" data-anchor-id="simulating-the-law-of-large-numbers-1">Simulating the Law of Large Numbers</h3>
+<p>The code below generates five independent realisations of the running sample mean for each of four distributions and plots them against sample size, with the true mean shown as a horizontal reference line.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Parameters ────────────────────────────────────────────────────────────────</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>n_max   <span class="ot">&lt;-</span> <span class="dv">2000</span>   <span class="co"># maximum sample size per path</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>n_paths <span class="ot">&lt;-</span> <span class="dv">5</span>      <span class="co"># number of independent paths per distribution</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Helper: compute running means for one distribution ────────────────────────</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># rfun     : function(n) that draws n observations from the target distribution</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># mu_true  : population mean of that distribution</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># dist_label: display name for facet strip</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>make_paths <span class="ot">&lt;-</span> <span class="cf">function</span>(rfun, mu_true, dist_label) {</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="fu">seq_len</span>(n_paths), <span class="cf">function</span>(p) {</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    x <span class="ot">&lt;-</span> <span class="fu">rfun</span>(n_max)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">n            =</span> <span class="fu">seq_len</span>(n_max),</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">running_mean =</span> <span class="fu">cumsum</span>(x) <span class="sc">/</span> <span class="fu">seq_len</span>(n_max),   <span class="co"># bar X_n at each step</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">path         =</span> <span class="fu">factor</span>(p),</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">distribution =</span> dist_label,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">mu_true      =</span> mu_true</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  }))</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Simulate four distributions ───────────────────────────────────────────────</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>lln_data <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_paths</span>(<span class="cf">function</span>(n) <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="dv">1</span>),    <span class="at">mu_true =</span> <span class="dv">0</span>,   <span class="at">dist_label =</span> <span class="st">"Normal(0, 1)   mu = 0"</span>),</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_paths</span>(<span class="cf">function</span>(n) <span class="fu">rexp</span>(n, <span class="at">rate =</span> <span class="dv">1</span>), <span class="at">mu_true =</span> <span class="dv">1</span>,   <span class="at">dist_label =</span> <span class="st">"Exponential(1)   mu = 1"</span>),</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_paths</span>(<span class="cf">function</span>(n) <span class="fu">runif</span>(n, <span class="dv">0</span>, <span class="dv">1</span>),    <span class="at">mu_true =</span> <span class="fl">0.5</span>, <span class="at">dist_label =</span> <span class="st">"Uniform(0, 1)   mu = 0.5"</span>),</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_paths</span>(<span class="cf">function</span>(n) <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.3</span>), <span class="at">mu_true =</span> <span class="fl">0.3</span>, <span class="at">dist_label =</span> <span class="st">"Bernoulli(0.3)   mu = 0.3"</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Reference lines: one per distribution panel</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>mu_ref <span class="ot">&lt;-</span> <span class="fu">unique</span>(lln_data[, <span class="fu">c</span>(<span class="st">"distribution"</span>, <span class="st">"mu_true"</span>)])</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Plot ──────────────────────────────────────────────────────────────────────</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(lln_data, <span class="fu">aes</span>(<span class="at">x =</span> n, <span class="at">y =</span> running_mean, <span class="at">group =</span> path)) <span class="sc">+</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">colour =</span> <span class="st">"#2b6cb0"</span>, <span class="at">alpha =</span> <span class="fl">0.55</span>, <span class="at">linewidth =</span> <span class="fl">0.45</span>) <span class="sc">+</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mu_ref,</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">yintercept =</span> mu_true),</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour    =</span> <span class="st">"#c0392b"</span>,</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype  =</span> <span class="st">"dashed"</span>,</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="fl">0.75</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> distribution, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">nrow =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Sample size  n"</span>,</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">expression</span>(<span class="fu">bar</span>(X)[n])</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">11</span>) <span class="sc">+</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.background =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text       =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">10</span>),</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title       =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>),</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.spacing    =</span> <span class="fu">unit</span>(<span class="fl">1.1</span>, <span class="st">"lines"</span>)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </section>
-<section id="the-lebesgue-integral" class="level3">
-<h3 class="anchored" data-anchor-id="the-lebesgue-integral">The Lebesgue Integral</h3>
-<p>The central insight behind Lebesgue integration is to change what we partition. Rather than slicing the <em>domain</em> (the <span class="math inline">\(x\)</span>-axis, as Riemann does), we slice the <em>range</em> (the <span class="math inline">\(y\)</span>-axis) and ask how much of the domain maps into each slice. Figure~<span class="math inline">\(\ref{fig:riemann_vs_lebesgue}\)</span> illustrates this contrast.</p>
-<section id="step-1-simple-functions" class="level4">
-<h4 class="anchored" data-anchor-id="step-1-simple-functions">Step 1 — Simple functions</h4>
-<p>A <em>simple function</em> takes only finitely many values. If <span class="math inline">\(\phi =
-\sum_{i=1}^{n} a_i \,\mathbf{1}_{E_i}\)</span> where the <span class="math inline">\(E_i\)</span> are disjoint measurable sets and <span class="math inline">\(a_i \ge 0\)</span>, its Lebesgue integral over a measurable set <span class="math inline">\(A\)</span> is defined as the natural weighted sum:</p>
-<p><span class="math display">\[      \int_A \phi \,d\lambda \;=\; \sum_{i=1}^{n} a_i \,\lambda(E_i \cap A).\]</span></p>
-<blockquote class="blockquote">
-<p><strong>Analogy.</strong></p>
-<p>Think of a simple function as a salary schedule that pays <span class="math inline">\(a_i\)</span> dollars per hour to employees in group <span class="math inline">\(E_i\)</span>. The integral is the total wage bill: rate size-of-group, summed over all groups. Lebesgue measure plays the role of “group size.”</p>
-</blockquote>
-</section>
-<section id="step-2-non-negative-measurable-functions" class="level4">
-<h4 class="anchored" data-anchor-id="step-2-non-negative-measurable-functions">Step 2 — Non-negative measurable functions</h4>
-<p>For a non-negative measurable function <span class="math inline">\(f \ge 0\)</span>, we approximate <span class="math inline">\(f\)</span> from below by an increasing sequence of simple functions <span class="math inline">\(\phi_1 \le \phi_2 \le \cdots \uparrow f\)</span> and define:</p>
-<p><span class="math display">\[      \int_A f\,d\lambda \;=\; \lim_{n\to\infty} \int_A \phi_n\,d\lambda.\]</span></p>
-</section>
-<section id="step-3-general-measurable-functions" class="level4">
-<h4 class="anchored" data-anchor-id="step-3-general-measurable-functions">Step 3 — General measurable functions</h4>
-<p>Any measurable function can be split into its positive and negative parts: <span class="math inline">\(f = f^+ - f^-\)</span>, where <span class="math inline">\(f^+ = \max(f,0)\)</span> and <span class="math inline">\(f^- = \max(-f,0)\)</span>. Both <span class="math inline">\(f^+\)</span> and <span class="math inline">\(f^-\)</span> are non-negative, so Step 2 applies to each. We then define:</p>
-<p><span class="math display">\[      \int_A f\,d\lambda \;=\; \int_A f^+\,d\lambda \; - \; \int_A f^-\,d\lambda,\]</span> provided at least one of the two terms is finite. If both are finite, <span class="math inline">\(f\)</span> is called <em>Lebesgue integrable</em> and we write <span class="math inline">\(f \in L^1(\lambda)\)</span>.</p>
-</section>
-</section>
-<section id="what-makes-lebesgue-integration-better" class="level3">
-<h3 class="anchored" data-anchor-id="what-makes-lebesgue-integration-better">What Makes Lebesgue Integration Better?</h3>
-<p>For bounded functions on compact intervals, the Lebesgue integral agrees with the Riemann integral whenever the Riemann integral exists — so nothing is lost in the standard elementary cases. But the Lebesgue integral handles many situations the Riemann integral cannot. Three properties are especially important for probability theory.</p>
-<ol type="1">
-<li><p>Integrable functions can be wildly discontinuous. The indicator function <span class="math inline">\(\mathbf{1}_{\mathbb{Q}}\)</span> is not Riemann integrable over <span class="math inline">\([0,1]\)</span>. Its Lebesgue integral is <span class="math inline">\(0\)</span>.</p></li>
-<li><p>“Almost everywhere” is the right notion of equality. We say two functions <span class="math inline">\(f\)</span> and <span class="math inline">\(g\)</span> are equal <em>almost everywhere</em> (a.e.) if <span class="math inline">\(\lambda(\{x : f(x) \ne g(x)\}) = 0\)</span>.</p></li>
-<li><p>Limit and integral can be swapped under mild conditions (Monotone Convergence, Fatou’s Lemma, Dominated Convergence).</p></li>
-</ol>
-</section>
-<section id="connection-to-probability" class="level3">
-<h3 class="anchored" data-anchor-id="connection-to-probability">Connection to Probability</h3>
-<p>Everything above extends directly to probability spaces. A <em>probability measure</em> <span class="math inline">\(\Prob\)</span> on a measurable space <span class="math inline">\((\Omega, \mathcal{F})\)</span> is simply a measure with <span class="math inline">\(\Prob(\Omega)=1\)</span>. The Lebesgue integral of a random variable <span class="math inline">\(X\)</span> with respect to <span class="math inline">\(\Prob\)</span> is its expected value:</p>
-<p><span class="math display">\[      \E[X] \;=\; \int_\Omega X(\omega)\,d\Prob(\omega).\]</span></p>
-<p>For a thorough treatment at the graduate level, see Royden and Fitzpatrick <em>Real Analysis</em> (4th ed.) and Billingsley <em>Probability and Measure</em> (3rd ed.).</p>
+<section id="simulating-the-central-limit-theorem-1" class="level3">
+<h3 class="anchored" data-anchor-id="simulating-the-central-limit-theorem-1">Simulating the Central Limit Theorem</h3>
+<p>The code below draws <span class="math inline">\(B = 5{,}000\)</span> independent samples of each size <span class="math inline">\(n \in \{1, 5, 30, 100\}\)</span> from three non-normal distributions, standardises each sample mean, and overlays the empirical histogram with the <span class="math inline">\(\mathcal{N}(0,1)\)</span> density.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Parameters ────────────────────────────────────────────────────────────────</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>B            <span class="ot">&lt;-</span> <span class="dv">5000</span>               <span class="co"># Monte Carlo replications</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>sample_sizes <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">30</span>, <span class="dv">100</span>)   <span class="co"># sample sizes to examine</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Distribution specifications ───────────────────────────────────────────────</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Each entry: display name, random draw function, population mean, population sd</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>dist_specs <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">name  =</span> <span class="st">"Exponential(1)"</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">rfun  =</span> <span class="cf">function</span>(n) <span class="fu">rexp</span>(n, <span class="at">rate =</span> <span class="dv">1</span>),</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu    =</span> <span class="dv">1</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">sigma =</span> <span class="dv">1</span>                          <span class="co"># sd of Exp(1) is 1</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">name  =</span> <span class="st">"Uniform(0, 1)"</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">rfun  =</span> <span class="cf">function</span>(n) <span class="fu">runif</span>(n, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu    =</span> <span class="fl">0.5</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">sigma =</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> <span class="dv">12</span>)               <span class="co"># sd of Uniform(0,1)</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">name  =</span> <span class="st">"Bernoulli(0.3)"</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">rfun  =</span> <span class="cf">function</span>(n) <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.3</span>),</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">mu    =</span> <span class="fl">0.3</span>,</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">sigma =</span> <span class="fu">sqrt</span>(<span class="fl">0.3</span> <span class="sc">*</span> <span class="fl">0.7</span>)            <span class="co"># sd of Bernoulli(0.3)</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Simulate: for each distribution × sample size, collect B standardised means</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>clt_data <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(dist_specs, <span class="cf">function</span>(d) {</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(sample_sizes, <span class="cf">function</span>(n) {</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    means <span class="ot">&lt;-</span> <span class="fu">replicate</span>(B, <span class="fu">mean</span>(d<span class="sc">$</span><span class="fu">rfun</span>(n)))          <span class="co"># B sample means</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    z     <span class="ot">&lt;-</span> (means <span class="sc">-</span> d<span class="sc">$</span>mu) <span class="sc">/</span> (d<span class="sc">$</span>sigma <span class="sc">/</span> <span class="fu">sqrt</span>(n))  <span class="co"># standardise to Z_n</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="fu">data.frame</span>(</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>      <span class="at">z            =</span> z,</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_label      =</span> <span class="fu">paste0</span>(<span class="st">"n = "</span>, n),</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>      <span class="at">distribution =</span> d<span class="sc">$</span>name</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  }))</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Preserve factor order for facets</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>clt_data<span class="sc">$</span>n_label      <span class="ot">&lt;-</span> <span class="fu">factor</span>(clt_data<span class="sc">$</span>n_label,</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>                                <span class="at">levels =</span> <span class="fu">paste0</span>(<span class="st">"n = "</span>, sample_sizes))</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>clt_data<span class="sc">$</span>distribution <span class="ot">&lt;-</span> <span class="fu">factor</span>(clt_data<span class="sc">$</span>distribution,</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>                                <span class="at">levels =</span> <span class="fu">sapply</span>(dist_specs, <span class="st">`</span><span class="at">[[</span><span class="st">`</span>, <span class="st">"name"</span>))</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="co"># ── N(0,1) reference curve ────────────────────────────────────────────────────</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>norm_df         <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">z =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">4</span>, <span class="at">length.out =</span> <span class="dv">300</span>))</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>norm_df<span class="sc">$</span>density <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(norm_df<span class="sc">$</span>z)</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Plot ──────────────────────────────────────────────────────────────────────</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(clt_data, <span class="fu">aes</span>(<span class="at">x =</span> z)) <span class="sc">+</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">y =</span> <span class="fu">after_stat</span>(density)),</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    <span class="at">bins      =</span> <span class="dv">55</span>,</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill      =</span> <span class="st">"#2b6cb0"</span>,</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour    =</span> <span class="st">"white"</span>,</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha     =</span> <span class="fl">0.70</span>,</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="fl">0.15</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">data        =</span> norm_df,</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> z, <span class="at">y =</span> density),</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour      =</span> <span class="st">"#c0392b"</span>,</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth   =</span> <span class="fl">0.80</span>,</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">inherit.aes =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(distribution <span class="sc">~</span> n_label) <span class="sc">+</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">4</span>)) <span class="sc">+</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">expression</span>(<span class="st">"Standardised sample mean  "</span> <span class="sc">*</span> Z[n]),</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Density"</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>(<span class="at">base_size =</span> <span class="dv">10</span>) <span class="sc">+</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.background =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text.x     =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">10</span>),</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text.y     =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">9</span>),</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.spacing    =</span> <span class="fu">unit</span>(<span class="fl">0.7</span>, <span class="st">"lines"</span>),</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title       =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>)</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </section>
 </section>
 </section>
