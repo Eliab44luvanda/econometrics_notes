@@ -1119,6 +1119,25 @@ At small $T$, estimating a long-run variance is itself noisy. By $T=5000$ the HA
 are close to 5% for every stationary DGP except the most persistent equal-coefficient case.
 Prewhitening or fixed-$b$ critical values would be the natural next step for that case.
 
+As in the local-power design below (@sec:power), the rejection frequencies above characterise
+only the tail mass of the sampling distribution; a Jarque--Bera test on the same t-statistics,
+pooled over the `r Nsim_main` replications behind @fig-hac at each DGP and sample size, checks
+its shape. At $T=50$ normality is decisively rejected for the HAC statistic in every DGP examined,
+including the i.i.d. benchmark (statistic `r dgp_jb("iid", 50, "HAC", "jb_statistic")`,
+$p=`r dgp_jb("iid", 50, "HAC", "jb_pvalue", 4)`$) and $(0.95,0.95)$
+(statistic `r dgp_jb("(0.95,0.95)", 50, "HAC", "jb_statistic")`,
+$p=`r dgp_jb("(0.95,0.95)", 50, "HAC", "jb_pvalue", 4)`$); in the most persistent case even the
+conventional statistic is not immune (statistic
+`r dgp_jb("(0.95,0.95)", 50, "Conventional OLS", "jb_statistic")`,
+$p=`r dgp_jb("(0.95,0.95)", 50, "Conventional OLS", "jb_pvalue", 4)`$). By $T=5000$ the conventional
+statistic is normal in shape for every stationary DGP, and the only case in which HAC still shows a
+detectable departure is $(0.95,0.95)$ (statistic
+`r dgp_jb("(0.95,0.95)", 5000, "HAC", "jb_statistic")`,
+$p=`r dgp_jb("(0.95,0.95)", 5000, "HAC", "jb_pvalue")`$) -- the same DGP already flagged above as
+the slowest to converge in rejection frequency. The two diagnostics therefore agree: what looks
+like a scale problem in @fig-hac is, at small $T$, also a shape problem, and both resolve together
+as $T$ grows, except in the one design where persistence is highest.
+
 ## Size-adjusted local power {#sec:power}
 
 Robust inference is often described as trading size for power. @fig-power quantifies the trade
@@ -1142,6 +1161,16 @@ $T=`r power_sample_sizes[2]`$, and they do not shrink with $T$ --- the distortio
 of the limit distribution, not a small-sample artefact. The corresponding HAC critical values,
 `r pw_cv("HAC", power_sample_sizes[1])` and `r pw_cv("HAC", power_sample_sizes[2])`, do decline
 toward 1.96, as Proposition \ref{prop:hac} requires.
+
+The critical-value comparison above checks only the scale of the limit distribution; a
+Jarque--Bera test on the same null $t$-statistics checks its shape. At $T=`r power_sample_sizes[1]`$
+the test does not reject normality for either method (statistic
+`r pw_jb("Conventional OLS", power_sample_sizes[1], "jb_statistic")`, $p=`r pw_jb("Conventional OLS", power_sample_sizes[1], "jb_pvalue")`$
+for the conventional $t$-ratio; `r pw_jb("HAC", power_sample_sizes[1], "jb_statistic")`,
+$p=`r pw_jb("HAC", power_sample_sizes[1], "jb_pvalue")`$ for HAC), and the same is true at
+$T=`r power_sample_sizes[2]`$ ($p=`r pw_jb("Conventional OLS", power_sample_sizes[2], "jb_pvalue")`$
+and $p=`r pw_jb("HAC", power_sample_sizes[2], "jb_pvalue")`$ respectively). The limit is therefore
+normal in shape, not merely correctly scaled once $\lambda$ is accounted for.
 
 ```{r}
 #| label: fig-power

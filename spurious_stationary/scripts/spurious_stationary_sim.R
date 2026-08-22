@@ -104,6 +104,20 @@ hac_lrv_matrix <- function(S, L, dof_scale = 1) {
   Omega * dof_scale
 }
 
+# Jarque-Bera normality statistic and its asymptotic chi-squared(2) p-value,
+# implemented directly (rather than importing tseries) for the same reason the
+# HAC estimator above is implemented directly: a single, auditable formula
+# used everywhere in the handout.
+jarque_bera <- function(x) {
+  n    <- length(x)
+  m    <- mean(x)
+  v    <- mean((x - m)^2)
+  skew <- mean((x - m)^3) / v^1.5
+  kurt <- mean((x - m)^4) / v^2
+  stat <- n / 6 * (skew^2 + (kurt - 3)^2 / 4)
+  c(statistic = stat, p_value = 1 - pchisq(stat, df = 2))
+}
+
 # =============================================================================
 # 2. Test statistics for the simple regression y ~ 1 + x
 # =============================================================================
@@ -221,6 +235,13 @@ simulate_dgp <- function(entry, Tmax, grid, selected_T, Nsim, alpha) {
   conventional_rej <- matrix(FALSE, nrow = length(grid),       ncol = Nsim)
   hac_rej          <- matrix(FALSE, nrow = length(selected_T), ncol = Nsim)
 
+  # t-statistics at selected_T only, kept purely for the Jarque-Bera check
+  # below: the shape of the limiting distribution, as opposed to the
+  # rejection frequencies above, which check its tail mass.
+  conventional_t <- matrix(NA_real_, nrow = length(selected_T), ncol = Nsim)
+  hac_t          <- matrix(NA_real_, nrow = length(selected_T), ncol = Nsim)
+  sel_idx        <- match(selected_T, grid)
+
   for (r in seq_len(Nsim)) {
     d <- entry$draw(Tmax)
     x <- d$x
@@ -237,14 +258,21 @@ simulate_dgp <- function(entry, Tmax, grid, selected_T, Nsim, alpha) {
     b    <- Sxyc / Sxxc
     ssr  <- Syyc - b * Sxyc
     se   <- sqrt((ssr / (nn - 2)) / Sxxc)
-    conventional_rej[, r] <- abs(b / se) > qt(1 - alpha / 2, nn - 2)
+    tstat <- b / se
+    conventional_rej[, r] <- abs(tstat) > qt(1 - alpha / 2, nn - 2)
+    conventional_t[, r]   <- tstat[sel_idx]
 
     # --- HAC statistic at selected sample sizes ---------------------------
     for (j in seq_along(selected_T)) {
       n <- selected_T[j]
-      hac_rej[j, r] <- slope_rejections(x[seq_len(n)], y[seq_len(n)], alpha)[["HAC"]]
+      stats <- slope_t_stats(x[seq_len(n)], y[seq_len(n)])
+      hac_t[j, r]   <- stats[["HAC"]]
+      hac_rej[j, r] <- abs(stats[["HAC"]]) > qt(1 - alpha / 2, n - 2)
     }
   }
+
+  jb_conventional <- apply(conventional_t, 1, jarque_bera)
+  jb_hac          <- apply(hac_t,          1, jarque_bera)
 
   list(
     conventional = data.frame(T = grid, reject = rowMeans(conventional_rej),
@@ -252,7 +280,13 @@ simulate_dgp <- function(entry, Tmax, grid, selected_T, Nsim, alpha) {
                               Nsim = Nsim, stringsAsFactors = FALSE),
     hac = data.frame(T = selected_T, reject = rowMeans(hac_rej),
                      method = "HAC", dgp = entry$dgp,
-                     Nsim = Nsim, stringsAsFactors = FALSE)
+                     Nsim = Nsim, stringsAsFactors = FALSE),
+    normality = data.frame(
+      T = rep(selected_T, 2),
+      method = rep(c("Conventional OLS", "HAC"), each = length(selected_T)),
+      jb_statistic = c(jb_conventional["statistic", ], jb_hac["statistic", ]),
+      jb_pvalue    = c(jb_conventional["p_value", ],   jb_hac["p_value", ]),
+      dgp = entry$dgp, Nsim = Nsim, stringsAsFactors = FALSE)
   )
 }
 
@@ -263,8 +297,10 @@ simulation_list <- lapply(dgp_registry, simulate_dgp,
 
 res     <- do.call(rbind, lapply(simulation_list, `[[`, "conventional"))
 hac_res <- do.call(rbind, lapply(simulation_list, `[[`, "hac"))
+dgp_normality_res <- do.call(rbind, lapply(simulation_list, `[[`, "normality"))
 res$dgp     <- factor(res$dgp,     levels = dgp_levels)
 hac_res$dgp <- factor(hac_res$dgp, levels = dgp_levels)
+dgp_normality_res$dgp <- factor(dgp_normality_res$dgp, levels = dgp_levels)
 
 # Monte Carlo standard error of each reported proportion.
 mcse <- function(p, N) sqrt(p * (1 - p) / N)
@@ -504,10 +540,20 @@ simulate_local_power <- function(sample_sizes, b_grid, Nsim, alpha,
     cv <- vapply(methods, function(m)
       unname(quantile(abs(tstat[, null_index, m]), 1 - alpha)), numeric(1))
 
+    # Jarque-Bera test of normality on the null (b = 0) t-statistics: the
+    # critical-value comparison above checks the SCALE of the limit
+    # distribution (whether lambda is estimated correctly); this checks its
+    # SHAPE, i.e. whether the limit is normal at all, as Proposition
+    # \ref{prop:tstat} also claims.
+    jb <- vapply(methods, function(m)
+      jarque_bera(tstat[, null_index, m]), numeric(2))
+
     cv_records[[j]] <- data.frame(
       T = n, method = methods, critical_value = cv,
       nominal = qnorm(1 - alpha / 2),
       implied_sqrt_lambda = cv / qnorm(1 - alpha / 2),
+      jb_statistic = jb["statistic", ],
+      jb_pvalue    = jb["p_value", ],
       Nsim = Nsim, stringsAsFactors = FALSE
     )
 
@@ -567,6 +613,16 @@ rej_of <- function(dgp_name, n, method = "Conventional OLS") {
 rp <- function(dgp_name, n, method = "Conventional OLS", digits = 1)
   pc(rej_of(dgp_name, n, method), digits)
 
+dgp_jb <- function(dgp_name, n, method = "Conventional OLS",
+                   what = c("jb_statistic", "jb_pvalue"), digits = 2) {
+  what <- match.arg(what)
+  sprintf(paste0("%.", digits, "f"),
+          .one(dgp_normality_res[[what]][as.character(dgp_normality_res$dgp) == dgp_name &
+                                         dgp_normality_res$T == n &
+                                         dgp_normality_res$method == method],
+               sprintf("dgp_jb(%s, %d, %s, %s)", dgp_name, n, method, what)))
+}
+
 lambda_of <- function(dgp_name)
   .one(dgp_spec$lambda[dgp_spec$dgp == dgp_name], sprintf("lambda_of(%s)", dgp_name))
 asy_of <- function(dgp_name, digits = 1)
@@ -595,6 +651,13 @@ pw_cv <- function(method, n, digits = 2)
           .one(power_cv_res$critical_value[power_cv_res$method == method &
                                            power_cv_res$T == n],
                sprintf("pw_cv(%s, %d)", method, n)))
+pw_jb <- function(method, n, what = c("jb_statistic", "jb_pvalue"), digits = 2) {
+  what <- match.arg(what)
+  sprintf(paste0("%.", digits, "f"),
+          .one(power_cv_res[[what]][power_cv_res$method == method &
+                                    power_cv_res$T == n],
+               sprintf("pw_jb(%s, %d, %s)", method, n, what)))
+}
 
 # maximum Monte Carlo standard error of a proportion at a given N
 max_mcse <- function(N, digits = 2) sprintf(paste0("%.", digits, "f"), 100 * sqrt(0.25 / N))
@@ -747,6 +810,7 @@ tables <- list(
   spurious_hac_rejection_frequency_series = hac_res,
   spurious_comparison_table               = comparison_table,
   spurious_hac_comparison_table           = hac_comparison_table,
+  spurious_dgp_normality                  = dgp_normality_res,
   spurious_common_volatility              = common_volatility_res,
   spurious_local_to_unity                 = local_to_unity_res,
   spurious_granger_misspecification       = granger_res,
