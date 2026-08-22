@@ -1,0 +1,433 @@
+---
+title: "Lebesgue Integration & Measure-Theoretic Probability for Econometricians"
+author: "Eliab Luvanda"
+date: "2025-08-09"
+format:
+  pdf:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    lof: true
+    lot: true
+---
+
+\pagebreak
+# Motivation: Why Measure Theory in Econometrics?
+
+- **Econometric models** require integration over probability spaces, especially for expectations and variances.
+- Classical Riemann integration is limited; Lebesgue integration generalizes the concept, handling more complex random variables and probability spaces.
+- Measure-theoretic probability provides a rigorous framework for advanced econometric theory.
+
+# Measure Theory Basics
+
+## Sets & Sigma-Algebras
+
+- **Sample Space ($\Omega$):** Universe of outcomes.
+- **Sigma-Algebra ($\mathcal{F}$):** A collection of subsets of $\Omega$ (including $\Omega$ and $\varnothing$) closed under countable unions and complements. Ensures "measurability" of events.
+
+## Measures
+
+- **Measure $\mu$:** Function $\mu: \mathcal{F} \to [0, \infty]$, assigning "size" to sets.
+- **Probability Measure $P$:** Special case, $P(\Omega) = 1$, representing certainty.
+
+# Lebesgue Integration
+
+## Motivation
+
+- Riemann integral partitions the domain (horizontal slices).
+- Lebesgue integral partitions the range (vertical slices); better suited for complex/discontinuous functions.
+
+## Definition
+
+### Simple Function
+
+A simple function $s(x)$ is:
+$$
+s(x) = \sum_{k=1}^n a_k \mathbb{I}_{A_k}(x)
+$$
+where $A_k \in \mathcal{F}$, $a_k \geq 0$.
+
+### Lebesgue Integral (non-negative $f$)
+$$
+\int_\Omega f \, d\mu = \sup \left\{ \int_\Omega s \, d\mu : 0 \leq s \leq f, ~ s \text{ is simple} \right\}
+$$
+
+### Key Properties
+
+- **Linearity:** $\int(f + g)d\mu = \int f d\mu + \int g d\mu$
+- **Monotonicity:** If $f \leq g$, then $\int f d\mu \leq \int g d\mu$
+- **Dominated Convergence Theorem (DCT)**
+- **Fatou’s Lemma**
+- **Fubini’s Theorem**
+
+## Probabilistic Interpretation
+
+- **Expectation:**
+$$
+E[X] = \int_\Omega X(\omega) ~ P(d\omega)
+$$
+Applies to discrete, continuous, and mixed distributions.
+
+# Measure-Theoretic Probability
+
+## Probability Space
+
+- **Triple $(\Omega, \mathcal{F}, P)$:**
+  - $\Omega$: Sample space
+  - $\mathcal{F}$: Sigma-algebra
+  - $P$: Probability measure
+
+## Random Variables
+
+- **Random Variable ($X$):** Measurable function $X : \Omega \to \mathbb{R}$
+- **Measurability:** For all Borel sets $B$, $X^{-1}(B) \in \mathcal{F}$
+
+## Distribution
+
+- **Pushforward Measure $\mu_X$ of $X$:**
+$$
+\mu_X(B) = P(X \in B) = P(X^{-1}(B))
+$$
+
+# Practical Econometric Applications
+
+- **Expectations, variances, covariances**: All defined as Lebesgue integrals.
+- **Laws of Large Numbers and Central Limit Theorem:** Measure-theoretic convergence (almost sure, in probability) is key.
+- **Likelihood estimation:** Supports both continuous and mixed models.
+
+# Key Theorems for Econometricians
+
+## Dominated Convergence Theorem (DCT)
+If $f_n \to f$ and $|f_n| \leq g$ (integrable),
+$$
+\lim_{n \to \infty} \int f_n\,d\mu = \int f\,d\mu
+$$
+
+## Fubini’s Theorem
+Interchange order of integration:
+$$
+\int_\Omega \int_\Theta f(x,y)\,d\nu(y)\,d\mu(x) = \int_\Theta \int_\Omega f(x,y)\,d\mu(x)\,d\nu(y)
+$$
+
+| Feature                  | Riemann Integral         | Lebesgue Integral           |
+|--------------------------|-------------------------|-----------------------------|
+| Partitioning             | Domain (subintervals)   | Range (value slices)        |
+| Functions handled        | Continuous              | Measurable                  |
+| Probabilistic Models     | Limited                 | Natural & robust            |
+| Convergence Theorems     | Few                     | DCT, Fatou’s, etc.          |
+| Use for Expectations     | Simple RVs only         | General probability models  |
+
+: Summary Table: Riemann vs Lebesgue Integration
+
+# Essential Reading
+
+- Billingsley, P. *Probability and Measure*
+- Dudley, R. *Real Analysis and Probability*
+- Chung, K.L. *A Course in Probability Theory*
+
+# Concluding Remarks
+
+- **Lebesgue integration** and **measure-theoretic probability** are foundational for econometric theory, supporting advanced models, convergence concepts, expectations, and asymptotics.
+
+# Practice Problems
+
+1. **Probability Spaces:** Construct a probability space for a Markov process, identify measurable events.
+2. **Expectation Calculation:** If $X = \mathbb{I}_A + 2\mathbb{I}_B$, $A, B \in \mathcal{F}$, compute $E[X]$.
+3. **Dominated Convergence:** State and apply the Dominated Convergence Theorem to a sequence of expected values.
+
+---
+
+**End of Notes**
+
+# Visualizations
+
+## 1. Venn Diagram (Classical/Frequentist Events)
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| error: false
+#| fig.width: 3
+#| fig.height: 3
+#| out.width: "60%"
+#| fig.cap: "Venn Diagram of Events A and B"
+# Install packages if needed
+if (!require("VennDiagram")) install.packages("VennDiagram", repos = "https://cloud.r-project.org")
+library(VennDiagram)
+
+venn.plot <- draw.pairwise.venn(area1 = 60, area2 = 40, cross.area = 20,
+              category = c("Event A", "Event B"),
+              fill = c("skyblue", "orange"), alpha = 0.5,
+              cat.pos = c(-20, 20), cat.cex = 1.2)
+grid.draw(venn.plot)
+```
+
+
+**Purpose:**  
+A Venn diagram visually demonstrates how events and their relationships (intersection, union, disjointness) are handled in classical and frequentist probability.
+
+**Detailed Explanation:**  
+- **Events:** Each circle represents a possible event (e.g., getting a head in a coin toss, or an ace in a card draw).
+- **Intersection:** The overlapping region shows outcomes shared by both events (e.g., outcomes where both "A" and "B" occur).
+- **Union:** The total area covered by circles represents "A or B."
+- **Disjointness:** If circles don’t overlap, events are mutually exclusive.
+- Use this plot to discuss how probabilities of unions and intersections are calculated (e.g., $P(A \cup B) = P(A) + P(B) - P(A \cap B)$).
+
+## Relative Frequency Plot (Law of Large Numbers)
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| error: false
+#| fig.width: 6
+#| fig.height: 4
+#| out.width: "80%"
+#| fig.cap: "Empirical Probability Converges to True Probability"
+set.seed(42)
+n_trials <- 1000
+p_heads <- 0.5
+results <- rbinom(n_trials, 1, p_heads)
+cum_freq <- cumsum(results) / (1:n_trials)
+
+# Plotting the relative frequency of heads over trials
+# Use ggplot2 for better aesthetics
+library(ggplot2)
+ggplot(data.frame(trials=1:n_trials, freq=cum_freq), aes(x=trials, y=freq)) +
+  geom_line(color="darkblue", linewidth = 1) +
+  geom_hline(yintercept=p_heads, linetype="dashed", color="red") +
+  labs(
+#    title="Empirical Probability Converges to True Probability",
+       x="Number of Trials", y="Relative Frequency") +
+  theme_classic()
+```
+
+**Purpose:**  
+Shows how empirical (experimentally observed) frequencies converge to theoretical probabilities as the number of trials increases—a foundation of frequentist probability and statistics.
+
+**Detailed Explanation:**  
+- **Empirical Line:** The blue line tracks the proportion of heads in repeated coin tosses.
+- **Theoretical Probability:** The dashed red line marks the true value ($p = 0.5$ for a fair coin).
+- **Convergence:** As the number of trials increases, the empirical proportion stabilizes around the theoretical probability, visually illustrating the Law of Large Numbers.
+
+## Bayesian Updating (Prior and Posterior PDFs)
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| error: false
+#| fig.width: 6
+#| fig.height: 4
+#| out.width: "80%"
+#| fig.cap: "Bayesian Updating: Prior, Likelihood, and Posterior Distributions"
+if (!require("ggplot2")) install.packages("ggplot2")
+library(ggplot2)
+library(dplyr)
+
+x <- seq(0, 1, length=200)
+prior <- dbeta(x, 2, 5)
+likelihood <- dbeta(x, 8, 2)
+posterior <- dbeta(x, 10, 7)
+
+df <- data.frame(
+  Probability=x,
+  Prior=prior,
+  Likelihood=likelihood,
+  Posterior=posterior
+)
+
+df_long <- df %>% tidyr::pivot_longer(cols=-Probability, names_to="Type", values_to="Density")
+
+ggplot(df_long, aes(x=Probability, y=Density, color=Type)) +
+  geom_line(linewidth = 1.2) +
+#  ggtitle("Bayesian Updating: Prior, Likelihood, and Posterior Distributions") +
+  theme_classic()
+```
+
+**Purpose:**
+Visualizes how Bayesian updating modifies beliefs (prior) based on new evidence (likelihood) to produce a posterior distribution.
+
+**Detailed Explanation:**
+
+- **Prior Distribution:** Represents initial beliefs about a parameter (e.g., probability of success).
+- **Likelihood:** Represents the evidence or data observed (e.g., number of successes in trials).
+- **Posterior Distribution:** Updated beliefs after considering the likelihood, combining prior and evidence.
+- **Interpretation:** The posterior reflects how the prior is adjusted by the likelihood, showing the Bayesian approach to probability and inference.
+
+## Probability Space Diagram (Measure-Theoretic)
+
+Measure-Theoretic Probability Space can handle infinite & uncountable sample spaces, such as a dart board.
+
+Let's consider a **dart board** as a classic example of an infinite and uncountable probability space, which is a fundamental concept in measure-theoretic probability.
+
+### Description
+
+- **Sample Space ($\Omega$)**: The set of all points on the dart board, mathematically represented as the set of all ordered pairs $$(x, y)$$ in the unit disk:
+  $$
+  \Omega = \{(x, y) \mid x^2 + y^2 \leq 1\}
+  $$
+  This set is **uncountably infinite**, meaning there are infinitely many points, and you cannot list them in a sequence.
+
+- **Events ($A \subset \Omega$)**: An event is any measurable subset of the dart board — for instance, a specific region, such as a sector or an annulus.
+
+- **Probability Measure ($\mathbb{P}$)**: The probability of "hitting" a subset $A$ is defined by the area of $A$ divided by the total area of the dart board. Formally,
+  $$
+  \mathbb{P}(A) = \frac{\text{Area}(A)}{\pi}
+  $$
+  (assuming the dart lands uniformly at random on the board of area $\pi$.)
+
+
+
+
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| error: false
+#| fig.width: 2
+#| fig.height: 2
+#| out.width: "50%"
+#| fig.cap: "Dartboard Visualization: Sample Space Ω and Event A = {x < 0}"
+# Use ggplot2 to create a dartboard visualization, and add legend
+library(ggplot2)
+
+theta <- seq(0, 2*pi, length.out=500)
+x <- cos(theta)
+y <- sin(theta)
+theta_left <- seq(pi/2, 3*pi/2, length.out=250)
+x_left <- c(0, cos(theta_left), 0)
+y_left <- c(0, sin(theta_left), 0)
+
+df_disk <- data.frame(x = x, y = y)
+df_left <- data.frame(x = x_left, y = y_left)
+
+ggplot() +
+  geom_polygon(data = df_disk, aes(x = x, y = y), fill = "lightblue", alpha = 0.5) +
+  geom_polygon(data = df_left, aes(x = x, y = y), fill = "red", alpha = 0.5) +
+  coord_fixed() +
+#  labs(title = "Dartboard: Sample Space Ω and Event A") +
+  theme_void() +
+  theme(legend.position = "topright") +
+  scale_fill_manual(values = c("lightblue" = "lightblue", "red" = "red"),
+                    labels = c(expression(Omega), "A")) +
+  guides(fill = guide_legend(title = "Regions"))
+
+```
+
+### Key Ideas from Probability Theory:
+
+-	Sample Space (Ω):
+The unit disk shows every possible outcome—the set of all points where a dart can land. This is an infinite, uncountable sample space.
+	
+-	Event ($A = {(x, y): x < 0}$):
+The left half is highlighted in red—representing a measurable event (a subset of possible outcomes).
+	
+-	Probability Measure:
+In continuous spaces, probability is assigned by area:
+
+For this symmetric case, the probability of hitting the left half is 50%.
+This visualization demonstrates the essence of measure-theoretic probability, where events are regions of a continuous space, and likelihoods are determined by their size relative to the whole sample space.
+
+## Probability of Hitting a Subset: Measure-Theoretic Perspective
+
+In measure-theoretic probability theory, the **sample space** ($\Omega$) can be a continuous, uncountable set of outcomes—such as every possible point where a dart can land on a circular board. Suppose we are interested in the probability that the dart lands inside a **smaller circle** (event $A$) that lies within the larger circle (the sample space).
+
+This setting formalizes probability in terms of **measures** (such as area), rather than counting discrete outcomes. Specifically:
+
+- **Sample Space ($\Omega$):**  
+  The entire large circle, representing all possible points where the dart may land.
+
+- **Event ($A$):**  
+  Any measurable subset of $\Omega$. In this scenario, $A$ is the smaller circle (possibly offset from the center) entirely or partially within the larger one.
+
+- **Probability Measure:**  
+  The probability of hitting any point in $A$ is given by the ratio of the area of $A$ to the area of $\Omega$—assuming the dart lands uniformly at random:
+  $$
+  \mathbb{P}(A) = \frac{\text{Area}(A)}{\text{Area}(\Omega)}
+  $$
+  If the smaller circle (radius $r$) is entirely inside the larger circle (radius $R$):
+  $$
+  \mathbb{P}(A) = \frac{\pi r^2}{\pi R^2} = \left(\frac{r}{R}\right)^2
+  $$
+  If the inner circle overlaps the edge of the larger one, $\mathbb{P}(A)$ is the ratio of the overlapping area to the area of $\Omega$.
+
+**Interpretation:**  
+This approach encapsulates the essence of measure-theoretic probability:  
+- The probability of an event in a continuous space is computed by comparing its "size" (area or measure) to that of the full sample space.
+- Events need not be centered, nor do they have to be simple shapes—they can be any measurable region within $\Omega$.
+
+**Visualization:**  
+The following graph (see next section) depicts this relationship, with the **larger circle** representing all possible outcomes and the **smaller, possibly offset circle** highlighting the subset of interest whose probability we are computing.
+
+
+
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+#| error: false
+#| fig.width: 2
+#| fig.height: 2
+#| out.width: "50%"
+#| fig.cap: "Dartboard Visualization of computing a probability measure of an event A"
+# Dartboard Visualization: Offset Inner Circle Embedded in a Square
+
+# Define radii
+R <- 1      # Radius of big circle (sample space Ω)
+r <- 0.1    # Radius of small circle (event A)
+
+# Inner circle center coordinates (not at the origin)
+cx <- 0.2   # x-coordinate of inner circle center
+cy <- 0.8     # y-coordinate of inner circle center
+
+# Set up coordinates for the big circle
+theta <- seq(0, 2*pi, length.out=500)
+x_big <- R * cos(theta)
+y_big <- R * sin(theta)
+
+# Coordinates for the offset small circle
+x_small <- cx + r * cos(theta)
+y_small <- cy + r * sin(theta)
+
+# Set square boundaries
+square_min <- -1.5
+square_max <- 1.5
+
+# Plot in a square box, no axes, no outer plot box
+par(bty="n", mar=c(2,2,2,2))
+plot(NA, NA,
+     xlim=c(square_min, square_max), ylim=c(square_min, square_max),
+     xlab="", ylab="", asp=1,
+#     main="Probability Space: Offset Circle in Square",
+     axes=FALSE)
+
+# Draw the square boundary
+rect(square_min, square_min, square_max, square_max,
+     border="black", lwd=0.1)
+
+# Fill the big circle (sample space Ω)
+polygon(x_big, y_big, col=rgb(0.6,0.9,1,0.5), border=NA)
+
+# Fill the offset inner circle (event A)
+polygon(x_small, y_small, col=rgb(1,0,0,0.5), border=NA)
+
+# Add a smaller legend inside the square
+legend("topright",
+       legend=c(expression(Omega), "A"),
+       fill=c(rgb(0.6,0.9,1,0.5), rgb(1,0,0,0.5)),
+       bty="n", cex=0.55)
+
+```
+
+
+### Key Measure-Theoretic Probability Ideas Illustrated by the Graph
+
+- **Sample Space ($\Omega$):** The larger circle represents all possible outcomes where the dart can land.
+- **Event ($A$):** The smaller circle, possibly offset, represents a specific measurable event within the sample space.
+- **Probability Measure:** The shaded area of the smaller circle relative to the larger circle illustrates how we compute the probability of event $A$ by comparing its area to that of $\Omega$.
+
+This visualization captures the essence of measure-theoretic probability, where events are defined in terms of their measurable size within a continuous space.

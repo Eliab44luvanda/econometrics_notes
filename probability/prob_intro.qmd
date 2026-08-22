@@ -1,0 +1,263 @@
+---
+title: "Lecture Notes: Approaches to Probability Theory and Their Applications in Ecometrics & Economics"
+author: "Eliab Luvanda"
+date: "2025-08-09"
+format:
+  pdf:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    code-fold: false
+    lof: true
+    lot: true
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 8,
+  fig.height = 6
+)
+```
+
+
+
+***
+
+# Introduction
+
+Probability theory provides the quantitative foundation of economic analysis, particularly in measuring risk, uncertainty, and stochastic behavior. There are two prominent traditions of the foundations of probability: non-axiomatic (classical/frequentist & subjective) and axiomatic (measure-theoretic) approach.
+
+***
+
+## Non-Axiomatic Approaches
+
+### Classical (Laplacean) Approach
+
+**Definition:**  
+Probability is interpreted as the ratio of favorable outcomes to the total possible outcomes, assuming each outcome is equally likely.
+
+**Formula:**  
+$$
+P(\text{event}) = \frac{\text{Number of favorable outcomes}}{\text{Total number of possible outcomes}}
+$$
+
+**Example:**  
+If a die is rolled, the probability of getting a 3 is:
+$$ \frac{1}{6} $$.
+
+**Applications in Economics & Ecometrics:**
+- Used in simple models, especially game theory and decision-making under fair odds.
+- Forms the basis for early economic risk modeling.
+
+**Limitations:**  
+- Only applies when outcomes are equally likely, countable and finite.
+- Cannot handle infinite or uncountable outcome spaces.
+- Not suitable for empirical data with unequal probabilities.
+
+***
+
+### Frequentist Approach
+
+**Definition:**  
+Probability is defined as the long-run relative frequency of occurrence of an event in repeated identical trials.
+
+**Formula:**  
+$$
+P(\text{event}) = \lim_{n \to \infty} \frac{\text{Number of times event occurred in n trials}}{n}
+$$
+
+**Example:**  
+The empirical probability of recession is the historical proportion of years with negative GDP growth.
+
+**Applications in Economics & Ecometrics:**
+- Foundation for most statistical methods (regression, hypothesis testing, maximum likelihood).
+- Widely used in econometric analysis, especially with large, repeated samples.
+- Applied to estimating risk, credit defaults, insurance, labor market transitions, etc.
+
+**Limitations:**  
+- Assumes infinite repeatability and stable underlying conditions.
+- Problematic for unique, non-replicable events (such as "one-off" economic crises).
+- Does not allow incorporation of subjective belief or prior information.
+
+***
+
+### Subjective (Bayesian) Approach
+
+**Definition:**  
+Probability is interpreted as a degree of belief or confidence in the occurrence of an event, based on available information.
+
+**Formula:**  
+Bayes’ theorem allows updating probability in light of new evidence:
+$$
+P(A|B) = \frac{P(B|A)P(A)}{P(B)}
+$$
+
+**Example:**  
+An investor assigns a subjective probability of a stock market crash based on their analysis and information.
+
+**Applications in Economics & Ecometrics:**
+- Bayesian inference is increasingly popular for predictive modeling, forecasting, policy evaluation.
+- Allows experts to incorporate prior knowledge and beliefs, valuable in economic uncertainty and unique situations.
+- Useful in decision-theory, auctions, game theory (learning under uncertainty).
+
+**Limitations:**  
+- Subjectivity can lead to disagreement and inconsistency among analysts.
+- Choosing priors can be controversial and sensitive.
+- Requires computationally intensive methods for complex models.
+
+***
+
+##  Axiomatic (Measure-Theoretic) Approach: Rigorous, Accessible Lecture Notes
+
+Axiomatic theories of probability, and specifically Kolmogorov's measure-theoretic theory, give probability theory a mathematically rigorous footing. They are needed in order to perform sophisticated applications of probability in economics and ecometrics, where proper definitions and algebraic manipulation of probabilities of random variables, expectations and stochastic processes are needed.
+
+### Formal Definition: Kolmogorov’s Framework
+
+The **axiomatic (measure-theoretic) approach** to probability was developed by Andrey Kolmogorov in 1933. It creates a mathematically rigorous foundation for probability theory, enabling precise reasoning about both discrete and continuous random phenomena.
+
+#### Core Ingredients
+
+- **Sample Space ($\Omega$):**  
+  The set of all possible outcomes of an experiment.
+
+- **σ-algebra ($\mathcal{F}$):**  
+  A collection of subsets of $\Omega$, called "events," which is closed under complementation and countable unions. Not every subset of $\Omega$ must be an event—only those in $\mathcal{F}$.
+
+- **Probability Measure ($P$):**  
+  A function $P: \mathcal{F} \to [0,1]$ that assigns a probability to *each* event, following three key axioms, also known as Kolmogorov's axioms:
+
+  1. **Non-negativity:**  
+     $$
+     P(A) \geq 0 \quad \text{for every } A \in \mathcal{F}
+     $$
+  2. **Normalization:**  
+     $$
+     P(\Omega) = 1
+     $$
+     The probability of the entire sample space is $1$.
+  3. **Countable Additivity:**  
+     For any countable sequence of mutually disjoint events $A_1, A_2, A_3, \ldots$ in $\mathcal{F}$:
+     $$
+     P\left( \bigcup_{i=1}^{\infty} A_i \right) = \sum_{i=1}^{\infty} P(A_i)
+     $$
+
+- The full probability space is described as $(\Omega, \mathcal{F}, P)$.
+
+***
+
+### Why This Matters for Econometrics and Economics
+
+- **Handles all cases:**  
+  This formalism allows probability theory to handle both simple finite cases (like dice or coins) and complex infinite/continuous cases (like asset prices, interest rates, and economic indicators evolving over time).
+
+- **Provides rigor:**  
+  Measure theory gives a solid mathematical ground for defining expectations, integrals, random variables, and stochastic processes, which are essential tools in advanced econometrics and mathematical finance.
+
+- **Applications:**  
+  - Stochastic models in asset pricing and financial economics (e.g. Brownian motion, diffusion processes).
+  - Rigorous analysis of time-series and econometric models involving continuous data or processes.
+  - Formal risk metrics (Value at Risk, expected shortfall), option pricing, and insurance mathematics.
+
+***
+
+### Limitations and Accessibility
+
+- **Complexity:**  
+  Requires familiarity with sets, σ-algebras, and measure theory—concepts advanced beyond classical probability.
+
+- **Abstraction:**  
+  May obscure simple intuition, especially for beginners. Sometimes more than necessary for discrete or elementary models.
+
+- **Interpretation:**  
+  Does not itself specify whether probability should be understood as “frequency,” “degree of belief,” or otherwise—it gives rules, not philosophical meaning.
+
+***
+
+### Summary Table: Axiomatic vs. Earlier Approaches
+
+| Approach                  | Key Idea                                  | Defining Feature              |
+|---------------------------|--------------------------------------------|-------------------------------|
+| Classical (Laplacean)     | Equally likely cases, ratio of outcomes   | Simplicity                    |
+| Frequentist               | Long run relative frequency                | Empirical repeatability       |
+| Bayesian/Subjective       | Degree of belief given available info      | Incorporates prior knowledge  |
+| **Axiomatic (Measure)**   | Abstract function on σ-algebra, satisfying axioms | Rigor, generality             |
+
+***
+
+### Suggested Further Reading
+
+- Billingsley, P. *Probability and Measure*
+- Kolmogorov, A.N. *Foundations of the Theory of Probability*
+- Casella, G. & Berger, R.L. *Statistical Inference*
+
+***
+
+**In summary**:  
+
+The axiomatic, measure-theoretic approach provides probability theory with consistency, power, and flexibility. It underpins all contemporary mathematical and statistical applications from economics and econometrics, although it involves a more advanced mathematical understanding. Its significance cannot be overstated, as it underlies the essential aspects of advanced economic analysis, such as random variables, expectations, and stochastic processes.
+
+### Applications in Economics & Ecometrics
+
+- Underpins all modern statistical inference, stochastic processes, and econometric theory.
+- Used for advanced topics: Brownian motion (finance), continuous-time models, time series, risk measures.
+- Enables rigorous construction of random variables, expectations, conditional probabilities.
+
+**Examples:**
+- Modeling asset returns as continuous stochastic processes.
+- Defining risk measures (VaR, expected shortfall) in financial risk management.
+- Random utility models in microeconometrics.
+
+***
+
+###  Limitations
+
+- Requires advanced mathematical background (measure theory, set theory).
+- Abstractness can obscure intuitive understanding.
+- Sometimes excessive for simple discrete models.
+- Does not specify interpretation (can be compatible with frequentist or Bayesian views).
+
+***
+
+## Importance and Applications in Ecometrics and Economics
+
+**Why these approaches matter:**
+- Enable formal reasoning about risk, uncertainty, expectation.
+- Drive empirical modeling and inference: regressions, forecasts, hypothesis tests.
+- Connect to game theory, decision theory, financial modeling.
+
+**Key Applications:**
+- *Frequentist:* Econometrics (OLS, MLE, hypothesis testing).
+- *Subjective/Bayesian:* Decision making, forecasting, expert systems.
+- *Axiomatic:* Advanced financial economics, stochastic calculus, asymptotic theory.
+
+***
+
+## Summary Table: Comparison of Approaches
+
+| Approach          | Interpretation         | Applications in Economics             | Limitations                         |
+|-------------------|-----------------------|--------------------------------------|-------------------------------------|
+| Classical         | Ratio of favorable to total equally likely outcomes | Simple games, basic probabilistic models | Only for finite, symmetric cases      |
+| Frequentist       | Long-run frequency    | Econometrics, statistics, risk modeling | Inapplicable to unique events        |
+| Subjective (Bayesian) | Degree of belief         | Forecasting, learning, auctions         | Choice of prior, computational cost  |
+| Axiomatic         | Abstract measure-theoretic | Modern finance, stochastic processes     | Mathematical complexity, abstraction |
+
+***
+
+## Conclusion
+
+- **Non-axiomatic approaches** provide practical grounding for applied work, foundational teaching, and basic empirical models.
+- **Axiomatic approach** ensures mathematical rigor, enabling complex analysis in modern economics and econometrics.
+- Selection depends on context, interpretive philosophy, and computational resources.
+
+All approaches continue to play a vital role in advancing quantitative methods and theoretically sound analysis in economics and ecometrics.
+
+# Reading List
+
+- Billingsley, P. (1995). Probability and Measure.
+- Casella, G., & Berger, R. L. (2002). Statistical Inference.
+- DeGroot, M. H., & Schervish, M. J. (2012). Probability and Statistics.
+- Kolmogorov, A. N. (1933). Foundations of the Theory of Probability.
+
+
