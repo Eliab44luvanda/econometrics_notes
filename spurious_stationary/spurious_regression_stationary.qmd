@@ -1,6 +1,6 @@
 ---
 title: "Is Spurious Regression a Problem in Stationary Time Series?"
-subtitle: "A Theoretical Framework and Monte Carlo Evidence"
+subtitle: "Asymptotic Theory and Finite-Sample Monte Carlo Evidence"
 author: "Eliab Luvanda"
 date: today
 lang: en
@@ -1119,7 +1119,7 @@ At small $T$, estimating a long-run variance is itself noisy. By $T=5000$ the HA
 are close to 5% for every stationary DGP except the most persistent equal-coefficient case.
 Prewhitening or fixed-$b$ critical values would be the natural next step for that case.
 
-As in the local-power design below (@sec:power), the rejection frequencies above characterise
+As in the local-power design below (Section \ref{sec:power}), the rejection frequencies above characterise
 only the tail mass of the sampling distribution; a Jarque--Bera test on the same t-statistics,
 pooled over the `r Nsim_main` replications behind @fig-hac at each DGP and sample size, checks
 its shape. At $T=50$ normality is decisively rejected for the HAC statistic in every DGP examined,
