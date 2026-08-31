@@ -151,5 +151,9 @@ Thumbs.db
 !/engoneity_iv_tsls_gmm/
 !/README.md
 
+# Knitr/Quarto render caches (binary, machine-specific, regenerated on render)
+*_cache/
+.quarto/
+
 # Keep this file tracked (explicit)
 !.gitignore

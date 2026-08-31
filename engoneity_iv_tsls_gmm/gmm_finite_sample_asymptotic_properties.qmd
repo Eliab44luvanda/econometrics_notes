@@ -1,0 +1,729 @@
+---
+title: "Finite-Sample and Asymptotic Properties of the Linear GMM Estimator"
+subtitle: "Theory and Monte Carlo Evidence"
+author: "Eliab Luvanda"
+date: today
+lang: en
+bibliography: references.bib
+
+abstract: |
+  We give a self-contained treatment of the linear Generalized Method of
+  Moments (GMM) estimator in an overidentified instrumental-variables model.
+  We state the identification, consistency, and asymptotic-normality results
+  from first principles, derive the efficiency bound attained by the optimal
+  weighting matrix, and derive the limiting chi-squared distribution of
+  Hansen's $J$ statistic for testing overidentifying restrictions. We then
+  contrast this asymptotic theory with finite-sample behaviour using a Monte
+  Carlo experiment: an overidentified, conditionally heteroskedastic
+  instrumental-variables design in which a one-step (2SLS-weighted) and a
+  two-step efficient GMM estimator are compared across sample sizes ranging
+  from 50 to 10,000. The simulation traces out consistency (bias and variance
+  shrinking with $n$), the efficiency gain of two-step over one-step GMM,
+  the approach of the studentized estimator's finite-sample distribution to
+  its $N(0,1)$ limit, the coverage of sandwich-based confidence intervals,
+  and the size of the $J$ test, and discusses where each departs from its
+  asymptotic approximation at small $n$.
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    fontsize: 11pt
+    papersize: a4
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    colorlinks: true
+    fig-pos: "htbp"
+
+geometry:
+  - inner=1.2in
+  - outer=1.0in
+  - top=1.1in
+  - bottom=1.2in
+  - headsep=0.3in
+
+mainfont: "TeX Gyre Termes"
+sansfont: "TeX Gyre Heros"
+monofont: "Inconsolata"
+mathfont: "TeX Gyre Termes Math"
+
+header-includes:
+  - \usepackage{amsmath, amssymb, amsthm, mathtools}
+  - \newcommand{\bm}[1]{\symbf{#1}}
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{setspace}
+  - \singlespacing
+  - |
+    \theoremstyle{plain}
+    \newtheorem{proposition}{Proposition}
+    \newtheorem{theorem}[proposition]{Theorem}
+    \newtheorem{lemma}[proposition]{Lemma}
+    \newtheorem{corollary}[proposition]{Corollary}
+  - |
+    \theoremstyle{definition}
+    \newtheorem{assumption}{Assumption}
+    \newtheorem{definition}[assumption]{Definition}
+  - \renewcommand{\qedsymbol}{$\blacksquare$}
+  - |
+    \newcommand{\E}{\mathbb{E}}
+    \newcommand{\Var}{\mathrm{Var}}
+    \newcommand{\Cov}{\mathrm{Cov}}
+    \newcommand{\plim}{\operatorname*{plim}}
+    \newcommand{\bX}{\bm{X}}
+    \newcommand{\bZ}{\bm{Z}}
+    \newcommand{\by}{\bm{y}}
+    \newcommand{\bbeta}{\bm{\beta}}
+    \newcommand{\beps}{\bm{\varepsilon}}
+  - \usepackage{fancyhdr}
+  - |
+    \pagestyle{fancy}
+    \fancyhf{}
+    \fancyhead[LE,RO]{\thepage}
+    \fancyhead[LO]{Finite-Sample and Asymptotic Properties of Linear GMM}
+    \fancyhead[RE]{Econometrics}
+
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup, include=FALSE, cache=TRUE, cache.extra=tools::md5sum("scripts/gmm_finite_sample_asymptotic_sim.R")}
+source("scripts/gmm_finite_sample_asymptotic_sim.R")
+library(knitr)
+```
+
+# Introduction
+
+The Generalized Method of Moments (GMM) estimator of @Hansen2022 [see also
+@Hayashi2000; @Hall2005] is the workhorse estimator for overidentified linear
+models with endogenous regressors: it nests ordinary least squares, simple
+instrumental variables, and two-stage least squares (2SLS) as special cases,
+and it remains valid when the number of instruments exceeds the number of
+parameters and when the structural error is conditionally heteroskedastic.
+Its large-sample theory is standard textbook material -- consistency,
+asymptotic normality, an efficiency bound attained by an optimal weighting
+matrix, and a chi-squared test of overidentifying restrictions. What that
+theory does *not* say is how large a sample has to be before its predictions
+become a good guide to what an applied researcher actually sees.
+
+This handout has two purposes. Section 2 develops the finite-sample and
+asymptotic theory of the linear GMM estimator rigorously, from the moment
+condition through the closed-form estimator, its consistency and asymptotic
+normality, the efficiency bound, the two-step feasible efficient estimator,
+and Hansen's $J$ test. Section 3 sets out a Monte Carlo design -- an
+overidentified, conditionally heteroskedastic instrumental-variables model in
+which the one-step (2SLS-weighted) and two-step efficient GMM estimators
+genuinely differ -- that is built to make each asymptotic result in Section 2
+independently checkable in finite samples. Section 4 reports and interprets
+the simulation evidence, and Section 5 concludes.
+
+# Theoretical Background
+
+## The Linear Moment-Condition Model
+
+Let $\{(y_i, \bm{x}_i, \bm{z}_i)\}_{i=1}^n$ be an independent and identically
+distributed sample, where $y_i$ is a scalar outcome, $\bm{x}_i$ is a
+$K \times 1$ vector of regressors (possibly including endogenous variables),
+and $\bm{z}_i$ is an $L \times 1$ vector of instruments with $L \geq K$. The
+model is linear,
+$$
+y_i = \bm{x}_i^\top \bbeta_0 + \varepsilon_i,
+$$
+and identification comes entirely from the population moment condition
+\begin{equation}
+\E\big[\bm{z}_i \varepsilon_i(\bbeta_0)\big] = \bm{0}_L, \qquad
+\varepsilon_i(\bbeta) \equiv y_i - \bm{x}_i^\top \bbeta,
+\end{equation}
+which states that the instruments are uncorrelated with the structural error
+at the true parameter value $\bbeta_0$. When $L > K$, (1) imposes $L - K$
+*overidentifying restrictions*: more moment conditions than are needed to
+pin down $\bbeta_0$, which is what makes the specification testable (Section
+2.6) and what makes an efficiency question ("which linear combination of the
+$L$ conditions should we use?") meaningful in the first place.
+
+Stacking observations into $\bX$ ($n\times K$), $\bZ$ ($n\times L$), and $\by$
+($n\times1$), define the *sample moment vector*
+$$
+\bar{\bm{g}}_n(\bbeta) \equiv \frac{1}{n}\bZ^\top(\by - \bX\bbeta)
+= \frac{1}{n}\sum_{i=1}^n \bm{z}_i\big(y_i - \bm{x}_i^\top\bbeta\big).
+$$
+By the weak law of large numbers, $\bar{\bm g}_n(\bbeta_0) \xrightarrow{p}
+\E[\bm z_i\varepsilon_i(\bbeta_0)] = \bm 0$, but for $L>K$ there is in general
+no $\bbeta$ that sets $\bar{\bm g}_n(\bbeta)$ *exactly* to zero in a given
+sample: the $L$ sample moment conditions are $L$ equations in only $K$
+unknowns. GMM resolves this by choosing $\bbeta$ to make the sample moments
+as close to zero as possible, in a quadratic metric.
+
+## The GMM Objective Function and the Closed-Form Estimator
+
+For a symmetric, positive definite weighting matrix $\bm{W}_n$, the GMM
+estimator is
+\begin{equation}
+\hat{\bbeta}(\bm{W}_n) = \arg\min_{\bbeta}\; Q_n(\bbeta), \qquad
+Q_n(\bbeta) \equiv \bar{\bm g}_n(\bbeta)^\top \bm{W}_n\, \bar{\bm g}_n(\bbeta).
+\end{equation}
+Because the model is linear, $Q_n$ is an exact quadratic form in $\bbeta$ and
+(2) has a closed-form solution. Writing $\bar{\bm g}_n(\bbeta) =
+\tfrac1n\bZ^\top\by - \tfrac1n\bZ^\top\bX\bbeta$, the first-order condition
+$\partial Q_n/\partial\bbeta = -\tfrac2n \bX^\top\bZ\,\bm W_n\,
+\bar{\bm g}_n(\bbeta) = \bm 0$ gives
+$$
+\bX^\top\bZ\,\bm{W}_n\,\bZ^\top\bX\,\hat{\bbeta}(\bm W_n)
+= \bX^\top\bZ\,\bm{W}_n\,\bZ^\top\by,
+$$
+so that, whenever $\bX^\top\bZ\,\bm W_n\,\bZ^\top\bX$ is invertible,
+\begin{equation}
+\hat{\bbeta}(\bm W_n) = \big(\bX^\top\bZ\,\bm{W}_n\,\bZ^\top\bX\big)^{-1}
+\bX^\top\bZ\,\bm{W}_n\,\bZ^\top\by.
+\end{equation}
+Two familiar estimators are special cases of (3): $\bm W_n = \bm I_L$ gives
+unweighted GMM, and $\bm W_n = (\bZ^\top\bZ/n)^{-1}$ gives numerically the
+2SLS estimator. Neither is asymptotically efficient in general; Section 2.5
+derives the weighting matrix that is.
+
+## Consistency
+
+\begin{assumption}[Identification and Regularity]
+\leavevmode
+\begin{enumerate}
+\item \textbf{(Correct specification)} $\E[\bm z_i\varepsilon_i(\bbeta)] = \bm 0$
+   holds if and only if $\bbeta=\bbeta_0$, for $\bbeta_0$ in the interior of
+   a compact parameter space.
+\item \textbf{(Rank condition)} $\bm G \equiv \E[\bm z_i\bm x_i^\top]$ has full
+   column rank $K$ (in particular $L\geq K$).
+\item \textbf{(Weighting matrix)} $\bm W_n \xrightarrow{p} \bm W$, a finite,
+   symmetric, positive definite $L\times L$ matrix.
+\item \textbf{(Moments)} $\E\|\bm z_i\bm x_i^\top\| < \infty$ and
+   $\E\|\bm z_i y_i\| < \infty$.
+\end{enumerate}
+\end{assumption}
+
+\begin{proposition}[Consistency of Linear GMM]
+Under Assumption 1,
+$\hat{\bbeta}(\bm W_n) \xrightarrow{p} \bbeta_0$.
+\end{proposition}
+
+\begin{proof}
+Substituting $y_i = \bm x_i^\top\bbeta_0+\varepsilon_i$ into
+$\bar{\bm g}_n(\bbeta_0) = \tfrac1n\bZ^\top\beps$ and writing
+$\hat{\bm G}_n \equiv \tfrac1n\bZ^\top\bX$, the closed form (3) rearranges to
+\begin{equation}
+\hat{\bbeta}(\bm W_n) - \bbeta_0
+= \big(\hat{\bm G}_n^\top \bm W_n \hat{\bm G}_n\big)^{-1}
+  \hat{\bm G}_n^\top \bm W_n\, \bar{\bm g}_n(\bbeta_0).
+\end{equation}
+By the weak law of large numbers, $\hat{\bm G}_n \xrightarrow{p} \bm G$ and
+$\bar{\bm g}_n(\bbeta_0)\xrightarrow{p}\E[\bm z_i\varepsilon_i(\bbeta_0)] =
+\bm 0$ by Assumption 1.1. Combined with $\bm W_n\xrightarrow{p}\bm W$ and the
+continuous-mapping theorem, $\bm G^\top\bm W\bm G$ is invertible by
+Assumption 1.2--1.3 (full column rank $\bm G$ and positive definite $\bm W$
+imply $\bm G^\top\bm W\bm G$ is positive definite, hence invertible), so the
+right-hand side of (4) converges in probability to
+$(\bm G^\top\bm W\bm G)^{-1}\bm G^\top\bm W\cdot\bm 0=\bm 0$. $\blacksquare$
+\end{proof}
+
+Two features of this argument are worth flagging because the simulation is
+built around them. First, consistency holds for *every* positive definite
+limiting weight $\bm W$ -- the one-step and two-step estimators of Section
+2.5 are both consistent, so any efficiency difference between them is a
+finite-sample or asymptotic-variance phenomenon, not a difference in the
+target they estimate. Second, the proof uses only a law of large numbers; no
+distributional assumption on $\varepsilon_i$, and in particular no
+homoskedasticity, is needed.
+
+## Asymptotic Normality
+
+\begin{assumption}[Central Limit Theorem for the Moments]
+In addition to Assumption 1,
+$\bm S \equiv \Var\big(\bm z_i\varepsilon_i(\bbeta_0)\big) =
+\E[\bm z_i\bm z_i^\top\varepsilon_i^2]$ is finite and positive definite, and
+$$
+\sqrt n\,\bar{\bm g}_n(\bbeta_0) = \frac{1}{\sqrt n}\bZ^\top\beps
+\xrightarrow{d} N(\bm 0, \bm S).
+$$
+\end{assumption}
+
+Assumption 2 allows $\varepsilon_i$ to be conditionally heteroskedastic --
+$\E[\varepsilon_i^2\mid \bm z_i]$ need not be constant -- which is exactly the
+feature built into the Monte Carlo design below, and is why $\bm S$ is
+written as $\E[\bm z_i\bm z_i^\top\varepsilon_i^2]$ rather than
+$\sigma^2\E[\bm z_i\bm z_i^\top]$.
+
+\begin{proposition}[Asymptotic Normality of Linear GMM]
+Under Assumptions 1--2,
+\begin{equation}
+\sqrt n\big(\hat{\bbeta}(\bm W_n) - \bbeta_0\big) \xrightarrow{d}
+N\Big(\bm 0,\; \bm V(\bm W)\Big), \qquad
+\bm V(\bm W) = (\bm G^\top\bm W\bm G)^{-1}\bm G^\top\bm W\bm S\bm W\bm G(\bm G^\top\bm W\bm G)^{-1}.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Multiply (4) by $\sqrt n$:
+$$
+\sqrt n\big(\hat{\bbeta}(\bm W_n)-\bbeta_0\big)
+= \big(\hat{\bm G}_n^\top\bm W_n\hat{\bm G}_n\big)^{-1}
+  \hat{\bm G}_n^\top\bm W_n\;\sqrt n\,\bar{\bm g}_n(\bbeta_0).
+$$
+By Assumption 2, $\sqrt n\,\bar{\bm g}_n(\bbeta_0)\xrightarrow{d}N(\bm0,\bm
+S)$; by Assumption 1, $\hat{\bm G}_n\xrightarrow{p}\bm G$ and $\bm
+W_n\xrightarrow{p}\bm W$. Slutsky's theorem applied to the product of the
+(stochastically bounded, converging-in-probability) matrix
+$(\hat{\bm G}_n^\top\bm W_n\hat{\bm G}_n)^{-1}\hat{\bm G}_n^\top\bm W_n$ and
+the asymptotically normal vector $\sqrt n\,\bar{\bm g}_n(\bbeta_0)$ gives
+$$
+\sqrt n\big(\hat{\bbeta}(\bm W_n)-\bbeta_0\big) \xrightarrow{d}
+(\bm G^\top\bm W\bm G)^{-1}\bm G^\top\bm W\,\bm u, \qquad \bm u\sim N(\bm0,\bm S),
+$$
+and the variance of a linear transformation $\bm A\bm u$ of $\bm u\sim
+N(\bm0,\bm S)$ is $\bm A\bm S\bm A^\top$, which for $\bm A =
+(\bm G^\top\bm W\bm G)^{-1}\bm G^\top\bm W$ gives exactly (5).
+$\blacksquare$
+\end{proof}
+
+In a finite sample, (5) is implemented by plugging in consistent estimators
+$\hat{\bm G}_n=\tfrac1n\bZ^\top\bX$, $\hat{\bm S}_n$ (Section 2.5), and $\bm
+W_n$, giving the *sandwich* variance estimator
+\begin{equation}
+\widehat{\Var}\big(\hat{\bbeta}(\bm W_n)\big)
+= \frac1n\big(\hat{\bm G}_n^\top\bm W_n\hat{\bm G}_n\big)^{-1}
+  \hat{\bm G}_n^\top\bm W_n\hat{\bm S}_n\bm W_n\hat{\bm G}_n
+  \big(\hat{\bm G}_n^\top\bm W_n\hat{\bm G}_n\big)^{-1}.
+\end{equation}
+This is the standard-error formula used for both estimators in the
+simulation; it collapses to a simpler expression for the efficient estimator
+below.
+
+## Efficient GMM and the Two-Step Estimator
+
+Equation (5) shows that the asymptotic variance depends on the choice of
+$\bm W$. @Hansen2022's classical result identifies the efficient choice.
+
+\begin{proposition}[GMM Efficiency Bound]
+Among all weighting matrices $\bm W$ satisfying
+Assumption 1.3, $\bm V(\bm W) - \bm V(\bm S^{-1})$ is positive semi-definite
+for every $\bm W$, so $\bm W = \bm S^{-1}$ minimizes the asymptotic variance
+(5) in the positive semi-definite ordering, and
+\begin{equation}
+\bm V(\bm S^{-1}) = (\bm G^\top\bm S^{-1}\bm G)^{-1}.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Substituting $\bm W=\bm S^{-1}$ into (5) gives $\bm V(\bm S^{-1}) =
+(\bm G^\top\bm S^{-1}\bm G)^{-1}\bm G^\top\bm S^{-1}\bm S\bm S^{-1}\bm G(\bm
+G^\top\bm S^{-1}\bm G)^{-1} = (\bm G^\top\bm S^{-1}\bm G)^{-1}$, which is (7).
+For optimality, let $\bm S^{1/2}$ be a symmetric square root of $\bm S$ and
+define $\bm A \equiv (\bm G^\top\bm W\bm G)^{-1}\bm G^\top\bm W\bm S^{1/2}$
+and $\bm B \equiv (\bm G^\top\bm S^{-1}\bm G)^{-1}\bm G^\top\bm S^{-1/2}$, so
+that $\bm V(\bm W)=\bm A\bm A^\top$ and $\bm V(\bm S^{-1})=\bm B\bm B^\top$.
+Direct multiplication using $\bm S^{-1/2}\bm S^{1/2}=\bm I_L$ verifies
+$\bm B\bm A^\top = \bm B\bm B^\top$, i.e. $(\bm A-\bm B)\bm B^\top = \bm 0$,
+so $\bm A\bm A^\top = \bm B\bm B^\top + (\bm A-\bm B)(\bm A-\bm B)^\top$, and
+$(\bm A-\bm B)(\bm A-\bm B)^\top$ is positive semi-definite. Hence $\bm
+V(\bm W) - \bm V(\bm S^{-1}) = (\bm A-\bm B)(\bm A-\bm B)^\top \succeq \bm
+0$. $\blacksquare$
+\end{proof}
+
+The efficiency bound (7) is attractive but infeasible: $\bm S$ is unknown.
+The standard solution is **two-step efficient GMM**:
+
+1. **Step 1.** Choose any consistent, feasible weighting matrix -- in this
+   handout, $\bm W_n^{(1)} = (\bZ^\top\bZ/n)^{-1}$, which makes
+   $\hat{\bbeta}^{(1)} \equiv \hat{\bbeta}(\bm W_n^{(1)})$ numerically equal to
+   the 2SLS estimator. By Proposition 1, $\hat{\bbeta}^{(1)}$ is consistent
+   even though $\bm W_n^{(1)}$ is generally *not* efficient.
+2. **Estimate $\bm S$.** Using the step-1 residuals $\hat\varepsilon_i^{(1)}
+   = y_i - \bm x_i^\top\hat{\bbeta}^{(1)}$, form the heteroskedasticity-robust
+   estimator
+   $$
+   \hat{\bm S}_n = \frac1n\sum_{i=1}^n \bm z_i\bm z_i^\top
+   \big(\hat\varepsilon_i^{(1)}\big)^2 \xrightarrow{p} \bm S,
+   $$
+   which is consistent for $\bm S$ under Assumption 2 regardless of the
+   form of the conditional heteroskedasticity [@White2000].
+3. **Step 2.** Set $\bm W_n^{(2)} = \hat{\bm S}_n^{-1}$ and compute
+   $\hat{\bbeta}^{(2)} \equiv \hat{\bbeta}(\bm W_n^{(2)})$.
+
+Because $\bm W_n^{(2)}\xrightarrow{p}\bm S^{-1}$, Proposition 3 applies with
+$\bm W=\bm S^{-1}$, so $\sqrt n(\hat{\bbeta}^{(2)}-\bbeta_0)\xrightarrow{d}
+N\big(\bm0,(\bm G^\top\bm S^{-1}\bm G)^{-1}\big)$, and the sandwich formula
+(6) collapses to
+\begin{equation}
+\widehat{\Var}\big(\hat{\bbeta}^{(2)}\big)
+= \frac1n\big(\hat{\bm G}_n^\top\hat{\bm S}_n^{-1}\hat{\bm G}_n\big)^{-1}.
+\end{equation}
+This is the estimator the simulation calls the "two-step efficient GMM"
+estimator, and (8) is the variance used for its confidence intervals.
+
+## Testing Overidentifying Restrictions
+
+When $L>K$, correct specification (Assumption 1.1) is testable: it implies
+$\bar{\bm g}_n(\hat{\bbeta}^{(2)})$ should be close to zero even though nothing
+in the estimation *forces* all $L$ sample moments to vanish. Hansen's $J$
+statistic formalizes "close to zero."
+
+\begin{proposition}[Hansen's $J$ Test]
+Under Assumptions 1--2 and correct specification,
+$$
+J_n \equiv n\,\bar{\bm g}_n(\hat{\bbeta}^{(2)})^\top \hat{\bm S}_n^{-1}
+\bar{\bm g}_n(\hat{\bbeta}^{(2)}) \xrightarrow{d} \chi^2(L-K).
+$$
+\end{proposition}
+
+\begin{proof}
+A first-order Taylor expansion of $\sqrt n\bar{\bm g}_n(\hat{\bbeta}^{(2)})$
+around $\bbeta_0$, combined with the first-order condition defining
+$\hat{\bbeta}^{(2)}$, gives
+$$
+\sqrt n\,\bar{\bm g}_n(\hat{\bbeta}^{(2)})
+= \Big[\bm I_L - \bm G(\bm G^\top\bm S^{-1}\bm G)^{-1}\bm G^\top\bm
+S^{-1}\Big]\sqrt n\,\bar{\bm g}_n(\bbeta_0) + o_p(1).
+$$
+Premultiplying by $\bm S^{-1/2}$ and writing $\bm u \equiv \bm
+S^{-1/2}\sqrt n\,\bar{\bm g}_n(\bbeta_0) \xrightarrow{d} N(\bm 0,\bm I_L)$
+(Assumption 2) and $\bm P \equiv \bm S^{-1/2}\bm G(\bm G^\top\bm S^{-1}\bm
+G)^{-1}\bm G^\top\bm S^{-1/2}$, this is
+$$
+\bm S^{-1/2}\sqrt n\,\bar{\bm g}_n(\hat{\bbeta}^{(2)}) = (\bm I_L-\bm P)\,\bm u + o_p(1).
+$$
+$\bm P$ is idempotent ($\bm P^2=\bm P$, by direct multiplication) and
+symmetric, with $\mathrm{rank}(\bm P) = \mathrm{tr}(\bm P) =
+\mathrm{tr}\big((\bm G^\top\bm S^{-1}\bm G)^{-1}\bm G^\top\bm S^{-1}\bm
+G\big) = \mathrm{tr}(\bm I_K) = K$, so $\bm I_L-\bm P$ is itself an
+idempotent projection of rank $L-K$. Since $J_n \xrightarrow{d} \bm
+u^\top(\bm I_L-\bm P)\bm u$ and $\bm u\sim N(\bm0,\bm I_L)$, this is the
+quadratic form of a standard normal vector in an idempotent matrix of rank
+$L-K$, which is $\chi^2(L-K)$ by the standard result for quadratic forms in
+normal vectors. $\blacksquare$
+\end{proof}
+
+With one endogenous regressor and two excluded instruments (Section 3), the
+design below has $L=3$, $K=2$, and a single overidentifying restriction, so
+$J_n\xrightarrow{d}\chi^2(1)$ under correct specification.
+
+## Finite-Sample Properties: What Asymptotic Theory Does Not Guarantee
+
+Propositions 1--4 are exact statements about limits as $n\to\infty$; none of
+them bounds how large $n$ must be in practice, and each can fail badly in a
+finite sample that its own asymptotic approximation does not warn against.
+Three caveats motivate the simulation design in Section 3:
+
+1. **GMM estimators are, in general, biased in finite samples**, even though
+   they are consistent. Unlike OLS under the classical Gauss--Markov
+   assumptions, $\E[\hat{\bbeta}(\bm W_n)]\neq\bbeta_0$ at any fixed $n$ for
+   the linear IV/GMM estimator, because $\hat{\bbeta}(\bm W_n)$ is a nonlinear
+   (ratio-like) function of the sample moments even though the *population*
+   moment condition is linear in $\bbeta$; the bias is $O(1/n)$ under
+   standard regularity conditions and shrinks as identification strengthens
+   [@Hall2005, ch.\ 3; @Hayashi2000, sec.\ 3.4].
+2. **Two-step efficient GMM introduces an extra source of finite-sample
+   noise**: $\hat{\bm S}_n$ in Section 2.5 is itself estimated, using
+   step-1 residuals, and that estimation error propagates into
+   $\hat{\bbeta}^{(2)}$. In sufficiently small samples, or with many
+   overidentifying moments, this can erode or even reverse the asymptotic
+   efficiency ranking of Proposition 3 relative to a well-chosen one-step
+   estimator -- a concern that motivates alternatives such as
+   continuously-updated GMM [@Hall2005, ch.\ 4].
+3. **Weak or many instruments distort both estimation and inference.** When
+   $\bm G$ is close to reduced rank (weak identification) the finite-sample
+   distribution of $\hat{\bbeta}(\bm W_n)$ can be far from normal and biased
+   toward the OLS estimator's plim, and the sandwich standard errors (6)
+   and (8) can be badly miscalibrated even at moderate $n$
+   [@ChausseIV2025].
+
+The design in Section 3 deliberately avoids weak identification (caveat 3)
+so that the simulation isolates caveats 1--2 -- ordinary finite-sample bias
+and the cost of estimating the optimal weighting matrix -- against the
+backdrop of Propositions 1--4.
+
+# Monte Carlo Design
+
+## Data-Generating Process
+
+The design has one endogenous regressor and two excluded, exogenous
+instruments, so $L=3$ instruments ($1,z_{1i},z_{2i}$) and $K=2$ regressors
+($1,x_{2i}$): one overidentifying restriction. For each replication:
+$$
+z_{1i}, z_{2i} \overset{\text{iid}}{\sim} N(0,1), \qquad
+u_i, w_i \overset{\text{iid}}{\sim} N(0,1), \quad
+u_i, w_i \perp z_{1i}, z_{2i},
+$$
+$$
+x_{2i} = \pi_0 + \pi_1 z_{1i} + \pi_2 z_{2i} + u_i, \qquad
+e_i = \rho\, u_i + \sqrt{1-\rho^2}\, w_i, \qquad
+\varepsilon_i = \sqrt{0.5+z_{1i}^2}\; e_i,
+$$
+$$
+y_i = \beta_1 + \beta_2\, x_{2i} + \varepsilon_i.
+$$
+The first-stage error $u_i$ enters both $x_{2i}$ and (through $e_i$) the
+structural error $\varepsilon_i$, so $x_{2i}$ is endogenous with
+$\mathrm{Corr}(u_i, e_i) = \rho$; the parametrization $e_i = \rho u_i +
+\sqrt{1-\rho^2}w_i$ with $u_i,w_i$ independent standard normal makes this
+exact regardless of $\rho\in(-1,1)$. The multiplicative factor
+$\sqrt{0.5+z_{1i}^2}$ makes $\Var(\varepsilon_i\mid z_{1i},z_{2i}) =
+0.5+z_{1i}^2$ depend on the instrument $z_{1i}$: the errors are
+conditionally heteroskedastic, so $\bm S=\E[\bm z_i\bm
+z_i^\top\varepsilon_i^2]\neq\sigma^2\E[\bm z_i\bm z_i^\top]$ and the one-step
+(2SLS-weighted) and two-step efficient GMM estimators of Section 2.5 have
+genuinely different asymptotic variances -- without heteroskedasticity the
+two would coincide asymptotically and the comparison in Section 4.1 would be
+uninformative.
+
+Parameter values, held fixed across all replications and sample sizes:
+$$
+(\beta_1,\beta_2) = (`r beta_true[["intercept"]]`, `r beta_true[["slope"]]`),
+\qquad
+(\pi_0,\pi_1,\pi_2) = (`r pi_coef[1]`, `r pi_coef[2]`, `r pi_coef[3]`),
+\qquad \rho = `r rho`.
+$$
+The instruments are relevant ($\pi_1=\pi_2=1$, not weak) and the
+endogeneity is moderate ($\rho=`r rho`$), consistent with the decision in
+Section 2.6 to isolate ordinary finite-sample bias and weighting-matrix
+estimation error rather than weak-instrument pathologies.
+
+## Estimators Compared
+
+For each simulated sample, two estimators are computed from the identical
+data, exactly as in Section 2.5:
+
+- **One-step GMM** ($\hat\beta^{(1)}$): $\bm W_n^{(1)} = (\bZ^\top\bZ/n)^{-1}$,
+  numerically identical to 2SLS, with sandwich standard errors from (6).
+- **Two-step efficient GMM** ($\hat\beta^{(2)}$): $\bm W_n^{(2)} =
+  \hat{\bm S}_n^{-1}$, with $\hat{\bm S}_n$ the heteroskedasticity-robust
+  estimator built from the $\hat\beta^{(1)}$ residuals, and standard errors
+  from the simplified formula (8).
+
+Both estimators are consistent for $\bbeta_0$ by Proposition 1; only their
+asymptotic (and finite-sample) variance should differ. Hansen's $J$
+statistic of Section 2.6 is computed at $\hat\beta^{(2)}$ using $\bm
+W_n^{(2)}$, with $L-K=1$ degree of freedom.
+
+## Simulation Parameters and Reported Statistics
+
+The sample size grid is $n\in\{`r paste(n_grid, collapse=", ")`\}$, with
+$N_{sim}=`r Nsim`$ independent replications drawn at each $n$ (seed fixed at
+the start of the experiment for reproducibility). All reported quantities
+concern the slope $\beta_2$, the coefficient on the endogenous regressor;
+the intercept behaves analogously and is omitted. At each $n$ the script
+`gmm_finite_sample_asymptotic_sim.R` computes, across the $N_{sim}$
+replications:
+
+- **Bias** and **variance** of $\hat\beta_2^{(1)}$ and $\hat\beta_2^{(2)}$
+  around the true $\beta_2$ (Section 4.1: consistency and efficiency);
+- **RMSE** of both estimators;
+- **Coverage** of the nominal 95\% confidence interval
+  $\hat\beta_2 \pm 1.96\times\widehat{\mathrm{se}}(\hat\beta_2)$, using the
+  sandwich standard errors of (6) and (8) (Section 4.3);
+- The rejection frequency of Hansen's $J_n$ statistic at the nominal 5\%
+  level against $\chi^2(1)$ (Section 4.4).
+
+In addition, at a small sample size ($n=`r n_small`$) and a large one
+($n=`r n_large`$), the script retains every replication's studentized
+statistic $(\hat\beta_2^{(2)}-\beta_2)/\widehat{\mathrm{se}}(\hat\beta_2^{(2)})$,
+which Proposition 2 predicts converges to $N(0,1)$, to visualize how close
+that limit is at each $n$ (Section 4.2).
+
+# Results
+
+## Consistency and Efficiency
+
+@fig-bias plots Monte Carlo bias against $n$ (log scale) for both
+estimators. Both are visually indistinguishable from zero once $n$ reaches a
+few hundred, and neither series shows a systematic sign or trend as $n$
+grows further -- exactly what Proposition 1 predicts, since both weighting
+matrices satisfy Assumption 1.3 regardless of their efficiency. At the
+smallest sample size, $n=`r n_grid[1]`$, the one-step estimator has bias
+`r bias_of(n_grid[1], "1step")` and the two-step estimator
+`r bias_of(n_grid[1], "2step")`; by $n=`r n_grid[length(n_grid)]`$ both have
+shrunk an order of magnitude further, to
+`r bias_of(n_grid[length(n_grid)], "1step")` and
+`r bias_of(n_grid[length(n_grid)], "2step")` respectively -- consistent
+with the $O(1/n)$ finite-sample bias flagged in Section 2.7, caveat 1, which
+predicts bias shrinking in proportion to $n$, faster than the
+$O(1/\sqrt n)$ rate of the standard error itself.
+
+```{r fig-bias}
+#| label: fig-bias
+#| fig-cap: "Monte Carlo bias of the one-step (2SLS-weighted) and two-step efficient GMM slope estimators, by sample size."
+#| fig-width: 5.6
+#| fig-height: 3.8
+p_bias
+```
+
+@fig-variance plots Monte Carlo variance against $n$ on a log-log scale.
+Two features match Section 2 exactly. First, both curves are close to a
+straight line of slope $-1$, the $O(1/n)$ rate implied by (5)/(7) (variance
+$\approx \bm V/n$ for fixed asymptotic $\bm V$). Second, the two-step
+efficient estimator's variance lies *below* the one-step estimator's at
+**every** sample size in the grid -- the efficiency ranking of Proposition 3
+is not just an asymptotic statement here but holds throughout the range
+simulated. The efficiency gain,
+$1-\widehat{\Var}(\hat\beta^{(2)})/\widehat{\Var}(\hat\beta^{(1)})$, is
+`r efficiency_gain_of(n_grid[1])` at $n=`r n_grid[1]`$ and
+`r efficiency_gain_of(n_grid[length(n_grid)])` at
+$n=`r n_grid[length(n_grid)]`$: the efficient estimator's advantage, driven
+by the conditional heteroskedasticity built into the design (Section 3.1),
+is present even in small samples and if anything widens as $n$ grows and
+$\hat{\bm S}_n$ is estimated more precisely.
+
+```{r fig-variance}
+#| label: fig-variance
+#| fig-cap: "Monte Carlo variance of the two GMM slope estimators, log-log scale; the two-step efficient estimator (Proposition 3) attains lower variance at every sample size."
+#| fig-width: 5.6
+#| fig-height: 3.8
+p_var
+```
+
+## Asymptotic Normality
+
+Proposition 2 predicts that the studentized statistic
+$(\hat\beta_2^{(2)}-\beta_2)/\widehat{\mathrm{se}}(\hat\beta_2^{(2)})$ is
+approximately $N(0,1)$, with the approximation improving as $n\to\infty$.
+@fig-density overlays the Monte Carlo density of this statistic against the
+$N(0,1)$ density at $n=`r n_small`$ and $n=`r n_large`$, and @fig-qq shows
+the corresponding QQ-plots against theoretical normal quantiles. At
+$n=`r n_small`$ the histogram is visibly heavier in the centre and the
+QQ-plot bows away from the 45-degree line in the tails -- a finite-sample
+departure from normality consistent with the $O(1/n)$ bias and imperfectly
+estimated $\hat{\bm S}_n$ discussed in Section 2.7. At $n=`r n_large`$ both
+diagnostics track the normal reference closely, illustrating Proposition 2's
+limit being approached, not merely asserted.
+
+```{r fig-density}
+#| label: fig-density
+#| fig-cap: "Density of the studentized two-step GMM slope estimator at a small and a large sample size, against its N(0,1) asymptotic limit."
+#| fig-width: 6.0
+#| fig-height: 3.4
+p_density
+```
+
+```{r fig-qq}
+#| label: fig-qq
+#| fig-cap: "QQ-plot of the studentized two-step GMM slope estimator against theoretical normal quantiles."
+#| fig-width: 6.0
+#| fig-height: 3.4
+p_qq
+```
+
+## Coverage of Confidence Intervals
+
+@fig-coverage plots the empirical coverage of the nominal 95\% confidence
+interval, built from the sandwich standard errors (6) and (8), against $n$.
+At $n=`r n_grid[1]`$ coverage is `r cov_of(n_grid[1], "1step")` for the
+one-step estimator and `r cov_of(n_grid[1], "2step")` for the two-step
+estimator -- both below the nominal 95\%, the direct consequence of the
+finite-sample bias and non-normality documented in Sections 4.1--4.2 feeding
+into an interval that assumes exact normality and a correctly centred
+point estimate. Coverage rises toward the nominal level as $n$ grows,
+reaching `r cov_of(n_grid[length(n_grid)], "1step")` and
+`r cov_of(n_grid[length(n_grid)], "2step")` respectively at
+$n=`r n_grid[length(n_grid)]`$, consistent with Proposition 2. This is the
+practical stakes of Section 2.7: a researcher quoting a 95\% CI from GMM
+estimated on a few dozen observations is, in this design, actually covering
+the true slope somewhat less often than the label promises.
+
+```{r fig-coverage}
+#| label: fig-coverage
+#| fig-cap: "Empirical coverage of the nominal 95% confidence interval for the GMM slope estimators, using the sandwich standard errors of equations (6) and (8)."
+#| fig-width: 5.6
+#| fig-height: 3.8
+p_coverage
+```
+
+## Size of the Overidentification Test
+
+@fig-jtest plots the rejection frequency of Hansen's $J_n$ statistic at the
+nominal 5\% level against $\chi^2(1)$, as a function of $n$. Because the
+model is correctly specified at every $n$ (the same DGP generates the data
+used to estimate and to test it), Proposition 4 predicts a rejection
+frequency of exactly 5\% in the limit; this is a test of **size**, not
+power. The rejection frequency is `r jrej_of(n_grid[1])` at
+$n=`r n_grid[1]`$ and settles near the nominal `r pc(alpha)` for
+$n\geq250$, confirming that the $\chi^2(1)$ approximation of Proposition 4
+is reliable well before the sample sizes at which the coverage results of
+Section 4.3 fully converge -- the $J$ test's asymptotic approximation kicks
+in faster here than the confidence-interval coverage does, because the $J$
+statistic depends on $\hat{\bm S}_n$ only through its role in weighting,
+whereas coverage also depends on the point estimate's own finite-sample
+bias.
+
+```{r fig-jtest}
+#| label: fig-jtest
+#| fig-cap: "Rejection frequency of Hansen's J overidentification test (df = 1) at the nominal 5% level, under correct specification."
+#| fig-width: 5.6
+#| fig-height: 3.8
+p_jtest
+```
+
+## Summary Table
+
+@tbl-summary collects all of the reported statistics by sample size.
+
+```{r tbl-summary}
+#| label: tbl-summary
+#| tbl-cap: !expr paste0("Monte Carlo bias, variance, RMSE, 95% CI coverage, and J-test rejection frequency of the one-step and two-step GMM slope estimators (N_sim = ", Nsim, " replications per row).")
+display_tbl <- data.frame(
+  n = summary_table$n,
+  Bias1 = summary_table$bias_1step,
+  Bias2 = summary_table$bias_2step,
+  Var1 = summary_table$var_1step,
+  Var2 = summary_table$var_2step,
+  RMSE1 = summary_table$rmse_1step,
+  RMSE2 = summary_table$rmse_2step
+)
+colnames(display_tbl) <- c("$n$", "Bias (1-step)", "Bias (2-step)",
+                           "Var (1-step)", "Var (2-step)",
+                           "RMSE (1-step)", "RMSE (2-step)")
+knitr::kable(display_tbl, digits = c(0, 4, 4, 5, 5, 4, 4),
+            booktabs = TRUE, align = c("r", rep("c", 6)))
+```
+
+```{r tbl-inference}
+#| label: tbl-inference
+#| tbl-cap: "Coverage of the nominal 95% confidence interval and rejection frequency of Hansen's J test, by sample size."
+display_tbl2 <- data.frame(
+  n = summary_table$n,
+  Cov1 = summary_table$coverage_1step,
+  Cov2 = summary_table$coverage_2step,
+  Jrej = summary_table$J_rejection
+)
+colnames(display_tbl2) <- c("$n$", "Coverage (1-step)", "Coverage (2-step)",
+                            "J-test rejection")
+knitr::kable(display_tbl2, digits = c(0, 3, 3, 3),
+            booktabs = TRUE, align = c("r", "c", "c", "c"))
+```
+
+# Discussion and Conclusion
+
+The theory of Section 2 and the simulation of Sections 3--4 tell the same
+story from two directions. Propositions 1--4 are exact limiting results, and
+the Monte Carlo evidence confirms every one of them is eventually a very
+good approximation: bias and variance shrink toward zero, the two-step
+estimator dominates the one-step estimator in variance exactly as the
+efficiency bound (7) predicts, the studentized estimator's distribution
+converges visibly to standard normal, confidence-interval coverage
+approaches its nominal level, and the $J$ test is correctly sized. None of
+this is automatic at the sample sizes an applied researcher actually has:
+at $n=`r n_grid[1]`$, coverage is several percentage points below nominal
+for both estimators, and the studentized distribution is visibly non-normal,
+even though the design avoids the weak-instrument pathologies that make
+GMM/IV inference unreliable for reasons unrelated to sample size (Section
+2.7, caveat 3). The practical implication is not that GMM inference is
+unreliable in general, but that the gap between "consistent and
+asymptotically normal" and "trustworthy at my sample size" has to be
+checked, not assumed -- exactly the exercise this handout carries out.
+
+The companion script, `scripts/gmm_finite_sample_asymptotic_sim.R`, is the
+single computational source for every number and figure in this handout: it
+implements the closed-form estimator (3), the sandwich variances (6) and
+(8), and Hansen's $J$ statistic exactly as derived in Section 2, and can be
+re-run (`Rscript scripts/gmm_finite_sample_asymptotic_sim.R`) to reproduce
+every result reported here, or edited to explore other sample-size grids,
+degrees of heteroskedasticity, or instrument strength.
+
+# References

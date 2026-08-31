@@ -283,7 +283,7 @@ normal_density <- data.frame(z = seq(-4, 4, length.out = 400))
 normal_density$density <- dnorm(normal_density$z)
 
 p_density <- ggplot(normality_data, aes(z)) +
-  geom_histogram(aes(y = after_stat(density)), bins = 40,
+  geom_histogram(aes(y = ggplot2::after_stat(density)), bins = 40,
                  fill = "grey80", colour = "white") +
   geom_line(data = normal_density, aes(z, density),
             colour = "#EE6677", linewidth = 0.7) +
